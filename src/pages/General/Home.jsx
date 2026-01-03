@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Users, Briefcase, UserCheck, ShieldCheck } from "lucide-react";
 import CompactCalendar from "../../components/Calendar/CompactCalendar";
 import Typewriter from "typewriter-effect";
-import ExampleModalUsage from "../ExampleModalUsage";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
@@ -129,49 +128,6 @@ const [openPending, setOpenPending] = useState(false);
     </div>
   </div>
 )}
-
-      {/* ================= KPI STATS ================= */}
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard title="Total Admins" value="8" icon={ShieldCheck} />
-        <StatCard title="Total Associates" value="424" icon={Users} />
-        <StatCard title="Total Projects" value="324" icon={Briefcase} />
-        <StatCard title="Team Leads" value="56" icon={UserCheck} />
-      </div> */}
-      {/* ================= KPI STATS (NEW DESIGN) ================= */}
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <KpiCard
-          title="Total Admins"
-          value="8"
-          subtitle="Active admins"
-          change="+2.1%"
-          icon={ShieldCheck}
-          gradient="from-purple-400 to-indigo-400"
-        />
-        <KpiCard
-          title="Total Associates"
-          value="424"
-          subtitle="Last 7 days"
-          change="+3.2%"
-          icon={Users}
-          gradient="from-blue-300 to-cyan-400"
-        />
-        <KpiCard
-          title="Total Projects"
-          value="324"
-          subtitle="Ongoing"
-          change="+1.4%"
-          icon={Briefcase}
-          gradient="from-orange-300 to-amber-400"
-        />
-        <KpiCard
-          title="Team Leads"
-          value="56"
-          subtitle="Active"
-          change="+0.9%"
-          icon={UserCheck}
-          gradient="from-emerald-300 to-teal-300"
-        />
-      </div> */}
       {/* ================= KPI STATS (MINIMAL) ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
@@ -192,28 +148,6 @@ const [openPending, setOpenPending] = useState(false);
         <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
         <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
       </div>
-
-      {/* ================= QUICK ACCESS ================= */}
-      {/* <div className="flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible">
-        {cards.map((card) => (
-          <div
-            key={card.title}
-            onClick={() => navigate(card.path)}
-            className="min-w-[200px] bg-slate-200/70 hover:bg-slate-300/70 transition rounded-lg p-3 cursor-pointer flex flex-col justify-between"
-          >
-            <h3 className="text-sm font-semibold text-blue-700">
-              {card.title}
-            </h3>
-
-            <div className="flex justify-between items-end mt-4">
-              <img src={card.image} alt={card.title} className="h-14" />
-              <div className="h-7 w-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm">
-                →
-              </div>
-            </div>
-          </div>
-        ))}
-      </div> */}
 
       {/* ================= QUICK ACCESS ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -269,7 +203,7 @@ const [openPending, setOpenPending] = useState(false);
 
       {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Calendar */}
+        {/* Plot Bookings */}
         <CompactCalendar />
 
         {/* SALES OVERVIEW */}
@@ -389,40 +323,31 @@ function MinimalKpi({ title, value, icon: Icon }) {
   return (
     <div
       className="
-      bg-white/80
-      border border-slate-200
-      rounded-xl
-      px-4 py-3
-      flex items-center gap-3
-    "
+        bg-white/80
+        border border-slate-200
+        rounded-xl
+        px-4 py-3
+        flex items-center gap-3
+      "
     >
+      {/* Icon */}
       <div className="h-9 w-9 rounded-lg bg-slate-100 flex items-center justify-center">
         <Icon size={18} className="text-slate-600" />
       </div>
 
+      {/* Text */}
       <div>
-        <p className="text-xs text-slate-500">{title}</p>
-        <p className="text-xl font-semibold text-slate-900">{value}</p>
+        <div className="text-xs text-slate-500">
+          {title}
+        </div>
+        <div className="text-xl font-semibold text-slate-900">
+          {value}
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, icon: Icon }) {
-  return (
-    <div className="bg-white/90 border border-slate-200 rounded-lg px-4 py-3 flex items-center gap-4">
-      <div className="p-2.5 rounded-md bg-purple-100 text-purple-600">
-        <Icon size={20} />
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-wide text-slate-500">
-          {title}
-        </p>
-        <p className="text-2xl font-bold text-slate-900">{value}</p>
-      </div>
-    </div>
-  );
-}
 
 function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
   return (

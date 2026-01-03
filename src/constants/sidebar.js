@@ -30,42 +30,150 @@ import {
   BookOpenCheck,
   Baby,
   User,
+  MapPinOffIcon,
+  LandPlotIcon,
+  Landmark,
+  MapPin,
+  Globe,
+  Camera,
 } from "lucide-react";
+import { GiVideoCamera } from "react-icons/gi";
 
 // ==================== ADMIN MENU ====================
 export const adminMenu = [
   {
-    label: "Common",
+    label: "General",
     icon: UserCircle,
     children: [
       {
-        label: "All Students",
-        link: "/students",
-        icon: User,
-        pageTitle: "All Students",
-        subtitle: "Manage and view all student records",
+        label: "Home",
+        link: "/",
+        icon: LayoutDashboard,
+        pageTitle: "Home",
+        // subtitle: "Manage and view all student records",
       },
       {
-        label: "Parents",
-        link: "/students/parents",
+        label: "Profile",
+        link: "/profile",
         icon: Users,
-        pageTitle: "Parents",
-        subtitle: "View and manage parent information",
+        pageTitle: "Profile",
+        subtitle: "View and edit your profile information",
       },
       {
-        label: "Add Student",
-        link: "/students/add",
-        icon: UserPlus,
-        pageTitle: "Student Registration",
-        subtitle: "Complete all steps to register a student",
+        label: "My Team",
+        link: "/myteam",
+        icon: UserCheck,
+        pageTitle: "My Team",
+        subtitle: "Manage your team members",
       },
       {
-        label: "Classes & Sections",
-        link: "/students/classes",
-        icon: BookOpen,
-        pageTitle: "Classes & Sections",
-        subtitle: "Manage class structure and sections",
+        label: "Reports",
+        link: "/reports",
+        icon: BarChart3,
+        pageTitle: "Reports",
+        subtitle: "Generate and view various reports",
+      }
+    ],
+  },
+   {
+    label: "Ventures",
+    icon: Landmark,
+    children: [
+      {
+        label: "Projects",
+        link: "/projects",
+        icon: LayoutDashboard, 
+        pageTitle: "Projects",
+        subtitle: "Manage and view all projects",
       },
+      {
+        label: "Plots",
+        link: "/plots",
+        icon: MapPin,
+        pageTitle: "Plots",
+        subtitle: "Manage and view all plots",
+      }
+    ],
+  },
+   {
+    label: "Administration",
+    icon: User,
+    children: [
+      {
+        label: "Admin",
+        link: "/admin",
+        icon: UserPlus, 
+        pageTitle: "Admin",
+        subtitle: "Administration Dashboard",
+      },
+      {
+        label: "Requests",
+        link: "/requests",
+        icon: LayoutDashboard, 
+        pageTitle: "Requests",
+        subtitle: "Manage and view all requests", 
+      },
+      {
+        label: "Roles",
+        link: "/roles",
+        icon: UserCircle,
+        pageTitle: "Roles",
+        subtitle: "Manage and view all roles",
+      },
+      {
+        label: "Users",
+        link: "/users",
+        icon: Users,
+        pageTitle: "Users",
+        subtitle: "Manage and view all users",
+      }
+    ],
+  },
+  {
+    label: "Media",
+    icon: MessageSquare,
+    children: [
+      {
+        label: "Greetings",
+        link: "/greetings",
+        icon: Smile,
+        pageTitle: "Greetings",
+        subtitle: "Manage and view all greetings",
+      },
+      {
+        label: "News",
+        link: "/news",
+        icon: Globe, 
+        pageTitle: "News",
+        subtitle: "Manage and view all news",
+      },
+      {
+        label: "Videos",
+        link: "/videos",
+        icon: Camera,
+        pageTitle: "Videos",
+        subtitle: "Manage and view all videos",
+      },
+      {
+        label: "Showcases",
+        link: "/showcases",
+        icon: BookOpenCheck,
+        pageTitle: "Showcases",
+        subtitle: "Manage and view all showcases",
+      }
+    ],
+  },
+   {
+    label: "Site Visits",
+    icon: MapPin,
+    children: [
+      {
+        label: "Site Visits",
+        link: "/Sitevisits",
+        icon: LayoutDashboard, 
+        pageTitle: "Site Visits",
+        subtitle: "Manage and view all Site visits", 
+      }
     ],
   },
 ];

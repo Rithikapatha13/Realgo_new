@@ -38,7 +38,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         {!collapsed && (
           <div className="p-2">
             <img
-              src="https://garuda-assets-bucket.s3.amazonaws.com/1719645101265-Grupe.png"
+              src="assets/Logo/Grupe_logo.png"
               alt=""
             />
           </div>

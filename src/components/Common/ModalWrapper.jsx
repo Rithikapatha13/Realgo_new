@@ -46,7 +46,9 @@ export default function ModalWrapper({
 
             {/* Body */}
             <div className="p-5 overflow-auto">
-              {children}
+              {typeof children === "function"
+                ? children(() => setOpen(false))
+                : children}
             </div>
           </div>
         </div>

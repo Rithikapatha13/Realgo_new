@@ -19,7 +19,7 @@ import Notifications from "../pages/Notifications/Notifications";
 
 export const publicRoutes = {
   auth: {
-    basePath: "", // Change from "/" to empty string!
+    basePath: "",
     routes: [{ path: "signup", component: Signup }],
   },
 };
@@ -30,14 +30,14 @@ export const routeConfig = {
     allowedRoles: ["admin", "associate", "superAdmin"],
     routes: [
       { path: "", component: Home },
-      { path: "/profile", component: Profile },
+      { path: "profile", component: Profile },
       { path: "/users", component: Users },
       { path: "/myteam", component: MyTeam },
       { path: "/reports", component: Reports },
     ],
   },
   Administration: {
-    basePath: "/administration",
+    basePath: "/",
     allowedRoles: ["admin", "superAdmin"],
     routes: [
       { path: "/users", component: Users },
@@ -47,7 +47,7 @@ export const routeConfig = {
     ],
   },
   Media: {
-    basePath: "/media",
+    basePath: "/",
     allowedRoles: ["admin", "associate", "superAdmin"],
     routes: [
       { path: "/greetings", component: Greetings },
@@ -57,12 +57,12 @@ export const routeConfig = {
     ],
   },
   Site: {
-    basePath: "/site",
+    basePath: "/",
     allowedRoles: ["admin", "associate", "superAdmin"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
-    basePath: "/ventures",
+    basePath: "/",
     allowedRoles: ["admin", "associate", "superAdmin"],
     routes: [
       { path: "plots", component: Plots },

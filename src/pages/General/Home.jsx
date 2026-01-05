@@ -4,7 +4,7 @@ import CompactCalendar from "../../components/Calendar/CompactCalendar";
 import Typewriter from "typewriter-effect";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
 /* ================= QUICK ACCESS CARDS ================= */
 const cards = [
@@ -24,11 +24,18 @@ const cards = [
   },
 ];
 
+const salesData = [
+  { name: "Registered", value: 100 },
+  { name: "Booked", value: 70 },
+  { name: "Available", value: 100 },
+  { name: "Hold", value: 60 },
+];
 
+const COLORS = ["#ff0000", "#ffa500", "#228b22", "#808080"];
 
 export default function Home() {
   const navigate = useNavigate();
-const [openPending, setOpenPending] = useState(false);
+  const [openPending, setOpenPending] = useState(false);
   return (
     <div className="p-4 sm:p-5 space-y-5 bg-slate-100/70 min-h-screen">
       {/* ================= BANNER ================= */}
@@ -74,60 +81,56 @@ const [openPending, setOpenPending] = useState(false);
         </div>
       </div>
 
-{/* ================= PENDING ASSOCIATES MODAL ================= */}
-{openPending && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center">
-    {/* Backdrop */}
-    <div
-      className="absolute inset-0 bg-black/40"
-      onClick={() => setOpenPending(false)}
-    />
-
-    {/* Modal */}
-    <div className="relative bg-white rounded-xl w-full max-w-md shadow-lg">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b">
-        <h2 className="text-base font-semibold text-slate-800">
-          Pending Associates
-        </h2>
-        <button
-          onClick={() => setOpenPending(false)}
-          className="text-slate-500 hover:text-slate-700"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Body */}
-      <div className="p-5 space-y-3 max-h-[60vh] overflow-auto">
-        {[
-          "Ravi Kumar",
-          "Anjali Sharma",
-          "Suresh Reddy",
-          "Meena Patel",
-        ].map((name, i) => (
+      {/* ================= PENDING ASSOCIATES MODAL ================= */}
+      {openPending && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
           <div
-            key={i}
-            className="flex items-center justify-between border rounded-lg px-3 py-2"
-          >
-            <div>
-              <p className="text-sm font-medium text-slate-800">
-                {name}
-              </p>
-              <p className="text-xs text-slate-500">
-                Awaiting approval
-              </p>
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpenPending(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-white rounded-xl w-full max-w-md shadow-lg">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b">
+              <h2 className="text-base font-semibold text-slate-800">
+                Pending Associates
+              </h2>
+              <button
+                onClick={() => setOpenPending(false)}
+                className="text-slate-500 hover:text-slate-700"
+              >
+                ✕
+              </button>
             </div>
 
-            <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">
-              Pending
-            </span>
+            {/* Body */}
+            <div className="p-5 space-y-3 max-h-[60vh] overflow-auto">
+              {[
+                "Ravi Kumar",
+                "Anjali Sharma",
+                "Suresh Reddy",
+                "Meena Patel",
+              ].map((name, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between border rounded-lg px-3 py-2"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-slate-800">{name}</p>
+                    <p className="text-xs text-slate-500">Awaiting approval</p>
+                  </div>
+
+                  <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">
+                    Pending
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
       {/* ================= KPI STATS (MINIMAL) ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
@@ -188,7 +191,7 @@ const [openPending, setOpenPending] = useState(false);
           subtitle="View analytics"
           icon={Briefcase}
           bg="bg-amber-100"
-          iconBg="bg-amtuber-500"
+          iconBg="bg-amber-500"
           onClick={() => navigate("/reports")}
         />
         <QuickAccessTile
@@ -207,30 +210,32 @@ const [openPending, setOpenPending] = useState(false);
         <CompactCalendar />
 
         {/* SALES OVERVIEW */}
-        <div className="bg-white/80 rounded-lg border border-slate-200 p-3">
-          <h2 className="text-base font-semibold text-slate-800">
+        <div className="bg-white/80 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">
             Sales Overview
           </h2>
 
-          <div className="flex items-center gap-4 mt-3">
-            <div className="relative w-24 h-24 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-semibold">
-              72%
-            </div>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={salesData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  innerRadius={45}
+                  paddingAngle={3}
+                >
+                  {salesData.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index]} />
+                  ))}
+                </Pie>
 
-            <div className="space-y-1 text-sm">
-              <p>
-                <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mr-2" />
-                Sold
-              </p>
-              <p>
-                <span className="inline-block w-2 h-2 bg-indigo-500 rounded-full mr-2" />
-                Ongoing
-              </p>
-              <p>
-                <span className="inline-block w-2 h-2 bg-slate-300 rounded-full mr-2" />
-                Available
-              </p>
-            </div>
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -243,8 +248,8 @@ const [openPending, setOpenPending] = useState(false);
           <div className="space-y-2">
             <StatusRow label="Available" value={258} />
             <StatusRow label="Sold" value={89} />
-            <StatusRow label="Ongoing" value={42} />
-            <StatusRow label="Closed" value={34} />
+            <StatusRow label="Booked" value={42} />
+            <StatusRow label="Hold" value={34} />
           </div>
         </div>
       </div>
@@ -337,17 +342,12 @@ function MinimalKpi({ title, value, icon: Icon }) {
 
       {/* Text */}
       <div>
-        <div className="text-xs text-slate-500">
-          {title}
-        </div>
-        <div className="text-xl font-semibold text-slate-900">
-          {value}
-        </div>
+        <div className="text-xs text-slate-500">{title}</div>
+        <div className="text-xl font-semibold text-slate-900">{value}</div>
       </div>
     </div>
   );
 }
-
 
 function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
   return (

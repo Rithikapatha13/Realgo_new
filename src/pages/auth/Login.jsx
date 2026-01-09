@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { checkUser } from "../../services/auth.service";
 
 const API_BASE = "http://localhost:3000/api";
 
@@ -31,9 +32,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/auth/identify/${phone}`);
-      const data = await res.json();
-
+      const res = await checkUser(phone);
       console.log(res);
 
       if (!res.ok) {

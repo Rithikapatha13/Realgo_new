@@ -134,7 +134,6 @@ export default function Home() {
       {/* ================= KPI STATS (MINIMAL) ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
-        {/* <MinimalKpi title="Total Associates" value="424" icon={Users} /> */}
         <div className="relative">
           <MinimalKpi title="Total Associates" value="424" icon={Users} />
 

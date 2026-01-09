@@ -15,14 +15,12 @@ export default function Profile() {
   const [form, setForm] = useState(profile);
 
   return (
-    <div className="p-6 min-h-[calc(100vh-64px)]">
-      {/* ================= PROFILE CARD ================= */}
-      <div className="bg-white border border-slate-200 rounded-xl p-10 min-h-full">
-
+    <div className="p-4 sm:p-6 min-h-[calc(100vh-64px)]">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-8 lg:p-10">
         {/* HEADER */}
-        <div className="flex items-center gap-6 mb-10">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-8">
           <div className="relative">
-            <div className="h-28 w-28 rounded-full bg-slate-100 flex items-center justify-center">
+            <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-full bg-slate-100 flex items-center justify-center">
               <User size={48} className="text-slate-500" />
             </div>
 
@@ -31,18 +29,16 @@ export default function Profile() {
             </button>
           </div>
 
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">
               {profile.username}
             </h1>
-            <p className="text-sm text-slate-500">
-              {profile.email}
-            </p>
+            <p className="text-sm text-slate-500">{profile.email}</p>
           </div>
         </div>
 
-        {/* READ ONLY DETAILS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+        {/* DETAILS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl">
           <ReadOnly label="Username" value={profile.username} />
           <ReadOnly label="Email" value={profile.email} />
           <ReadOnly label="Phone" value={profile.phone} />
@@ -51,14 +47,13 @@ export default function Profile() {
         </div>
 
         {/* ACTIONS */}
-        <div className="mt-12 pt-6 border-t border-slate-200 flex justify-between">
-          <button className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-slate-100">
+        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row gap-4 sm:justify-between">
+          <button className="flex items-center justify-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-slate-100">
             <Lock size={16} />
             Change Password
           </button>
 
-          <div className="flex gap-3">
-            {/* ================= EDIT PROFILE MODAL ================= */}
+          <div className="flex flex-col sm:flex-row gap-3">
             <ModalWrapper
               title="Edit Profile"
               width="max-w-2xl"
@@ -78,11 +73,7 @@ export default function Profile() {
                     }
                   />
 
-                  <FormInput
-                    label="Email *"
-                    value={form.email}
-                    disabled
-                  />
+                  <FormInput label="Email *" value={form.email} disabled />
 
                   <FormInput
                     label="Phone *"
@@ -92,12 +83,7 @@ export default function Profile() {
                     }
                   />
 
-                  <FormInput
-                    label="Role *"
-                    value={form.role}
-                    disabled
-                  />
-
+                  <FormInput label="Role *" value={form.role} disabled />
                   <FormInput
                     label="Company *"
                     value={form.company}
@@ -106,22 +92,20 @@ export default function Profile() {
                     }
                   />
 
-                  {/* MODAL ACTIONS */}
                   <div className="sm:col-span-2 flex justify-end gap-3 pt-4">
                     <button
                       onClick={() => {
-                        setForm(profile); // reset
+                        setForm(profile);
                         closeModal();
                       }}
                       className="px-4 py-2 border rounded-lg text-sm"
                     >
                       Cancel
                     </button>
-
                     <button
                       onClick={() => {
-                        setProfile(form); // save
-                        closeModal();     // close modal
+                        setProfile(form);
+                        closeModal();
                       }}
                       className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm"
                     >
@@ -132,10 +116,6 @@ export default function Profile() {
               )}
             </ModalWrapper>
 
-            <button className="flex items-center gap-2 px-5 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50">
-              <LogOut size={16} />
-              Logout
-            </button>
           </div>
         </div>
       </div>
@@ -143,14 +123,11 @@ export default function Profile() {
   );
 }
 
-/* ================= READ ONLY FIELD ================= */
 function ReadOnly({ label, value }) {
   return (
     <div>
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-sm font-medium text-slate-900 mt-1">
-        {value}
-      </p>
+      <p className="text-sm font-medium text-slate-900 mt-1">{value}</p>
     </div>
   );
 }

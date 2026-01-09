@@ -3,6 +3,7 @@ import Roles from "../pages/administration/Roles";
 import Home from "../pages/General/Home";
 import Profile from "../pages/General/Profile";
 import MyTeam from "../pages/General/MyTeam";
+import TeamTree from "../pages/General/TeamTree";
 import Users from "./../pages/administration/Users";
 import Admin from "./../pages/administration/Admin";
 import Reports from "./../pages/General/Reports";
@@ -15,12 +16,15 @@ import SiteVisits from "../pages/Site/Sitevisits";
 import Plots from "./../pages/Ventures/Plots";
 import Projects from "./../pages/Ventures/Projects";
 import Notifications from "../pages/Notifications/Notifications";
+import Login from "../pages/auth/Login";
 
 
 export const publicRoutes = {
   auth: {
     basePath: "",
-    routes: [{ path: "signup", component: Signup }],
+    routes: [{ path: "signup", component: Signup },
+      {path: "login", component: Login}
+    ],
   },
 };
 
@@ -33,6 +37,7 @@ export const routeConfig = {
       { path: "profile", component: Profile },
       { path: "/users", component: Users },
       { path: "/myteam", component: MyTeam },
+      { path: "/team-tree", component: TeamTree },
       { path: "/reports", component: Reports },
     ],
   },

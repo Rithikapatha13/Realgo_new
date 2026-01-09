@@ -1,7 +1,70 @@
-import React from 'react'
+import { Users, BarChart3, TrendingUp, Building2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Reports() {
+  const navigate = useNavigate();
+
+  const reports = [
+    {
+      title: "Users Report",
+      subtitle: "Click to explore",
+      icon: Users,
+      path: "/reports/users",
+    },
+    {
+      title: "Plots Report",
+      subtitle: "Click to explore",
+      icon: BarChart3,
+      path: "/reports/plots",
+    },
+    {
+      title: "Sales Report",
+      subtitle: "Click to explore",
+      icon: TrendingUp,
+      path: "/reports/sales",
+    },
+    {
+      title: "Company Users Report",
+      subtitle: "Click to explore",
+      icon: Building2,
+      path: "/reports/company-users",
+    },
+  ];
+
   return (
-    <div>Reports</div>
-  )
+    <div className="p-6">
+      {/* HEADER */}
+      <h1 className="text-xl font-semibold text-slate-900">Reports</h1>
+      <p className="text-sm text-slate-500 mt-1">
+        Select an Option to View the Report
+      </p>
+
+      {/* REPORT CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {reports.map((report, idx) => {
+          const Icon = report.icon;
+
+          return (
+            <button
+              key={idx}
+              onClick={() => navigate(report.path)}
+              className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm
+                         hover:shadow-md transition text-left flex items-center gap-4"
+            >
+              <div className="h-12 w-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Icon className="text-blue-600" size={22} />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-blue-600">
+                  {report.title}
+                </p>
+                <p className="text-xs text-slate-500">{report.subtitle}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

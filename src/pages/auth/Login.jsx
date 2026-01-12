@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { checkUser } from "../../services/auth.service";
+import { checkUser,login } from "../../services/auth.service";
+
 
 const API_BASE = "http://localhost:3000/api";
 
@@ -34,27 +35,22 @@ export default function Login() {
     try {
       const res = await checkUser(phone);
       console.log(res);
-
-      if (!res.ok) {
-        setError(data.message || "User not found");
-        return;
-      }
-
-      if (data.userType === "superadmin") {
+      if (res.role === "superadmin") {
         setStep("PASSWORD");
         return;
       }
 
-      setCompanies(data.companies || []);
+      setCompanies(res.companies || []);
 
-      if (data.companies.length === 1) {
-        setCompanyId(data.companies[0].companyId);
+      if (res.companies.length === 1) {
+        setCompanyId(res.companies[0].company.id);
         setStep("PASSWORD");
       } else {
         setStep("COMPANY");
       }
-    } catch {
-      setError("Server not reachable");
+    } catch (error) {
+      console.log(error);
+      setError(error?.response?.data?.message || "Internal Server Error");
     } finally {
       setLoading(false);
     }
@@ -63,45 +59,72 @@ export default function Login() {
   // ===============================
   // STEP 3: LOGIN
   // ===============================
+  // const handleLogin = async () => {
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+     
+  //     const res = await axios.post(
+  //       `${API_BASE}/auth/login`,
+  //       { phone, password, companyId },
+  //       {
+  //         headers: { "Content-Type": "application/json" },
+  //       }
+  //     );
+  //     console.log(res);
+
+  //     const data = await res.json();
+  //     console.log(res.json());
+  //     if (!res.ok) {
+  //       // 🔴 FORCE CHANGE PASSWORD
+  //       if (data.message?.toLowerCase().includes("change")) {
+  //         setOldPassword(password);
+  //         setStep("CHANGE_PASSWORD");
+  //         return;
+  //       }
+  //       setError(data.message || "Login failed");
+  //       return;
+  //     }
+
+  //     localStorage.setItem("token", data.token);
+  //     alert("Login successful ✅");
+  //     navigate("/");
+
+      
+  //   } catch {
+  //     setError("Server not reachable");
+  //     console.log(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleLogin = async () => {
     setError("");
     setLoading(true);
 
     try {
-      console.log();
-      const res = await axios.post(
-        `${API_BASE}/auth/login`,
-        { phone, password, companyId },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      console.log(res);
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        // 🔴 FORCE CHANGE PASSWORD
-        if (data.message?.toLowerCase().includes("change")) {
-          setOldPassword(password);
-          setStep("CHANGE_PASSWORD");
-          return;
-        }
-
-        setError(data.message || "Login failed");
+      const res = await login(phone, companyId, password); // 🔥 same pattern as checkUser
+      const data = res;
+     
+      // 🔴 FORCE CHANGE PASSWORD
+      if (data.message?.toLowerCase().includes("change")) {
+        setOldPassword(password);
+        setStep("CHANGE_PASSWORD");
         return;
       }
 
       localStorage.setItem("token", data.token);
       alert("Login successful ✅");
       navigate("/");
-    } catch {
-      setError("Server not reachable");
-      console.log(error);
+    } catch (error) {
+      setError(error?.response?.data?.message || "Server not reachable");
     } finally {
       setLoading(false);
     }
   };
+  
+console.log(first)
 
   // ===============================
   // STEP 4: CHANGE PASSWORD
@@ -199,9 +222,9 @@ export default function Login() {
               </button>
             </div>
           )}
-
+          {console.log(companies)}
           {/* COMPANY */}
-          {step === "COMPANY" && (
+          {/* {step === "COMPANY" && (
             <div className="w-full">
               <label className="block text-sm text-black mb-2">
                 Select Company
@@ -213,8 +236,9 @@ export default function Login() {
               >
                 <option value="">Select company</option>
                 {companies.map((c, i) => (
-                  <option key={i} value={c.companyId}>
-                    {c.companyId}
+                  <option key={i} value={c.company.id}>
+                    
+                    {c.company.company}
                   </option>
                 ))}
               </select>
@@ -225,8 +249,45 @@ export default function Login() {
                 Next
               </button>
             </div>
-          )}
-
+          )} */}
+          {/* Company Card Picker */}
+            {step === "COMPANY" && (
+              <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+                {companies.map((c, i) => {
+                  const isSelected = companyId === c.company.id;
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => setCompanyId(c.company.id)}
+                      className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center shadow-sm transition-all
+        ${
+          isSelected
+            ? "border-indigo-600 ring-2 ring-indigo-300 bg-indigo-50"
+            : "border-gray-200 hover:border-indigo-400"
+        }`}
+                    >
+                      <img
+                        src={`${import.meta.env.VITE_S3_URL}${c.company.img}`}
+                        alt={c.company.company}
+                        className="w-22 h-22 object-contain mb-3"
+                      />
+                      <p className="text-sm font-medium text-gray-800 text-center">
+                        {c.company.company}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+              <button
+              onClick={() => setStep("PASSWORD")}
+              className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
+            >
+              Next
+            </button>
+           </>
+            )}
+            
           {/* PASSWORD */}
           {step === "PASSWORD" && (
             <div className="w-full">

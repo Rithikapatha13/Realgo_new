@@ -18,3 +18,14 @@ export const login = async (phone, companyId, password) => {
   return res.data;
 
 };
+
+export const changepassword = async (phone, companyId) =>{
+
+  const res =await apiClient.post("/auth/changepassword", {
+    phone,
+    companyId
+  });
+
+  return res.data;
+  
+}

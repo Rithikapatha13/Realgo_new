@@ -124,7 +124,6 @@ export default function Login() {
     }
   };
   
-console.log(first)
 
   // ===============================
   // STEP 4: CHANGE PASSWORD

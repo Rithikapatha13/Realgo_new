@@ -5,26 +5,6 @@ export default function TeamTree() {
   const [associate, setAssociate] = useState("");
   const [designation, setDesignation] = useState("");
 
-  // const treeData = {
-  //   id: "1",
-  //   name: "D ASHOK",
-  //   role: "Director",
-  //   code: "G564",
-  //   image: "https://randomuser.me/api/portraits/men/75.jpg",
-  //   children: [
-  //     {
-  //       id: "2",
-  //       name: "DASARI BHARATH KUMAR",
-  //       role: "Deputy Director",
-  //       code: "G1486",
-  //       children: [
-  //         { id: "5", name: "AJAY", role: "Deputy GM", code: "G2248" },
-  //         { id: "6", name: "KOMMINENI", role: "Manager", code: "G1517" },
-  //       ],
-  //     },
-  //   ],
-  // };
-
   const treeData = {
     id: "1",
     name: "D ASHOK",

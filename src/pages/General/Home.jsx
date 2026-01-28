@@ -159,7 +159,7 @@ export default function Home() {
           icon={Briefcase}
           bg="bg-blue-100"
           iconBg="bg-blue-500"
-          onClick={() => navigate("/projects-home")}
+          onClick={() => navigate("/projects")}
         />
         <QuickAccessTile
           title="Team"
@@ -167,7 +167,7 @@ export default function Home() {
           icon={Users}
           bg="bg-purple-100"
           iconBg="bg-purple-500"
-          onClick={() => navigate("/team-home")}
+          onClick={() => navigate("/myteam")}
         />
         <QuickAccessTile
           title="Designs"

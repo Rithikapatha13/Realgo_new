@@ -3,15 +3,17 @@ import Layout from "./components/layout/Layout";
 import { ConfigRoutes } from "./components/routing/RoutesConfig";
 import { publicRoutes, routeConfig } from "./constants/routeConfig";
 import { Toaster } from "react-hot-toast";
+import { getUser, getUserType } from "./services/auth.service";
 // import { getUser } from "./services/auth.service";
 // import Snowfall from "react-snowfall";
 
 function App() {
-  // const user = getUser();
-  const userRole = "admin";
+  const user = getUser();
+  const userType = getUserType();
+  const userRole = user?.role?.toLowerCase() || null;
 
   // Add this check - if no valid user, don't pass userRole at all
-  const isAuthenticated = true;
+  const isAuthenticated = user && user.role;
 
   return (
     <BrowserRouter>
@@ -31,7 +33,7 @@ function App() {
             <Layout>
               <ConfigRoutes
                 config={routeConfig}
-                userRole={isAuthenticated ? userRole.toLowerCase() : null}
+                userRole={isAuthenticated ? userType.toLowerCase() : null}
               />
             </Layout>
           }

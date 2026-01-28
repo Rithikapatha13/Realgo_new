@@ -1,180 +1,236 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { checkUser,login } from "../../services/auth.service";
+import toast from "react-hot-toast";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { changepassword, checkUser, login } from "../../services/auth.service";
+import FormInput from "../../components/Common/FormInput";
+import Button from "../../components/Common/Button";
+import { delay, resolveImageUrl } from "../../utils/common";
 
-
-const API_BASE = "http://localhost:3000/api";
+const STEPS = {
+  PHONE: "PHONE",
+  COMPANY: "COMPANY",
+  PASSWORD: "PASSWORD",
+  CHANGE_PASSWORD: "CHANGE_PASSWORD",
+};
 
 export default function Login() {
-  const [step, setStep] = useState("PHONE");
+  const navigate = useNavigate();
 
+  // Step management
+  const [step, setStep] = useState(STEPS.PHONE);
+
+  // Form fields
   const [phone, setPhone] = useState("");
   const [companies, setCompanies] = useState([]);
   const [companyId, setCompanyId] = useState("");
   const [password, setPassword] = useState("");
-
-  // change password fields
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // UI states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+  // Reset error on any input change
+  const clearError = () => setError("");
 
   // ===============================
-  // STEP 1: IDENTIFY USER BY PHONE
+  // STEP 1: CHECK USER BY PHONE
   // ===============================
   const handlePhoneSubmit = async () => {
-    setError("");
+    if (!phone || phone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number");
+      return;
+    }
+
+    clearError();
     setLoading(true);
 
     try {
       const res = await checkUser(phone);
-      console.log(res);
+
+      // Super admin goes directly to password
       if (res.role === "superadmin") {
-        setStep("PASSWORD");
+        setStep(STEPS.PASSWORD);
         return;
       }
 
+      // Set companies and determine next step
       setCompanies(res.companies || []);
 
       if (res.companies.length === 1) {
         setCompanyId(res.companies[0].company.id);
-        setStep("PASSWORD");
+        setStep(STEPS.PASSWORD);
+      } else if (res.companies.length > 1) {
+        setStep(STEPS.COMPANY);
       } else {
-        setStep("COMPANY");
+        setError("No companies found for this phone number");
       }
     } catch (error) {
-      console.log(error);
-      setError(error?.response?.data?.message || "Internal Server Error");
+      console.error("Phone check error:", error);
+      setError(
+        error?.response?.data?.message ||
+          "User not found. Please check your phone number."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   // ===============================
-  // STEP 3: LOGIN
+  // STEP 2: SELECT COMPANY (if multiple)
   // ===============================
-  // const handleLogin = async () => {
-  //   setError("");
-  //   setLoading(true);
+  const handleCompanySelect = () => {
+    if (!companyId) {
+      setError("Please select a company to continue");
+      return;
+    }
+    clearError();
+    setStep(STEPS.PASSWORD);
+  };
 
-  //   try {
-     
-  //     const res = await axios.post(
-  //       `${API_BASE}/auth/login`,
-  //       { phone, password, companyId },
-  //       {
-  //         headers: { "Content-Type": "application/json" },
-  //       }
-  //     );
-  //     console.log(res);
-
-  //     const data = await res.json();
-  //     console.log(res.json());
-  //     if (!res.ok) {
-  //       // 🔴 FORCE CHANGE PASSWORD
-  //       if (data.message?.toLowerCase().includes("change")) {
-  //         setOldPassword(password);
-  //         setStep("CHANGE_PASSWORD");
-  //         return;
-  //       }
-  //       setError(data.message || "Login failed");
-  //       return;
-  //     }
-
-  //     localStorage.setItem("token", data.token);
-  //     alert("Login successful ✅");
-  //     navigate("/");
-
-      
-  //   } catch {
-  //     setError("Server not reachable");
-  //     console.log(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // ===============================
+  // STEP 3: LOGIN WITH PASSWORD
+  // ===============================
   const handleLogin = async () => {
-    setError("");
+    if (!password) {
+      setError("Please enter your password");
+      return;
+    }
+
+    clearError();
     setLoading(true);
 
     try {
-      const res = await login(phone, companyId, password); // 🔥 same pattern as checkUser
-      const data = res;
-     
-      // 🔴 FORCE CHANGE PASSWORD
-      if (data.message?.toLowerCase().includes("change")) {
-        setOldPassword(password);
-        setStep("CHANGE_PASSWORD");
+      const res = await login(phone, companyId, password);
+
+      // Check if password change is required
+      if (res.message?.toLowerCase().includes("change")) {
+        toast("Password change required");
+        setStep(STEPS.CHANGE_PASSWORD);
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      alert("Login successful ✅");
-      navigate("/");
+      // Successful login
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("usertype", res.userType);
+
+      toast.success("Login successful! Redirecting...");
+      await delay(1500);
+      window.location.href = "/";
     } catch (error) {
-      setError(error?.response?.data?.message || "Server not reachable");
+      console.error("Login error:", error);
+      setError(
+        error?.response?.data?.message || "Invalid password. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
-  
 
   // ===============================
   // STEP 4: CHANGE PASSWORD
   // ===============================
   const handleChangePassword = async () => {
-    setError("");
-    setSuccess("");
+    if (!newPassword || !confirmPassword) {
+      setError("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
+    clearError();
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/auth/change-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone,
-          companyId,
-          oldPassword,
-          newPassword,
-        }),
-      });
+      const res = await changepassword(phone, companyId, newPassword);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Password update failed");
-        return;
+      if (res.success) {
+        toast.success(
+          "Password changed successfully! Please login with your new password."
+        );
+        // Reset password fields and go back to password step
+        setPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setStep(STEPS.PASSWORD);
       }
-
-      setSuccess("Password changed successfully. Logging in...");
-      setPassword(newPassword);
-
-      setTimeout(() => {
-        setStep("PASSWORD");
-        handleLogin();
-      }, 800);
-    } catch {
-      setError("Server not reachable");
+    } catch (error) {
+      console.error("Password change error:", error);
+      setError(
+        error?.response?.data?.message ||
+          "Failed to change password. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // ===============================
+  // HANDLE BACK NAVIGATION
+  // ===============================
+  const handleBack = () => {
+    clearError();
+    if (step === STEPS.COMPANY || step === STEPS.PASSWORD) {
+      setStep(STEPS.PHONE);
+      setPassword("");
+      setCompanyId("");
+    } else if (step === STEPS.CHANGE_PASSWORD) {
+      setStep(STEPS.PASSWORD);
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  // ===============================
+  // RENDER HELPERS
+  // ===============================
+  const getStepTitle = () => {
+    switch (step) {
+      case STEPS.PHONE:
+        return "Log in to your account";
+      case STEPS.COMPANY:
+        return "Select your company";
+      case STEPS.PASSWORD:
+        return "Enter your password";
+      case STEPS.CHANGE_PASSWORD:
+        return "Change your password";
+      default:
+        return "Login";
+    }
+  };
+
+  const getStepDescription = () => {
+    switch (step) {
+      case STEPS.PHONE:
+        return "Welcome back! Please enter your registered phone number";
+      case STEPS.COMPANY:
+        return "You have multiple companies. Select one to continue";
+      case STEPS.PASSWORD:
+        return "Enter your password to access your account";
+      case STEPS.CHANGE_PASSWORD:
+        return "Please set a new password for your account";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-white">
-      {/* LEFT IMAGE */}
+      {/* LEFT IMAGE SECTION */}
       <div
         className="hidden lg:block w-1/2 bg-cover bg-center"
         style={{
@@ -183,182 +239,240 @@ export default function Login() {
         }}
       />
 
-      {/* RIGHT CONTENT */}
+      {/* RIGHT CONTENT SECTION */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between px-6">
-        {/* FORM CENTER */}
+        {/* MAIN FORM AREA */}
         <div className="flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto">
           {/* LOGO */}
           <img
             src="https://app.realgo.in/assets/images/logo1.png"
             alt="RealGo"
-            className="h-14 mb-4"
+            className="h-14 mb-8"
           />
 
-          <h2 className="text-xl font-semibold text-black mb-2">
-            Log in to your account
-          </h2>
+          {/* BACK BUTTON */}
+          {step !== STEPS.PHONE && (
+            <button
+              onClick={handleBack}
+              className="self-start flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 mb-4 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </button>
+          )}
 
-          <p className="text-sm text-indigo-400 mb-8 text-center">
-            Welcome back, Please enter your phone number
+          {/* STEP TITLE & DESCRIPTION */}
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            {getStepTitle()}
+          </h2>
+          <p className="text-sm text-gray-500 mb-8 text-center">
+            {getStepDescription()}
           </p>
 
-          {/* PHONE */}
-          {step === "PHONE" && (
-            <div className="w-full">
-              <label className="block text-sm text-black mb-2">
-                Phone Number
-              </label>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-gray-100 rounded-md px-4 py-3 mb-6 focus:outline-none"
-              />
-              <button
-                onClick={handlePhoneSubmit}
-                className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
-              >
-                Next
-              </button>
-            </div>
-          )}
-          {console.log(companies)}
-          {/* COMPANY */}
-          {/* {step === "COMPANY" && (
-            <div className="w-full">
-              <label className="block text-sm text-black mb-2">
-                Select Company
-              </label>
-              <select
-                value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-                className="w-full bg-gray-100 rounded-md px-4 py-3 mb-6"
-              >
-                <option value="">Select company</option>
-                {companies.map((c, i) => (
-                  <option key={i} value={c.company.id}>
-                    
-                    {c.company.company}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => setStep("PASSWORD")}
-                className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
-              >
-                Next
-              </button>
-            </div>
-          )} */}
-          {/* Company Card Picker */}
-            {step === "COMPANY" && (
+          {/* STEP CONTENT */}
+          <div className="w-full space-y-4">
+            {/* STEP 1: PHONE NUMBER */}
+            {step === STEPS.PHONE && (
               <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
-                {companies.map((c, i) => {
-                  const isSelected = companyId === c.company.id;
-                  return (
-                    <div
-                      key={i}
-                      onClick={() => setCompanyId(c.company.id)}
-                      className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center shadow-sm transition-all
-        ${
-          isSelected
-            ? "border-indigo-600 ring-2 ring-indigo-300 bg-indigo-50"
-            : "border-gray-200 hover:border-indigo-400"
-        }`}
-                    >
-                      <img
-                        src={`${import.meta.env.VITE_S3_URL}${c.company.img}`}
-                        alt={c.company.company}
-                        className="w-22 h-22 object-contain mb-3"
-                      />
-                      <p className="text-sm font-medium text-gray-800 text-center">
-                        {c.company.company}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-              <button
-              onClick={() => setStep("PASSWORD")}
-              className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
-            >
-              Next
-            </button>
-           </>
+                <FormInput
+                  label="Phone Number"
+                  type="tel"
+                  value={phone}
+                  maxLength={10}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    clearError();
+                  }}
+                  placeholder="Enter your 10-digit phone number"
+                  onKeyPress={(e) => e.key === "Enter" && handlePhoneSubmit()}
+                />
+                <Button
+                  onClick={handlePhoneSubmit}
+                  className="w-full"
+                  loading={loading}
+                  disabled={!phone || phone.length !== 10}
+                >
+                  Continue
+                </Button>
+              </>
             )}
-            
-          {/* PASSWORD */}
-          {step === "PASSWORD" && (
-            <div className="w-full">
-              <label className="block text-sm text-black mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-gray-100 rounded-md px-4 py-3 mb-6"
-              />
-              <button
-                onClick={handleLogin}
-                className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
-              >
-                Login
-              </button>
-            </div>
-          )}
 
-          {/* CHANGE PASSWORD */}
-          {step === "CHANGE_PASSWORD" && (
-            <div className="w-full">
-              <label className="block text-sm text-black mb-2">
-                New Password
-              </label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-gray-100 rounded-md px-4 py-3 mb-4"
-              />
-              <input
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-gray-100 rounded-md px-4 py-3 mb-6"
-              />
-              <button
-                onClick={handleChangePassword}
-                className="w-full bg-indigo-900 text-white py-3 rounded-md font-medium"
-              >
-                Update Password
-              </button>
-            </div>
-          )}
+            {/* STEP 2: COMPANY SELECTION */}
+            {step === STEPS.COMPANY && (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                  {companies.map((c, i) => {
+                    const isSelected = companyId === c.company.id;
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => {
+                          setCompanyId(c.company.id);
+                          clearError();
+                        }}
+                        className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center justify-center transition-all ${
+                          isSelected
+                            ? "border-indigo-600 ring-2 ring-indigo-200 bg-indigo-50"
+                            : "border-gray-200 hover:border-indigo-300 hover:shadow-md"
+                        }`}
+                      >
+                        <img
+                          src={resolveImageUrl(c.company.img)}
+                          alt={c.company.company}
+                          className="h-16 w-16 object-contain mb-3"
+                        />
+                        <p className="text-sm font-medium text-gray-800 text-center">
+                          {c.company.company}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <Button
+                  onClick={handleCompanySelect}
+                  className="w-full"
+                  disabled={!companyId}
+                >
+                  Continue
+                </Button>
+              </>
+            )}
 
-          {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
-          {success && <p className="text-sm text-green-600 mt-4">{success}</p>}
+            {/* STEP 3: PASSWORD */}
+            {step === STEPS.PASSWORD && (
+              <>
+                <div className="relative">
+                  <FormInput
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      clearError();
+                    }}
+                    placeholder="Enter your password"
+                    onKeyPress={(e) => e.key === "Enter" && handleLogin()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                <Button
+                  onClick={handleLogin}
+                  className="w-full"
+                  loading={loading}
+                  disabled={!password}
+                >
+                  Login
+                </Button>
+              </>
+            )}
+
+            {/* STEP 4: CHANGE PASSWORD */}
+            {step === STEPS.CHANGE_PASSWORD && (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-amber-800">
+                    For security reasons, you need to change your password
+                    before continuing.
+                  </p>
+                </div>
+
+                <div className="relative">
+                  <FormInput
+                    label="New Password"
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      clearError();
+                    }}
+                    placeholder="Enter new password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <FormInput
+                    label="Confirm Password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      clearError();
+                    }}
+                    placeholder="Confirm new password"
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && handleChangePassword()
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+
+                <Button
+                  onClick={handleChangePassword}
+                  className="w-full"
+                  loading={loading}
+                  disabled={!newPassword || !confirmPassword}
+                >
+                  Update Password
+                </Button>
+              </>
+            )}
+
+            {/* ERROR MESSAGE */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* FOOTER */}
-
-        <div className="text-center text-xs text-gray-500 mb-4">
-          © 2026{" "}
-          <a
-            href="https://www.brandwar.in/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block align-middle mx-1"
-          >
-            <img
-              src="https://app.realgo.in/assets/images/brandwar.png"
-              alt="Brandwar"
-              className="h-11 inline"
-            />
-          </a>
-          |{" "}
-          <a href="#" className="hover:underline">
-            Privacy Policy
-          </a>
-          <div className="mt-1">All Rights Reserved.</div>
+        <div className="text-center text-xs text-gray-500 py-6 border-t border-gray-100">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            © 2026
+            <a
+              href="https://www.brandwar.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <img
+                src="https://app.realgo.in/assets/images/brandwar.png"
+                alt="Brandwar"
+                className="h-11"
+              />
+            </a>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <a href="#" className="hover:underline hover:text-gray-700">
+              Privacy Policy
+            </a>
+            <span>•</span>
+            <span>All Rights Reserved</span>
+          </div>
         </div>
       </div>
     </div>

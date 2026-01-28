@@ -2,6 +2,7 @@ import { Menu, Search, User, X, Bell, ArrowLeft } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMenuByRole } from "../../constants/sidebar";
+import { getUser } from "../../services/auth.service";
 
 export default function Header({
   onMenuClick,
@@ -11,10 +12,10 @@ export default function Header({
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const user = getUser();
 
   const location = useLocation();
   const navigate = useNavigate();
-
 
   // Close menus on route change
   useEffect(() => {
@@ -144,8 +145,8 @@ export default function Header({
               <User size={16} className="text-white" />
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium">{userName}</p>
-              <p className="text-xs text-slate-500 capitalize">{userRole}</p>
+              <p className="text-sm font-medium">{user.userName}</p>
+              <p className="text-xs text-slate-500 capitalize">{user.role}</p>
             </div>
           </button>
 

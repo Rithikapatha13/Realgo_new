@@ -37,7 +37,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [openPending, setOpenPending] = useState(false);
   return (
-    <div className="p-4 sm:p-5 space-y-5 bg-slate-100/70 min-h-screen">
+    <div className=" space-y-5 min-h-screen">
       {/* ================= BANNER ================= */}
       <div className="relative w-full h-[38vh] rounded-xl overflow-hidden">
         {/* Image */}

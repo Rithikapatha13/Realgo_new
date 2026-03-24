@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-500: var(--primary-500);
+  --color-secondary-500: var(--secondary-500);
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

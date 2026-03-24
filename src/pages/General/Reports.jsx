@@ -51,12 +51,12 @@ export default function Reports() {
               className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm
                          hover:shadow-md transition text-left flex items-center gap-4"
             >
-              <div className="h-12 w-12 rounded-lg bg-blue-50 flex items-center justify-center">
-                <Icon className="text-blue-600" size={22} />
+              <div className="h-12 w-12 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                <Icon className="text-primary-500" size={22} />
               </div>
 
               <div>
-                <p className="text-sm font-semibold text-blue-600">
+                <p className="text-sm font-semibold text-primary-500">
                   {report.title}
                 </p>
                 <p className="text-xs text-slate-500">{report.subtitle}</p>

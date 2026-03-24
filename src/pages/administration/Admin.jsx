@@ -1,123 +1,332 @@
-import { useState } from "react";
-import { MoreVertical } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { MoreVertical, Search, Plus, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2 } from "lucide-react";
+import { useGetAdmins, useDeleteAdminUser, useUpdateAdminStatus } from "@/hooks/useAdmin";
+import ModalWrapper from "@/components/Common/ModalWrapper";
+import AdminForm from "./AdminForm";
+import { resolveImageUrl } from "@/utils/common";
+import { toast } from "react-hot-toast";
 
 export default function Admin() {
-  const [openMenuId, setOpenMenuId] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formAction, setFormAction] = useState("Create");
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const admins = [
-    {
-      id: 1,
-      name: "Brandwar",
-      phone: "8885378378",
-      role: "Admin",
-      verified: true,
-      image: "",
-    },
-    {
-      id: 2,
-      name: "Shashi",
-      phone: "9000402310",
-      role: "Admin",
-      verified: true,
-      image: "https://randomuser.me/api/portraits/men/44.jpg",
-    },
-  ];
+  const PAGE_SIZE = 12;
+  const lastElementRef = useRef(null);
 
-  const clearAll = () => {
-    setSearch("");
+  // Debouncing search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = useGetAdmins(PAGE_SIZE, debouncedSearch);
+
+  const deleteAdminMutation = useDeleteAdminUser();
+  const updateStatusMutation = useUpdateAdminStatus();
+
+  const admins = data?.pages?.flatMap((page) => page.items) || [];
+
+  // Intersection Observer for Infinite Scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (lastElementRef.current) {
+      observer.observe(lastElementRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const handleAdd = () => {
+    setFormAction("Create");
+    setSelectedAdmin(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (admin) => {
+    setFormAction("Update");
+    setSelectedAdmin(admin);
+    setIsFormOpen(true);
+    setOpenMenuId(null);
+  };
+
+  const handleDeleteClick = (admin) => {
+    setSelectedAdmin(admin);
+    setIsDeleteDialogOpen(true);
+    setOpenMenuId(null);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteAdminMutation.mutateAsync(selectedAdmin.id);
+      toast.success("Admin deleted successfully");
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to delete admin");
+    }
+  };
+
+  const toggleStatus = async (admin) => {
+    const newStatus = admin.status === "VERIFIED" ? "PENDING" : "VERIFIED";
+    try {
+      await updateStatusMutation.mutateAsync({ id: admin.id, status: newStatus });
+      toast.success(`Status updated to ${newStatus}`);
+      setOpenMenuId(null);
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const StatusBadge = ({ status }) => {
+    const configs = {
+      VERIFIED: { color: "text-green-600 bg-green-50", icon: CheckCircle, label: "VERIFIED" },
+      PENDING: { color: "text-amber-600 bg-amber-50", icon: Clock, label: "PENDING" },
+      NONE: { color: "text-slate-500 bg-slate-50", icon: XCircle, label: "NONE" },
+    };
+    const config = configs[status] || configs.NONE;
+    const Icon = config.icon;
+
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider ${config.color}`}>
+        <Icon size={12} />
+        {config.label}
+      </span>
+    );
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen bg-slate-50/50">
       {/* HEADER */}
-      <div className="flex items-center mb-6">
-        <h1 className="text-xl font-semibold">Admin</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Administrators</h1>
+          <p className="text-slate-500 text-sm mt-1">Manage platform administrators and their permissions</p>
+        </div>
 
-        <button className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
-          Add Admin
+        <button
+          onClick={handleAdd}
+          className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-md shadow-indigo-200 active:scale-95"
+        >
+          <Plus size={20} />
+          <span>Add New Admin</span>
         </button>
       </div>
 
       {/* FILTER BAR */}
-      <div className="flex items-center gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Search Admin by Name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border rounded-md px-4 py-2 text-sm w-64"
-        />
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+          />
+        </div>
 
         <button
-          onClick={clearAll}
-          className="text-red-500 text-sm flex items-center gap-1"
+          onClick={() => setSearch("")}
+          className="text-slate-500 hover:text-red-500 text-sm font-medium transition-colors"
         >
-          ✕ Clear All
+          ✕ Clear Filters
         </button>
       </div>
 
-      {/* ADMIN CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {admins.map((admin) => (
-          <div
-            key={admin.id}
-            className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative"
-          >
-            {/* MENU */}
-            <button
-              onClick={() =>
-                setOpenMenuId(openMenuId === admin.id ? null : admin.id)
-              }
-              className="absolute top-4 right-4 text-slate-600"
+      {/* ADMIN GRID */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <Loader2 className="animate-spin text-indigo-600" size={40} />
+          <p className="text-slate-500 font-medium">Loading administrators...</p>
+        </div>
+      ) : isError ? (
+        <div className="text-center py-20">
+          <p className="text-red-500 font-medium">Error loading administrators. Please try again.</p>
+          <button onClick={() => refetch()} className="mt-4 text-indigo-600 underline">Retry</button>
+        </div>
+      ) : admins.length === 0 ? (
+        <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center">
+          <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserCog className="text-slate-400" size={32} />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900">No admins found</h3>
+          <p className="text-slate-500 max-w-xs mx-auto mt-1">We couldn't find any administrators matching your search criteria.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {admins.map((admin, index) => (
+            <div
+              key={admin.id}
+              ref={index === admins.length - 1 ? lastElementRef : null}
+              className="group bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative"
             >
-              <MoreVertical size={18} />
-            </button>
+              {/* MENU TOGGLE */}
+              <button
+                onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+              >
+                <MoreVertical size={18} />
+              </button>
 
-            {/* DROPDOWN */}
-            {openMenuId === admin.id && (
-              <div className="absolute top-10 right-4 bg-white border rounded-md shadow-md w-44 z-10">
-                <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                  View Admin
-                </button>
-                <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600">
-                  Delete Admin
-                </button>
+              {/* DROPDOWN MENU */}
+              {openMenuId === admin.id && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                  <div className="absolute top-12 right-4 bg-white border border-slate-100 rounded-xl shadow-xl w-48 z-20 py-1.5 animate-in fade-in zoom-in duration-200">
+                    <button
+                      onClick={() => handleEdit(admin)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
+                    >
+                      <UserCog size={16} className="text-indigo-500" />
+                      Edit Details
+                    </button>
+                    <button
+                      onClick={() => toggleStatus(admin)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
+                    >
+                      <CheckCircle size={16} className="text-emerald-500" />
+                      Toggle Status
+                    </button>
+                    <div className="my-1 border-t border-slate-100" />
+                    <button
+                      onClick={() => handleDeleteClick(admin)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                      Delete Admin
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* CARD CONTENT */}
+              <div className="flex gap-4">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center overflow-hidden ring-4 ring-white shadow-inner">
+                    {admin.image ? (
+                      <img
+                        src={resolveImageUrl(admin.image)}
+                        alt={admin.username}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <span className="text-2xl font-bold text-slate-300 italic">
+                        {admin.username?.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full p-0.5 shadow-sm">
+                    <div className={`w-full h-full rounded-full ${admin.status === 'VERIFIED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
+                      {admin.firstName} {admin.lastName}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                      @{admin.username}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 space-y-1.5">
+                    <p className="text-[13px] text-slate-600 flex items-center gap-2">
+                      <span className="text-slate-400">📞</span> {admin.phone}
+                    </p>
+                    <p className="text-[13px] text-slate-600 flex items-center gap-2 truncate">
+                      <span className="text-slate-400">✉️</span> {admin.email || "N/A"}
+                    </p>
+                    <div className="pt-2">
+                      <StatusBadge status={admin.status} />
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
 
-            {/* CONTENT */}
-            <div className="flex gap-4">
-              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                {admin.image ? (
-                  <img
-                    src={admin.image}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-300" />
-                )}
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-sm text-gray-900">
-                  {admin.name}
-                </h3>
-
-                <p className="text-xs text-gray-500 mt-1">{admin.phone}</p>
-
-                <p className="text-xs text-gray-500">{admin.role}</p>
-
-                {admin.verified && (
-                  <p className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1">
-                    ✔ VERIFIED
-                  </p>
-                )}
+              <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-[11px] font-bold tracking-tight text-slate-400 uppercase">
+                <span>{admin.role?.roleName || "ADMIN"}</span>
+                <span>Joined {new Date(admin.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
+          ))}
+        </div>
+      )}
+
+      {/* INFINITE SCROLL LOADER */}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-10">
+          <Loader2 className="animate-spin text-indigo-600" size={32} />
+        </div>
+      )}
+
+      {/* FORM MODAL */}
+      <ModalWrapper
+        open={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        title={formAction === "Create" ? "Add New Administrator" : "Update Administrator"}
+        width="max-w-2xl"
+      >
+        <AdminForm
+          action={formAction}
+          item={selectedAdmin}
+          onClose={() => setIsFormOpen(false)}
+          onRefetch={refetch}
+        />
+      </ModalWrapper>
+
+      {/* DELETE CONFIRMATION */}
+      <ModalWrapper
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        title="Delete Administrator"
+        width="max-w-md"
+      >
+        <div className="text-center py-4">
+          <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Trash2 className="text-red-500" size={32} />
           </div>
-        ))}
-      </div>
+          <h3 className="text-lg font-bold text-slate-900">Are you sure?</h3>
+          <p className="text-slate-500 mt-2">
+            You are about to delete <span className="font-bold text-slate-800">@{selectedAdmin?.username}</span>.
+            This action cannot be undone.
+          </p>
+          <div className="flex gap-3 mt-8">
+            <button
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors shadow-md shadow-red-100"
+            >
+              Delete Admin
+            </button>
+          </div>
+        </div>
+      </ModalWrapper>
     </div>
   );
 }

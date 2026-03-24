@@ -22,7 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { delay, resolveImageUrl } from "../../utils/common";
 import toast from "react-hot-toast";
-import { updateProfile } from "../../services/common.services";
+import { updateProfile } from "../../services/common.service";
 
 // Template images - defined outside component to prevent re-creation
 const TEMPLATE_IMAGES = [
@@ -303,7 +303,7 @@ export default function Profile() {
                     <li>Request sent to administrator</li>
                     <li>
                       Password reset to:{" "}
-                      <code className="bg-white px-2 py-0.5 rounded text-blue-600">
+                      <code className="bg-white px-2 py-0.5 rounded text-primary-500">
                         Realgo@123
                       </code>
                     </li>
@@ -431,7 +431,7 @@ export default function Profile() {
                   onClick={() => setSelectedTemplate(index)}
                   className={`relative cursor-pointer rounded-lg overflow-hidden border-4 transition-all ${
                     selectedTemplate === index
-                      ? "border-blue-500 shadow-lg"
+                      ? "border-primary-500 shadow-lg"
                       : "border-slate-200 hover:border-slate-300"
                   }`}
                 >
@@ -441,8 +441,8 @@ export default function Profile() {
                     className="w-full h-80 object-cover"
                   />
                   {selectedTemplate === index && (
-                    <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                      <div className="bg-blue-500 text-white px-4 py-2 rounded-full font-medium">
+                    <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                      <div className="bg-primary-500 text-white px-4 py-2 rounded-full font-medium">
                         Selected
                       </div>
                     </div>

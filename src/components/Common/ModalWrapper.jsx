@@ -3,24 +3,26 @@ import { X } from "lucide-react";
 
 export default function ModalWrapper({
   open,
+  isOpen,
   onClose,
   title,
   children,
   width = "max-w-lg",
 }) {
+  const isModalOpen = open ?? isOpen;
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (isModalOpen) {
       setIsVisible(true);
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [isModalOpen]);
 
   useEffect(() => {
-    if (open) {
+    if (isModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -36,17 +38,15 @@ export default function ModalWrapper({
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
-          open ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${isModalOpen ? "opacity-100" : "opacity-0"
+          }`}
         onClick={onClose}
       />
 
       {/* Desktop Modal */}
       <div
-        className={`hidden md:flex absolute inset-0 items-center justify-center p-2 transition-all duration-300 ${
-          open ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        }`}
+        className={`hidden md:flex absolute inset-0 items-center justify-center p-2 transition-all duration-300 ${isModalOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          }`}
       >
         <div
           className={`relative bg-white rounded-xl shadow-lg w-full ${width} max-h-[90vh] flex flex-col`}
@@ -72,9 +72,8 @@ export default function ModalWrapper({
 
       {/* Mobile Drawer */}
       <div
-        className={`md:hidden absolute inset-x-0 bottom-0 transition-transform duration-300 ease-out ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`md:hidden absolute inset-x-0 bottom-0 transition-transform duration-300 ease-out ${isModalOpen ? "translate-y-0" : "translate-y-full"
+          }`}
       >
         <div
           className="bg-white rounded-t-2xl shadow-lg h-[85vh] flex flex-col"

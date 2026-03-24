@@ -122,7 +122,7 @@ export default function Home() {
                     <p className="text-xs text-slate-500">Awaiting approval</p>
                   </div>
 
-                  <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">
+                  <span className="text-xs px-2 py-1 rounded bg-secondary-500/10 text-secondary-500 font-medium">
                     Pending
                   </span>
                 </div>
@@ -244,11 +244,11 @@ export default function Home() {
             Project Status
           </h2>
 
-          <div className="space-y-2">
-            <StatusRow label="Available" value={258} />
-            <StatusRow label="Sold" value={89} />
-            <StatusRow label="Booked" value={42} />
-            <StatusRow label="Hold" value={34} />
+          <div className="space-y-4">
+            <StatusRow label="Available" value={258} color="bg-primary-500" />
+            <StatusRow label="Sold" value={89} color="bg-emerald-500" />
+            <StatusRow label="Booked" value={42} color="bg-secondary-500" />
+            <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
           </div>
         </div>
       </div>
@@ -290,7 +290,7 @@ export default function Home() {
                     </p>
                     <p className="text-xs text-slate-500">Awaiting approval</p>
                   </div>
-                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 rounded">
+                  <span className="text-xs bg-secondary-500/10 text-secondary-500 px-2 rounded font-medium">
                     Pending
                   </span>
                 </div>
@@ -335,8 +335,8 @@ function MinimalKpi({ title, value, icon: Icon }) {
       "
     >
       {/* Icon */}
-      <div className="h-9 w-9 rounded-lg bg-slate-100 flex items-center justify-center">
-        <Icon size={18} className="text-slate-600" />
+      <div className="h-9 w-9 rounded-lg bg-secondary-500/10 flex items-center justify-center">
+        <Icon size={18} className="text-secondary-500" />
       </div>
 
       {/* Text */}
@@ -368,15 +368,15 @@ function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
   );
 }
 
-function StatusRow({ label, value }) {
+function StatusRow({ label, value, color = "bg-primary-500" }) {
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
-        <span className="text-slate-600">{label}</span>
+        <span className="text-slate-600 font-medium">{label}</span>
         <span className="font-semibold text-slate-900">{value}</span>
       </div>
-      <div className="h-2 bg-slate-100 rounded">
-        <div className="h-2 bg-purple-500 rounded w-2/3" />
+      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full`} style={{ width: `${Math.min((value/350)*100, 100)}%` }} />
       </div>
     </div>
   );

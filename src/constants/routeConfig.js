@@ -7,10 +7,17 @@ import TeamTree from "../pages/General/TeamTree";
 import Users from "./../pages/administration/Users";
 import Admin from "./../pages/administration/Admin";
 import Reports from "./../pages/General/Reports";
+
+import UserReport from "./../pages/Reports/UserReport";
+import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
+import PlotsReport from "./../pages/Reports/PlotsReport";
+import SalesReport from "./../pages/Reports/SalesReport";
+
 import Greetings from "./../pages/Media/Greetings";
 import News from "./../pages/Media/News";
 import Showcase from "./../pages/Media/Showcase";
 import Videos from "./../pages/Media/Videos";
+import PortraitVideos from "./../pages/Media/PortraitVideos";
 import Requests from "./../pages/administration/Requests";
 import SiteVisits from "../pages/Site/Sitevisits";
 import Plots from "./../pages/Ventures/Plots";
@@ -23,7 +30,7 @@ export const publicRoutes = {
   auth: {
     basePath: "",
     routes: [{ path: "signup", component: Signup },
-      {path: "login", component: Login}
+    { path: "login", component: Login }
     ],
   },
 };
@@ -39,6 +46,10 @@ export const routeConfig = {
       { path: "/myteam", component: MyTeam },
       { path: "/team-tree", component: TeamTree },
       { path: "/reports", component: Reports },
+      { path: "/reports/users", component: UserReport },
+      { path: "/reports/company-users", component: CompanyUsersReport },
+      { path: "/reports/plots", component: PlotsReport },
+      { path: "/reports/sales", component: SalesReport },
     ],
   },
   Administration: {
@@ -58,6 +69,7 @@ export const routeConfig = {
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
       { path: "/videos", component: Videos },
+      { path: "/portrait-videos", component: PortraitVideos },
       { path: "/showcases", component: Showcase },
     ],
   },

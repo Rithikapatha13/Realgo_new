@@ -6,13 +6,12 @@ import { getUser } from "../../services/auth.service";
 
 export default function Header({
   onMenuClick,
-  userRole = "admin",
-  userName = "Admin User",
 }) {
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const user = getUser();
+  const userRole = user?.role || "associate";
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,7 +84,7 @@ export default function Header({
             placeholder="Search..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-64 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-sm"
+            className="w-64 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-sm"
           />
           {searchValue && (
             <button
@@ -141,12 +140,13 @@ export default function Header({
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-2.5 pl-3 pr-2 py-1 border-l border-slate-200 hover:bg-slate-100 rounded-lg"
           >
-            <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center ring-2 ring-secondary-500 ring-offset-2">
               <User size={16} className="text-white" />
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium">{user.userName}</p>
-              <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+              <p className="text-sm font-medium">{user?.userName || "Guest"}</p>
+              <br></br>
+              <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
             </div>
           </button>
 

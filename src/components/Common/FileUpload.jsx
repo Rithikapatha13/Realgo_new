@@ -16,7 +16,7 @@ import { resolveImageUrl } from "../../utils/common";
 export default function FileInput({
   label,
   name = "image",
-  accept = "image/*,.pdf",
+  accept = "image/*,.pdf,.jpeg",
   maxSizeMB = 2,
   multiple = false,
   onChange,
@@ -312,12 +312,11 @@ export default function FileInput({
         className={`
           relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
           transition-all duration-200
-          ${
-            isDragging
-              ? "border-blue-500 bg-blue-50"
-              : error || uploadError
-                ? "border-red-300 bg-red-50"
-                : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+          ${isDragging
+            ? "border-blue-500 bg-blue-50"
+            : error || uploadError
+              ? "border-red-300 bg-red-50"
+              : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
           }
           ${disabled || isProcessing ? "opacity-50 cursor-not-allowed" : ""}
         `}

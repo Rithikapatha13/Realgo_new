@@ -6,22 +6,20 @@ import {
   Menu,
 } from "lucide-react";
 import { useState } from "react";
-import { adminMenu } from "../../constants/sidebar";
+import { getMenuByRole } from "../../constants/sidebar";
 import { useNavigate } from "react-router-dom";
 // import { getUser } from "../../services/auth.service";
+import { delay, resolveImageUrl } from "../../utils/common";
+import {
+  getUser,
+} from "../../services/auth.service";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const [open, setOpen] = useState({});
   const [activeLink, setActiveLink] = useState("/dashboard");
   const navigate = useNavigate();
-
-  const userRole = "ADMIN";
-
-  const sidebarMenuMap = {
-    ADMIN: adminMenu,
-  };
-
-  const sidebarMenu = sidebarMenuMap[userRole] || [];
+  const user = getUser();
+  const sidebarMenu = getMenuByRole(user?.role || "associate");
 
   const toggleSection = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -29,17 +27,17 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <div
-      className={`h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${
-        collapsed ? "w-16" : "w-64"
-      }`}
+      className={`h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${collapsed ? "w-16" : "w-64"
+        }`}
     >
       {/* Header with Logo and Collapse Button */}
       <div className="h-fit px-4 flex items-center justify-between border-b border-slate-200">
         {!collapsed && (
-          <div className="p-2">
+          <div className="h-20 w-full sm:h-25 px-2 rounded-lg flex items-center justify-center">
             <img
-              src="assets/Logo/Grupe_logo.png"
-              alt=""
+              src={resolveImageUrl(user.companyImg)}
+              alt="Company logo"
+              className="w-full h-full object-contain"
             />
           </div>
         )}
@@ -67,16 +65,15 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                     navigate(item.link);
                     setActiveLink(item.link);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group ${
-                    isActive
-                      ? "bg-purple-50 text-purple-700"
-                      : "text-slate-700 hover:bg-slate-50"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all group relative ${isActive
+                    ? "bg-primary-500/10 text-primary-500 border-l-4 border-secondary-500"
+                    : "text-slate-700 hover:bg-slate-50 border-l-4 border-transparent"
+                    }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon
                     size={20}
-                    className={isActive ? "text-purple-600" : "text-slate-500"}
+                    className={isActive ? "text-primary-500" : "text-slate-500"}
                   />
                   {!collapsed && (
                     <span className="text-sm font-medium">{item.label}</span>
@@ -122,17 +119,16 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                             navigate(child.link);
                             setActiveLink(child.link);
                           }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                            isChildActive
-                              ? "bg-purple-50 text-purple-700 font-medium"
-                              : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                          }`}
+                          className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm rounded-md transition-colors ${isChildActive
+                            ? "bg-primary-500/10 text-primary-500 font-medium"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                            }`}
                         >
                           <ChildIcon
                             size={16}
                             className={
                               isChildActive
-                                ? "text-purple-600"
+                                ? "text-primary-500"
                                 : "text-slate-400"
                             }
                           />

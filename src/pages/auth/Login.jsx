@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { changepassword, checkUser, login } from "../../services/auth.service";
 import FormInput from "../../components/Common/FormInput";
 import Button from "../../components/Common/Button";
 import { delay, resolveImageUrl } from "../../utils/common";
+import { ColorContext } from "../../context/ColorContext";
 
 const STEPS = {
   PHONE: "PHONE",
@@ -16,6 +17,7 @@ const STEPS = {
 
 export default function Login() {
   const navigate = useNavigate();
+  const { updateColors } = useContext(ColorContext);
 
   // Step management
   const [step, setStep] = useState(STEPS.PHONE);
@@ -119,6 +121,11 @@ export default function Login() {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("usertype", res.userType);
+
+      // Apply theme colors if available
+      if (res.user?.primaryColour && res.user?.secondaryColour) {
+        updateColors(res.user.primaryColour, res.user.secondaryColour);
+      }
 
       toast.success("Login successful! Redirecting...");
       await delay(1500);
@@ -254,7 +261,7 @@ export default function Login() {
           {step !== STEPS.PHONE && (
             <button
               onClick={handleBack}
-              className="self-start flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 mb-4 transition-colors"
+              className="self-start flex items-center gap-2 text-sm text-primary-500 hover:text-primary-600 mb-4 transition-colors font-medium"
             >
               <ArrowLeft size={16} />
               Back
@@ -286,14 +293,17 @@ export default function Login() {
                   placeholder="Enter your 10-digit phone number"
                   onKeyPress={(e) => e.key === "Enter" && handlePhoneSubmit()}
                 />
-                <Button
-                  onClick={handlePhoneSubmit}
-                  className="w-full"
-                  loading={loading}
-                  disabled={!phone || phone.length !== 10}
-                >
-                  Continue
-                </Button>
+                <br />
+                <div className="flex justify-center">
+                  <Button
+                    onClick={handlePhoneSubmit}
+                    className="w-40 bg-primary-500 hover:bg-primary-600"
+                    loading={loading}
+                    disabled={!phone || phone.length !== 10}
+                  >
+                    Continue
+                  </Button>
+                </div>
               </>
             )}
 
@@ -312,15 +322,22 @@ export default function Login() {
                         }}
                         className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center justify-center transition-all ${
                           isSelected
-                            ? "border-indigo-600 ring-2 ring-indigo-200 bg-indigo-50"
-                            : "border-gray-200 hover:border-indigo-300 hover:shadow-md"
+                            ? "border-secondary-500 ring-2 ring-secondary-500/20 bg-secondary-500/5"
+                            : "border-gray-100 hover:border-secondary-500/30 hover:shadow-md"
                         }`}
                       >
-                        <img
-                          src={resolveImageUrl(c.company.img)}
-                          alt={c.company.company}
-                          className="h-16 w-16 object-contain mb-3"
-                        />
+                        <div className="relative">
+                          <img
+                            src={resolveImageUrl(c.company.img)}
+                            alt={c.company.company}
+                            className="h-16 w-16 object-contain mb-3"
+                          />
+                          {isSelected && (
+                            <div className="absolute -top-2 -right-2 bg-secondary-500 text-white rounded-full p-0.5 shadow-sm">
+                              <CheckCircle2 size={12} />
+                            </div>
+                          )}
+                        </div>
                         <p className="text-sm font-medium text-gray-800 text-center">
                           {c.company.company}
                         </p>
@@ -330,7 +347,7 @@ export default function Login() {
                 </div>
                 <Button
                   onClick={handleCompanySelect}
-                  className="w-full"
+                  className="w-full bg-primary-500"
                   disabled={!companyId}
                 >
                   Continue
@@ -363,7 +380,7 @@ export default function Login() {
                 </div>
                 <Button
                   onClick={handleLogin}
-                  className="w-full"
+                  className="w-full bg-primary-500"
                   loading={loading}
                   disabled={!password}
                 >

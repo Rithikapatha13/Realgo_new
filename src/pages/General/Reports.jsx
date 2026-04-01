@@ -1,8 +1,14 @@
-import { Users, BarChart3, TrendingUp, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getUserType } from "@/services/auth.service";
+import SuperAdminReports from "../SuperAdmin/SuperAdminReports";
 
 export default function Reports() {
   const navigate = useNavigate();
+  const userType = getUserType()?.toLowerCase();
+
+  if (userType === "superadmin" || userType === "super-admin") {
+    return <SuperAdminReports />;
+  }
 
   const reports = [
     {

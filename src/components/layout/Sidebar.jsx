@@ -8,10 +8,10 @@ import {
 import { useState } from "react";
 import { getMenuByRole } from "../../constants/sidebar";
 import { useNavigate } from "react-router-dom";
-// import { getUser } from "../../services/auth.service";
 import { delay, resolveImageUrl } from "../../utils/common";
 import {
   getUser,
+  getUserType,
 } from "../../services/auth.service";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
@@ -19,7 +19,19 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const [activeLink, setActiveLink] = useState("/dashboard");
   const navigate = useNavigate();
   const user = getUser();
-  const sidebarMenu = getMenuByRole(user?.role || "associate");
+  const userType = getUserType()?.toLowerCase();
+  const isSuperAdmin = userType === "superadmin" || user?.role?.toLowerCase() === "superadmin" || userType === "super-admin";
+  const rawSidebarMenu = getMenuByRole(isSuperAdmin ? "superadmin" : user?.role || "associate");
+
+  // Filter menu based on company modules
+  const companyModules = user?.company?.modules || [];
+  const sidebarMenu = rawSidebarMenu.filter((item) => {
+    // SuperAdmin or ALWAYS visible modules
+    if (isSuperAdmin || item.module === "GENERAL" || item.module === "SYSTEM") return true;
+    
+    // Check if module is enabled for company
+    return companyModules.includes(item.module);
+  });
 
   const toggleSection = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -34,11 +46,19 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       <div className="h-fit px-4 flex items-center justify-between border-b border-slate-200">
         {!collapsed && (
           <div className="h-20 w-full sm:h-25 px-2 rounded-lg flex items-center justify-center">
-            <img
-              src={resolveImageUrl(user.companyImg)}
-              alt="Company logo"
-              className="w-full h-full object-contain"
-            />
+            {isSuperAdmin ? (
+              <img
+                src="https://app.realgo.in/assets/images/brandwar.png"
+                alt="Brandwar logo"
+                className="w-full h-full object-contain p-2"
+              />
+            ) : (
+              <img
+                src={resolveImageUrl(user?.companyImg)}
+                alt="Company logo"
+                className="w-full h-full object-contain"
+              />
+            )}
           </div>
         )}
         <button

@@ -56,7 +56,7 @@ export default function Login() {
       const res = await checkUser(phone);
 
       // Super admin goes directly to password
-      if (res.role === "superadmin") {
+      if (res.userType === "superadmin") {
         setStep(STEPS.PASSWORD);
         return;
       }
@@ -76,7 +76,7 @@ export default function Login() {
       console.error("Phone check error:", error);
       setError(
         error?.response?.data?.message ||
-          "User not found. Please check your phone number."
+        "User not found. Please check your phone number."
       );
     } finally {
       setLoading(false);
@@ -179,7 +179,7 @@ export default function Login() {
       console.error("Password change error:", error);
       setError(
         error?.response?.data?.message ||
-          "Failed to change password. Please try again."
+        "Failed to change password. Please try again."
       );
     } finally {
       setLoading(false);
@@ -320,11 +320,10 @@ export default function Login() {
                           setCompanyId(c.company.id);
                           clearError();
                         }}
-                        className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center justify-center transition-all ${
-                          isSelected
+                        className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center justify-center transition-all ${isSelected
                             ? "border-secondary-500 ring-2 ring-secondary-500/20 bg-secondary-500/5"
                             : "border-gray-100 hover:border-secondary-500/30 hover:shadow-md"
-                        }`}
+                          }`}
                       >
                         <div className="relative">
                           <img

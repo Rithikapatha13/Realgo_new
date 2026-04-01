@@ -5,6 +5,8 @@ import Typewriter from "typewriter-effect";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import SystemDashboard from "../SuperAdmin/SystemDashboard";
+import { getUserType } from "@/services/auth.service";
 
 /* ================= QUICK ACCESS CARDS ================= */
 const cards = [
@@ -36,6 +38,17 @@ const COLORS = ["#ff0000", "#ffa500", "#228b22", "#808080"];
 export default function Home() {
   const navigate = useNavigate();
   const [openPending, setOpenPending] = useState(false);
+  const userType = getUserType()?.toLowerCase();
+
+  // If superadmin, render the SystemDashboard instead of the regular Home view
+  if (userType === "superadmin" || userType === "super-admin") {
+    return (
+      <div className="min-h-screen">
+        <SystemDashboard />
+      </div>
+    );
+  }
+
   return (
     <div className=" space-y-5 min-h-screen">
       {/* ================= BANNER ================= */}

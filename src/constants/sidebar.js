@@ -43,6 +43,7 @@ import { GiVideoCamera } from "react-icons/gi";
 export const commonMenu = {
   label: "General",
   icon: UserCircle,
+  module: "GENERAL",
   children: [
     {
       label: "Home",
@@ -74,10 +75,45 @@ export const commonMenu = {
   ],
 };
 
+export const superAdminMenu = [
+  {
+    label: "Home",
+    link: "/",
+    icon: LayoutDashboard,
+    pageTitle: "Home",
+  },
+  {
+    label: "Reports",
+    link: "/reports",
+    icon: BarChart3,
+    pageTitle: "Reports",
+  },
+  {
+    label: "Companies",
+    link: "/companies",
+    icon: Landmark,
+    pageTitle: "Companies",
+  },
+  {
+    label: "Profile",
+    link: "/profile",
+    icon: UserCircle,
+    pageTitle: "Profile",
+  },
+];
+
+
+export const superAdminCommonMenu = {
+  ...commonMenu,
+  children: commonMenu.children.filter(child => child.label !== "My Team")
+};
+
+
 // ==================== MODULE GROUPS ====================
 export const venturesMenu = {
   label: "Ventures",
   icon: Landmark,
+  module: "VENTURES",
   children: [
     {
       label: "Projects",
@@ -99,6 +135,7 @@ export const venturesMenu = {
 export const administrationMenu = {
   label: "Administration",
   icon: User,
+  module: "ADMINISTRATION",
   children: [
     {
       label: "Admin",
@@ -134,6 +171,7 @@ export const administrationMenu = {
 export const mediaMenu = {
   label: "Media",
   icon: MessageSquare,
+  module: "MEDIA",
   children: [
     {
       label: "Greetings",
@@ -169,6 +207,7 @@ export const mediaMenu = {
 export const siteVisitsMenu = {
   label: "Site Visits",
   icon: MapPin,
+  module: "SITE_VISITS",
   children: [
     {
       label: "Site Visits",
@@ -189,13 +228,30 @@ export const adminMenu = [
   siteVisitsMenu,
 ];
 
-export const superAdminMenu = [
-  commonMenu,
-  venturesMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-];
+export const systemManagementMenu = {
+  label: "System",
+  icon: Settings,
+  module: "SYSTEM",
+  children: [
+    {
+      label: "Companies",
+      link: "/companies",
+      icon: Landmark,
+      pageTitle: "Companies",
+      subtitle: "Manage and view all registered companies",
+    },
+    {
+      label: "System Dashboard",
+      link: "/system-dashboard",
+      icon: Activity,
+      pageTitle: "System Dashboard",
+      subtitle: "Global overview of the platform",
+    }
+  ],
+};
+
+// Cleaned up redundant superAdminMenu definition below
+
 
 export const associateMenu = [
   commonMenu,

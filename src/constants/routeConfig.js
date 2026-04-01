@@ -24,7 +24,9 @@ import Plots from "./../pages/Ventures/Plots";
 import Projects from "./../pages/Ventures/Projects";
 import Notifications from "../pages/Notifications/Notifications";
 import Login from "../pages/auth/Login";
-
+import Companies from "../pages/SuperAdmin/Companies";
+import SystemDashboard from "../pages/SuperAdmin/SystemDashboard";
+import CompanyDetails from "../pages/SuperAdmin/CompanyDetails";
 
 export const publicRoutes = {
   auth: {
@@ -38,7 +40,7 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superAdmin"],
+    allowedRoles: ["admin", "associate", "superadmin"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -54,7 +56,7 @@ export const routeConfig = {
   },
   Administration: {
     basePath: "/",
-    allowedRoles: ["admin", "superAdmin"],
+    allowedRoles: ["admin", "superadmin"],
     routes: [
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
@@ -64,7 +66,7 @@ export const routeConfig = {
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superAdmin"],
+    allowedRoles: ["admin", "associate", "superadmin"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -75,12 +77,12 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superAdmin"],
+    allowedRoles: ["admin", "associate", "superadmin"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superAdmin"],
+    allowedRoles: ["admin", "associate", "superadmin"],
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -88,7 +90,16 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superAdmin"],
+    allowedRoles: ["admin", "associate", "superadmin"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
+  System: {
+    basePath: "/",
+    allowedRoles: ["superadmin"],
+    routes: [
+      { path: "companies", component: Companies },
+      { path: "companies/:id", component: CompanyDetails },
+      { path: "system-dashboard", component: SystemDashboard },
+    ]
+  }
 };

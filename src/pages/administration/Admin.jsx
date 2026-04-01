@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { MoreVertical, Search, Plus, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2 } from "lucide-react";
+import { MoreVertical, Search, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2, UserPlus } from "lucide-react";
 import { useGetAdmins, useDeleteAdminUser, useUpdateAdminStatus } from "@/hooks/useAdmin";
 import ModalWrapper from "@/components/Common/ModalWrapper";
 import AdminForm from "./AdminForm";
 import { resolveImageUrl } from "@/utils/common";
+import { getUserType } from "@/services/auth.service";
 import { toast } from "react-hot-toast";
 
 export default function Admin() {
@@ -11,9 +12,11 @@ export default function Admin() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formAction, setFormAction] = useState("Create");
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const userType = getUserType();
+  const isSuperAdmin = userType?.toLowerCase() === "superadmin";
 
   const PAGE_SIZE = 12;
   const lastElementRef = useRef(null);
@@ -57,17 +60,16 @@ export default function Admin() {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleAdd = () => {
-    setFormAction("Create");
-    setSelectedAdmin(null);
-    setIsFormOpen(true);
-  };
 
   const handleEdit = (admin) => {
-    setFormAction("Update");
     setSelectedAdmin(admin);
     setIsFormOpen(true);
     setOpenMenuId(null);
+  };
+
+  const handleAdd = () => {
+    setSelectedAdmin(null);
+    setIsFormOpen(true);
   };
 
   const handleDeleteClick = (admin) => {
@@ -122,14 +124,15 @@ export default function Admin() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Administrators</h1>
           <p className="text-slate-500 text-sm mt-1">Manage platform administrators and their permissions</p>
         </div>
-
-        <button
-          onClick={handleAdd}
-          className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-md shadow-indigo-200 active:scale-95"
-        >
-          <Plus size={20} />
-          <span>Add New Admin</span>
-        </button>
+        {isSuperAdmin && (
+          <button
+            onClick={handleAdd}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm font-medium w-full sm:w-auto"
+          >
+            <UserPlus size={18} />
+            Add Admin
+          </button>
+        )}
       </div>
 
       {/* FILTER BAR */}
@@ -284,11 +287,11 @@ export default function Admin() {
       <ModalWrapper
         open={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={formAction === "Create" ? "Add New Administrator" : "Update Administrator"}
+        title={selectedAdmin ? "Update Administrator" : "Add Administrator"}
         width="max-w-2xl"
       >
         <AdminForm
-          action={formAction}
+          action={selectedAdmin ? "Update" : "Add"}
           item={selectedAdmin}
           onClose={() => setIsFormOpen(false)}
           onRefetch={refetch}

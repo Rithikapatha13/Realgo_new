@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { getUserType } from "@/services/auth.service";
 import SuperAdminReports from "../SuperAdmin/SuperAdminReports";
+import { Users, BarChart3, TrendingUp, Building2 } from "lucide-react";
 
 export default function Reports() {
   const navigate = useNavigate();

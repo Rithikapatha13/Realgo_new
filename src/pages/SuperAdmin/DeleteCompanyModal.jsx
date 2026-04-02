@@ -83,16 +83,15 @@ export default function DeleteCompanyModal({ open, onClose, onConfirm, companyNa
 
             <div className="mb-8 space-y-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
-                Type company name to confirm
+                Type company name <span className="font-bold text-slate-900">"{companyName}"</span> to confirm
               </label>
               <input
                 type="text"
                 autoFocus
-                className={`w-full px-4 py-3 rounded-xl border outline-none transition-all font-medium ${
-                  isNameConfirmed
-                    ? "border-emerald-500 bg-emerald-50/30 text-emerald-900"
-                    : "border-slate-200 bg-slate-50 focus:border-red-400 text-slate-700"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border outline-none transition-all font-medium ${isNameConfirmed
+                  ? "border-emerald-500 bg-emerald-50/30 text-emerald-900"
+                  : "border-slate-200 bg-slate-50 focus:border-red-400 text-slate-700"
+                  }`}
                 placeholder={`Type "${companyName}"`}
                 value={confirmationName}
                 onChange={(e) => setConfirmationName(e.target.value)}
@@ -113,11 +112,10 @@ export default function DeleteCompanyModal({ open, onClose, onConfirm, companyNa
               </Button>
               <Button
                 variant="primary"
-                className={`flex-1 rounded-xl shadow-lg transition-all duration-300 ${
-                  isNameConfirmed && !isLoading
-                    ? "bg-red-600 hover:bg-red-700 active:scale-[0.98]"
-                    : "bg-slate-200 border-slate-200 text-slate-400 cursor-not-allowed"
-                }`}
+                className={`flex-1 rounded-xl shadow-lg transition-all duration-300 ${isNameConfirmed && !isLoading
+                  ? "bg-red-600 hover:bg-red-700 active:scale-[0.98]"
+                  : "bg-slate-200 border-slate-200 text-slate-400 cursor-not-allowed"
+                  }`}
                 onClick={onConfirm}
                 disabled={!isNameConfirmed || isLoading}
               >

@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
 import { getMenuByRole } from "../../constants/sidebar";
@@ -21,13 +22,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const user = getUser();
   const userType = getUserType()?.toLowerCase();
   const isSuperAdmin = userType === "superadmin" || user?.role?.toLowerCase() === "superadmin" || userType === "super-admin";
+  const isAdmin = userType === "admin" || user?.role?.toLowerCase() === "admin";
   const rawSidebarMenu = getMenuByRole(isSuperAdmin ? "superadmin" : user?.role || "associate");
 
   // Filter menu based on company modules
   const companyModules = user?.company?.modules || [];
   const sidebarMenu = rawSidebarMenu.filter((item) => {
-    // SuperAdmin or ALWAYS visible modules
-    if (isSuperAdmin || item.module === "GENERAL" || item.module === "SYSTEM") return true;
+    // SuperAdmin, Admin or ALWAYS visible modules
+    if (isSuperAdmin || isAdmin || item.module === "GENERAL" || item.module === "SYSTEM") return true;
     
     // Check if module is enabled for company
     return companyModules.includes(item.module);
@@ -35,6 +37,12 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   const toggleSection = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/auth/login");
   };
 
   return (
@@ -71,7 +79,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 overflow-y-auto hide-scrollbar py-4 px-3">
+      <nav className="flex-1 overflow-y-auto hide-scrollbar py-4 px-3 flex flex-col justify-between">
         <div className="space-y-1">
           {sidebarMenu.map((item) => {
             const Icon = item.icon;
@@ -86,14 +94,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                     setActiveLink(item.link);
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all group relative ${isActive
-                    ? "bg-primary-500/10 text-primary-500 border-l-4 border-secondary-500"
-                    : "text-slate-700 hover:bg-slate-50 border-l-4 border-transparent"
+                    ? "bg-primary-500 text-white"
+                    : "text-slate-700 hover:bg-slate-50"
                     }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon
                     size={20}
-                    className={isActive ? "text-primary-500" : "text-slate-500"}
+                    className={isActive ? "text-white" : "text-slate-500"}
                   />
                   {!collapsed && (
                     <span className="text-sm font-medium">{item.label}</span>
@@ -140,7 +148,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                             setActiveLink(child.link);
                           }}
                           className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm rounded-md transition-colors ${isChildActive
-                            ? "bg-primary-500/10 text-primary-500 font-medium"
+                            ? "bg-primary-500 text-white font-medium"
                             : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                             }`}
                         >
@@ -148,7 +156,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                             size={16}
                             className={
                               isChildActive
-                                ? "text-primary-500"
+                                ? "text-white"
                                 : "text-slate-400"
                             }
                           />
@@ -161,6 +169,20 @@ export default function Sidebar({ collapsed, setCollapsed }) {
               </div>
             );
           })}
+        </div>
+        
+        {/* Logout Button Pushed to Bottom */}
+        <div className="mt-8 pt-4 border-t border-slate-200">
+           <button
+             onClick={handleLogout}
+             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+             title={collapsed ? "Logout" : ""}
+           >
+             <LogOut size={20} className="text-slate-500" />
+             {!collapsed && (
+               <span className="text-sm font-medium">Logout</span>
+             )}
+           </button>
         </div>
       </nav>
     </div>

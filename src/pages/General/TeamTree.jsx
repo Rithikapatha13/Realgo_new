@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGetTeamTree } from '@/hooks/useTeam';
 import { useGetUsersNames } from '@/hooks/useUser';
 import { useGetAllRoles, useGetRoleById } from '@/hooks/useRoles';
 import { getUser } from '@/services/auth.service';
 import TeamTreeChart from '@/components/TeamTreeChart';
 import { LoadingIndicator } from '@/components';
-import { Check, ChevronsUpDown, X, Search, Filter, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Check, ChevronsUpDown, X, Search, Filter, ZoomIn, ZoomOut, RotateCcw, ArrowLeft } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const TeamTree = () => {
+  const navigate = useNavigate();
   const user = getUser();
   const [id, setId] = useState(undefined);
   const [username, setUsername] = useState('');
@@ -87,6 +89,15 @@ const TeamTree = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-h-screen">
+      <div className="mb-4">
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-slate-500 hover:text-primary-500 transition-colors bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 w-fit"
+        >
+          <ArrowLeft size={16} />
+          <span className="text-sm font-medium">Back to Team</span>
+        </button>
+      </div>
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 border-l-4 border-primary-500 pl-4">Team Hierarchy</h1>

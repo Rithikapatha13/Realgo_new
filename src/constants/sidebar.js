@@ -219,6 +219,41 @@ export const siteVisitsMenu = {
   ],
 };
 
+export const financeMenu = {
+  label: "Finance",
+  icon: Wallet,
+  children: [
+    {
+      label: "Account Tree",
+      link: "/finance/accounts",
+      icon: ListChecks,
+      pageTitle: "Account Tree",
+      subtitle: "Manage Chart of Accounts",
+    },
+    {
+      label: "Ledgers",
+      link: "/finance/ledgers",
+      icon: BookOpen,
+      pageTitle: "Ledgers",
+      subtitle: "Manage Ledger Accounts",
+    },
+    {
+      label: "Parties",
+      link: "/finance/parties",
+      icon: Users,
+      pageTitle: "Parties",
+      subtitle: "Manage Vendors and Customers",
+    },
+    {
+      label: "Transactions",
+      link: "/finance/transactions",
+      icon: Receipt,
+      pageTitle: "Transactions",
+      subtitle: "View and Manage Transactions",
+    }
+  ],
+};
+
 // ==================== ROLE-BASED MENUS ====================
 export const adminMenu = [
   commonMenu,
@@ -226,6 +261,7 @@ export const adminMenu = [
   administrationMenu,
   mediaMenu,
   siteVisitsMenu,
+  financeMenu,
 ];
 
 export const systemManagementMenu = {
@@ -252,6 +288,15 @@ export const systemManagementMenu = {
 
 // Cleaned up redundant superAdminMenu definition below
 
+export const superAdminMenu = [
+  commonMenu,
+  venturesMenu,
+  administrationMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  financeMenu,
+  systemManagementMenu,
+];
 
 export const associateMenu = [
   commonMenu,

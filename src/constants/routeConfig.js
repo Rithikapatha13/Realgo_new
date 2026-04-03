@@ -27,6 +27,11 @@ import Login from "../pages/auth/Login";
 import Companies from "../pages/SuperAdmin/Companies";
 import SystemDashboard from "../pages/SuperAdmin/SystemDashboard";
 import CompanyDetails from "../pages/SuperAdmin/CompanyDetails";
+import Accounts from "../pages/Finance/Accounts";
+import Ledgers from "../pages/Finance/Ledgers";
+import Parties from "../pages/Finance/Parties";
+import Transactions from "../pages/Finance/Transactions";
+
 
 export const publicRoutes = {
   auth: {
@@ -101,5 +106,15 @@ export const routeConfig = {
       { path: "companies/:id", component: CompanyDetails },
       { path: "system-dashboard", component: SystemDashboard },
     ]
-  }
+  },
+  Finance: {
+    basePath: "/finance",
+    allowedRoles: ["admin", "superadmin"],
+    routes: [
+      { path: "/accounts", component: Accounts },
+      { path: "/ledgers", component: Ledgers },
+      { path: "/parties", component: Parties },
+      { path: "/transactions", component: Transactions },
+    ],
+  },
 };

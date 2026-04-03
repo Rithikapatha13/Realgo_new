@@ -42,3 +42,41 @@ export const addTransaction = async (data) => {
   const res = await apiClient.post("/finance/add-transaction", data);
   return res.data;
 };
+
+// ================= SUBLEDGERS =================
+
+export const getSubledgers = async (ledgerId) => {
+  const url = ledgerId ? `/finance/subledgers?ledgerId=${ledgerId}` : "/finance/subledgers";
+  const res = await apiClient.get(url);
+  return res.data;
+};
+
+export const addSubledger = async (data) => {
+  const res = await apiClient.post("/finance/add-subledger", data);
+  return res.data;
+};
+
+// ================= REPORTS =================
+
+export const getLedgerStatement = async (params) => {
+  const queryString = new URLSearchParams(params).toString();
+  const res = await apiClient.get(`/finance/reports/ledger-statement?${queryString}`);
+  return res.data;
+};
+
+export const getTrialBalance = async () => {
+  const res = await apiClient.get("/finance/reports/trial-balance");
+  return res.data;
+};
+
+export const getProfitLoss = async (params) => {
+  const queryString = new URLSearchParams(params).toString();
+  const res = await apiClient.get(`/finance/reports/profit-loss?${queryString}`);
+  return res.data;
+};
+
+export const getBalanceSheet = async () => {
+  const res = await apiClient.get("/finance/reports/balance-sheet");
+  return res.data;
+};
+

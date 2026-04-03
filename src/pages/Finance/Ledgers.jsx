@@ -11,6 +11,9 @@ const Ledgers = () => {
     const [selectedAccountTree, setSelectedAccountTree] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isSubFormOpen, setIsSubFormOpen] = useState(false);
+    const [selectedLedgerForSub, setSelectedLedgerForSub] = useState(null);
+
     
     const { data, isLoading, isError, refetch } = useGetLedgers(selectedAccountTree);
     const { data: accountsData } = useGetAccounts();
@@ -105,13 +108,40 @@ const Ledgers = () => {
                                     )}
                                 </div>
                                 <h3 className="font-bold text-slate-900 truncate mb-1">{ledger.name}</h3>
-                                <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 uppercase">
+                                <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 uppercase mb-4">
                                     <Layers size={12} /> {ledger.accountTree?.name || "Uncategorized"}
                                 </p>
+
+                                {ledger.bifurcated && (
+                                    <div className="space-y-2 mb-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sub-ledgers</span>
+                                            <button 
+                                                onClick={() => {
+                                                    setSelectedLedgerForSub(ledger);
+                                                    setIsSubFormOpen(true);
+                                                }}
+                                                className="text-[10px] font-bold text-indigo-600 hover:underline"
+                                            >
+                                                + ADD
+                                            </button>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1">
+                                            {ledger.subledgers?.map(sub => (
+                                                <span key={sub.id} className="text-[9px] font-semibold bg-slate-50 text-slate-600 px-2 py-0.5 rounded border border-slate-100">
+                                                    {sub.name}
+                                                </span>
+                                            ))}
+                                            {(!ledger.subledgers || ledger.subledgers.length === 0) && (
+                                                <span className="text-[9px] italic text-slate-400">No sub-ledgers added</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             
-                            <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                <span>{ledger.subledgers?.length || 0} Sub-ledgers</span>
+                            <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                <span>{ledger.transactionEntries?.length || 0} Entries</span>
                                 <button className="text-indigo-600 hover:underline">View History</button>
                             </div>
                         </div>
@@ -131,7 +161,61 @@ const Ledgers = () => {
                     onRefetch={refetch} 
                 />
             </ModalWrapper>
+
+            <ModalWrapper
+                isOpen={isSubFormOpen}
+                onClose={() => setIsSubFormOpen(false)}
+                title={`Add Sub-ledger for "${selectedLedgerForSub?.name}"`}
+                width="max-w-md"
+            >
+                <SubLedgerForm 
+                    ledgerId={selectedLedgerForSub?.id}
+                    onClose={() => setIsSubFormOpen(false)} 
+                    onRefetch={refetch} 
+                />
+            </ModalWrapper>
         </div>
+    );
+};
+
+const SubLedgerForm = ({ ledgerId, onClose, onRefetch }) => {
+    const { mutateAsync: addSubledger, isLoading: isAdding } = useAddSubledger();
+    const [name, setName] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await addSubledger({ name, ledgerId });
+            toast.success("Sub-ledger added successfully");
+            onRefetch();
+            onClose();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Error adding sub-ledger");
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Sub-ledger Name *</label>
+                <input 
+                    required 
+                    type="text" 
+                    placeholder="e.g. Employee Name, Vehicle Number"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                    value={name} 
+                    onChange={e => setName(e.target.value)} 
+                />
+            </div>
+            <button 
+                disabled={isAdding} 
+                type="submit" 
+                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-70"
+            >
+                {isAdding && <Loader2 className="animate-spin" size={20} />}
+                Add Sub-ledger
+            </button>
+        </form>
     );
 };
 

@@ -68,3 +68,55 @@ export const useAddTransaction = () => {
     },
   });
 };
+
+// ================= SUBLEDGERS =================
+
+export const useGetSubledgers = (ledgerId) => {
+  return useQuery({
+    queryKey: ["finance", "subledgers", ledgerId],
+    queryFn: () => financeService.getSubledgers(ledgerId),
+  });
+};
+
+export const useAddSubledger = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: financeService.addSubledger,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["finance", "subledgers"] });
+      queryClient.invalidateQueries({ queryKey: ["finance", "ledgers"] });
+    },
+  });
+};
+
+// ================= REPORTS =================
+
+export const useGetLedgerStatement = (params) => {
+  return useQuery({
+    queryKey: ["finance", "reports", "ledger", params],
+    queryFn: () => financeService.getLedgerStatement(params),
+    enabled: !!params.ledgerId,
+  });
+};
+
+export const useGetTrialBalance = () => {
+  return useQuery({
+    queryKey: ["finance", "reports", "trial-balance"],
+    queryFn: financeService.getTrialBalance,
+  });
+};
+
+export const useGetProfitLoss = (params) => {
+  return useQuery({
+    queryKey: ["finance", "reports", "profit-loss", params],
+    queryFn: () => financeService.getProfitLoss(params),
+  });
+};
+
+export const useGetBalanceSheet = () => {
+  return useQuery({
+    queryKey: ["finance", "reports", "balance-sheet"],
+    queryFn: financeService.getBalanceSheet,
+  });
+};
+

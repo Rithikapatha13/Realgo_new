@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { 
-    Plus, Search, Receipt, ArrowRight, 
-    Calendar, Filter, Loader2, FileText,
-    ArrowUpRight, ArrowDownLeft, RefreshCcw, Landmark
+    Plus, Receipt, FileText, 
+    Calendar, Filter, Loader2,
+    ArrowUpRight, ArrowDownLeft, RefreshCcw, Landmark,
+    CheckCircle, AlertCircle, XCircle
 } from "lucide-react";
-import { useGetTransactions, useAddTransaction, useGetLedgers, useGetParties } from "@/hooks/useFinance";
+import { 
+    useGetTransactions, useAddTransaction, useGetLedgers, 
+    useGetParties, useGetSubledgers 
+} from "@/hooks/useFinance";
 import { ModalWrapper } from "@/components/Common";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
@@ -130,7 +134,7 @@ const Transactions = () => {
                                             {tx.entries?.slice(0, 2).map((entry, idx) => (
                                                 <div key={idx} className="text-xs text-slate-600 flex items-center gap-2">
                                                     <span className={`w-1 h-1 rounded-full ${entry.entryType === 'DEBIT' ? 'bg-indigo-400' : 'bg-amber-400'}`} />
-                                                    {entry.ledger?.name}
+                                                    {entry.ledger?.name} {entry.subledger ? `(${entry.subledger.name})` : ''}
                                                 </div>
                                             ))}
                                             {tx.entries?.length > 2 && <div className="text-[10px] text-indigo-500 font-bold">+{tx.entries.length - 2} MORE</div>}
@@ -151,7 +155,7 @@ const Transactions = () => {
                 isOpen={isFormOpen}
                 onClose={() => setIsFormOpen(false)}
                 title="Create Financial Transaction"
-                width="max-w-2xl"
+                width="max-w-4xl"
             >
                 <TransactionForm onClose={() => setIsFormOpen(false)} onRefetch={refetch} />
             </ModalWrapper>
@@ -175,13 +179,22 @@ const TransactionForm = ({ onClose, onRefetch }) => {
         totalAmount: 0,
         partyId: "",
         projectId: null,
-        entries: [{ ledgerId: "", amount: 0, entryType: "DEBIT", narration: "" }]
+        entries: [{ ledgerId: "", subledgerId: "", amount: 0, entryType: "DEBIT", narration: "" }]
     });
 
+    const [totals, setTotals] = useState({ debit: 0, credit: 0 });
+
     const addEntry = () => {
+        const lastType = formData.entries[formData.entries.length - 1]?.entryType;
         setFormData({
             ...formData,
-            entries: [...formData.entries, { ledgerId: "", amount: 0, entryType: "CREDIT", narration: "" }]
+            entries: [...formData.entries, { 
+                ledgerId: "", 
+                subledgerId: "", 
+                amount: 0, 
+                entryType: lastType === "DEBIT" ? "CREDIT" : "DEBIT", 
+                narration: "" 
+            }]
         });
     };
 
@@ -189,29 +202,49 @@ const TransactionForm = ({ onClose, onRefetch }) => {
         const newEntries = [...formData.entries];
         newEntries[index][field] = value;
         
-        // Auto-calculate total if amount changes
-        if (field === "amount") {
-            const total = newEntries.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-            setFormData({...formData, entries: newEntries, totalAmount: total});
-        } else {
-            setFormData({...formData, entries: newEntries});
+        if (field === "ledgerId") {
+            newEntries[index].subledgerId = "";
         }
+        
+        let dr = 0;
+        let cr = 0;
+        newEntries.forEach(e => {
+            const val = parseFloat(e.amount) || 0;
+            if (e.entryType === "DEBIT") dr += val;
+            else cr += val;
+        });
+
+        setTotals({ debit: dr, credit: cr });
+        setFormData({
+            ...formData, 
+            entries: newEntries, 
+            totalAmount: dr
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (Math.abs(totals.debit - totals.credit) > 0.01) {
+            return toast.error(`Transaction not balanced! Difference: ₹${Math.abs(totals.debit - totals.credit).toFixed(2)}`);
+        }
+
+        if (formData.entries.length < 2) {
+            return toast.error("At least two entries are required.");
+        }
+
         try {
             await addTransaction(formData);
             toast.success("Transaction recorded successfully");
             onRefetch();
             onClose();
         } catch (error) {
-            toast.error("Failed to record transaction");
+            toast.error(error.response?.data?.message || "Failed to record transaction");
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[85vh] overflow-y-auto">
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Type *</label>
@@ -253,43 +286,48 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                     </button>
                 </div>
                 {formData.entries.map((entry, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 items-end">
-                        <div className="col-span-4">
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1">Ledger Head</label>
-                            <select value={entry.ledgerId} onChange={e => updateEntry(idx, "ledgerId", e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
-                                <option value="">Select Ledger</option>
-                                {ledgers.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                            </select>
-                        </div>
-                        <div className="col-span-3">
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1">Entry Type</label>
-                            <select value={entry.entryType} onChange={e => updateEntry(idx, "entryType", e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
-                                <option value="DEBIT">Debit</option>
-                                <option value="CREDIT">Credit</option>
-                            </select>
-                        </div>
-                        <div className="col-span-4">
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1">Amount (₹)</label>
-                            <input type="number" value={entry.amount} onChange={e => updateEntry(idx, "amount", e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none" />
-                        </div>
-                        <div className="col-span-1">
-                            {idx > 0 && (
-                                <button type="button" onClick={() => setFormData({...formData, entries: formData.entries.filter((_, i) => i !== idx)})}
-                                    className="p-1 px-2 text-red-500 hover:bg-red-50 rounded-lg mb-1">×</button>
-                            )}
-                        </div>
-                    </div>
+                    <EntryRow 
+                        key={idx} 
+                        entry={entry} 
+                        ledgers={ledgers} 
+                        onUpdate={(field, value) => updateEntry(idx, field, value)}
+                        onRemove={() => setFormData({...formData, entries: formData.entries.filter((_, i) => i !== idx)})}
+                        showRemove={idx > 0}
+                    />
                 ))}
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                <div className="text-sm font-bold text-slate-900">
-                    Total Amount: <span className="text-indigo-600 ml-2">₹{formData.totalAmount.toLocaleString('en-IN')}</span>
+            <div className="bg-slate-900 rounded-2xl p-4 text-white shadow-xl">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Balancing Summary</span>
+                    {Math.abs(totals.debit - totals.credit) < 0.01 ? (
+                        <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                            <CheckCircle size={12} /> BALANCED
+                        </span>
+                    ) : (
+                        <span className="text-[10px] font-bold text-rose-400 flex items-center gap-1">
+                            <AlertCircle size={12} /> UNBALANCED: ₹{Math.abs(totals.debit - totals.credit).toFixed(2)}
+                        </span>
+                    )}
                 </div>
-                <button disabled={isAdding} type="submit" className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 active:scale-95 disabled:opacity-70">
+                <div className="grid grid-cols-2 gap-8">
+                    <div>
+                        <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">Total Debit</div>
+                        <div className="text-xl font-bold">₹{totals.debit.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">Total Credit</div>
+                        <div className="text-xl font-bold">₹{totals.credit.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100">
+                <button 
+                    disabled={isAdding || Math.abs(totals.debit - totals.credit) > 0.01} 
+                    type="submit" 
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 active:scale-95 disabled:opacity-50"
+                >
                     {isAdding && <Loader2 className="animate-spin" size={18} />}
                     Record Transaction
                 </button>
@@ -298,4 +336,58 @@ const TransactionForm = ({ onClose, onRefetch }) => {
     );
 };
 
+const EntryRow = ({ entry, ledgers, onUpdate, onRemove, showRemove }) => {
+    const selectedLedger = ledgers.find(l => l.id === entry.ledgerId);
+    const { data: subledgersData } = useGetSubledgers(entry.ledgerId);
+    const subledgers = subledgersData?.items || [];
+
+    return (
+        <div className="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 items-end">
+            <div className={`${selectedLedger?.bifurcated ? 'col-span-3' : 'col-span-4'}`}>
+                <label className="block text-[10px] font-bold text-slate-400 mb-1">Ledger</label>
+                <select value={entry.ledgerId} onChange={e => onUpdate("ledgerId", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
+                    <option value="">Select Ledger</option>
+                    {ledgers.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                </select>
+            </div>
+
+            {selectedLedger?.bifurcated && (
+                <div className="col-span-3">
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1">Sub-ledger</label>
+                    <select value={entry.subledgerId} onChange={e => onUpdate("subledgerId", e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
+                        <option value="">Select Sub-ledger</option>
+                        {subledgers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                </div>
+            )}
+
+            <div className="col-span-2">
+                <label className="block text-[10px] font-bold text-slate-400 mb-1">DR/CR</label>
+                <select value={entry.entryType} onChange={e => onUpdate("entryType", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
+                    <option value="DEBIT">Debit</option>
+                    <option value="CREDIT">Credit</option>
+                </select>
+            </div>
+
+            <div className={`${selectedLedger?.bifurcated ? 'col-span-3' : 'col-span-3'}`}>
+                <label className="block text-[10px] font-bold text-slate-400 mb-1">Amount</label>
+                <input type="number" step="0.01" value={entry.amount} onChange={e => onUpdate("amount", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none" />
+            </div>
+
+            <div className="col-span-1 text-right">
+                {showRemove ? (
+                    <button type="button" onClick={onRemove} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <XCircle size={18} />
+                    </button>
+                ) : <div className="w-8" />}
+            </div>
+        </div>
+    );
+};
+
 export default Transactions;
+

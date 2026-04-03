@@ -31,6 +31,7 @@ import Accounts from "../pages/Finance/Accounts";
 import Ledgers from "../pages/Finance/Ledgers";
 import Parties from "../pages/Finance/Parties";
 import Transactions from "../pages/Finance/Transactions";
+import FinanceReports from "../pages/Finance/FinanceReports";
 
 
 export const publicRoutes = {
@@ -115,6 +116,7 @@ export const routeConfig = {
       { path: "/ledgers", component: Ledgers },
       { path: "/parties", component: Parties },
       { path: "/transactions", component: Transactions },
+      { path: "/reports", component: FinanceReports },
     ],
   },
 };

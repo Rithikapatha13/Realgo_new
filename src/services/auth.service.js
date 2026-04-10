@@ -16,10 +16,11 @@ export const login = async (phone, companyId, password) => {
   return res.data;
 };
 
-export const changepassword = async (phone, companyId, newPassword) => {
+export const changepassword = async (phone, companyId, oldPassword, newPassword) => {
   const res = await apiClient.post("/auth/change-password", {
     phone,
     companyId,
+    oldPassword,
     newPassword,
   });
 

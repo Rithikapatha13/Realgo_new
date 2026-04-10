@@ -12,6 +12,7 @@ import UserReport from "./../pages/Reports/UserReport";
 import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
 import PlotsReport from "./../pages/Reports/PlotsReport";
 import SalesReport from "./../pages/Reports/SalesReport";
+import PerformanceDashboard from "./../pages/Reports/PerformanceDashboard";
 
 import Greetings from "./../pages/Media/Greetings";
 import News from "./../pages/Media/News";
@@ -27,6 +28,12 @@ import Login from "../pages/auth/Login";
 import Companies from "../pages/SuperAdmin/Companies";
 import SystemDashboard from "../pages/SuperAdmin/SystemDashboard";
 import CompanyDetails from "../pages/SuperAdmin/CompanyDetails";
+import ClientAdminDashboard from "../pages/administration/ClientAdminDashboard";
+import Leads from "../pages/CRM/Leads";
+import UploadLeads from "../pages/CRM/UploadLeads";
+import CRMDashboard from "../pages/CRM/CRMDashboard";
+
+import AddAssociate from "../pages/administration/AddAssociate";
 
 export const publicRoutes = {
   auth: {
@@ -40,7 +47,7 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -52,21 +59,24 @@ export const routeConfig = {
       { path: "/reports/company-users", component: CompanyUsersReport },
       { path: "/reports/plots", component: PlotsReport },
       { path: "/reports/sales", component: SalesReport },
+      { path: "/performance", component: PerformanceDashboard },
     ],
   },
   Administration: {
     basePath: "/",
-    allowedRoles: ["admin", "superadmin"],
+    allowedRoles: ["admin", "superadmin", "clientadmin", "companyadmin"],
     routes: [
+      { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
       { path: "/roles", component: Roles },
       { path: "requests", component: Requests },
+      { path: "/users/add", component: AddAssociate },
     ],
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -77,12 +87,12 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -90,7 +100,7 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {
@@ -100,6 +110,17 @@ export const routeConfig = {
       { path: "companies", component: Companies },
       { path: "companies/:id", component: CompanyDetails },
       { path: "system-dashboard", component: SystemDashboard },
+    ]
+  },
+  CRM: {
+    basePath: "/",
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller"],
+    routes: [
+      { path: "/crm-dashboard", component: CRMDashboard },
+      { path: "/leads", component: Leads },
+      { path: "/leads/upload", component: UploadLeads },
+      { path: "/leads/pending", component: Leads },
+      { path: "/leads/followups", component: Leads },
     ]
   }
 };

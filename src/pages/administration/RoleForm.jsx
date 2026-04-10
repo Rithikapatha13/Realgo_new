@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Button from "@/components/Common/Button";
 import FormInput from "@/components/Common/FormInput";
@@ -6,30 +7,17 @@ import { useAddRole, useUpdateRole } from "@/hooks/useRoles";
 import { getUser } from "@/services/auth.service";
 
 const MODULES_LIST = [
-    "HOME",
-    "PROFILE",
-    "MY TEAM",
-    "REPORTS",
-    "PROJECTS",
-    "PLOTS",
-    "ADMIN",
-    "REQUESTS",
-    "ROLES",
-    "USERS",
-    "GREETINGS",
-    "NEWS",
-    "VIDEOS",
-    "SHOWCASES",
-    "SITE VISITS",
+    "VENTURES",
+    "FINANCE",
+    "ADMINISTRATION",
+    "MEDIA",
+    "SITE_VISITS",
+    "CRM",
 ];
 
 const ASSOCIATE_MODULES = [
-    "PROFILE",
-    "GREETINGS",
-    "PLOTS",
-    "NEWS",
-    "SITE VISITS",
-    "VIDEOS",
+    "MEDIA",
+    "SITE_VISITS",
 ];
 
 const RoleForm = ({ role, action, onClose, onRefetch }) => {
@@ -56,6 +44,11 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
             });
         }
     }, [role, action]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
     const handleModuleToggle = (module) => {
         if (action === "View") return;
@@ -120,25 +113,28 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInput
                     label="Role Name"
+                    name="roleName"
                     value={formData.roleName}
-                    onChange={(val) => setFormData({ ...formData, roleName: val })}
+                    onChange={handleChange}
                     required
                     disabled={isView}
                     placeholder="e.g. Sales Manager"
                 />
                 <FormInput
                     label="Role Number"
+                    name="roleNo"
                     type="number"
                     value={formData.roleNo}
-                    onChange={(val) => setFormData({ ...formData, roleNo: val })}
+                    onChange={handleChange}
                     required
                     disabled={isView}
                     placeholder="e.g. 110"
                 />
                 <FormInput
                     label="Display Name"
+                    name="displayName"
                     value={formData.displayName}
-                    onChange={(val) => setFormData({ ...formData, displayName: val })}
+                    onChange={handleChange}
                     required
                     disabled={isView}
                     placeholder="e.g. Sales Manager"

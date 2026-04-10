@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { MoreVertical, Search, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2, UserPlus } from "lucide-react";
+import { MoreVertical, Search, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2, UserPlus, ShieldCheck } from "lucide-react";
 import { useGetAdmins, useDeleteAdminUser, useUpdateAdminStatus } from "@/hooks/useAdmin";
 import ModalWrapper from "@/components/Common/ModalWrapper";
 import AdminForm from "./AdminForm";
 import { resolveImageUrl } from "@/utils/common";
-import { getUserType } from "@/services/auth.service";
+import { getUserType, getUser } from "@/services/auth.service";
 import { toast } from "react-hot-toast";
 
 export default function Admin() {
@@ -15,8 +15,12 @@ export default function Admin() {
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const userType = getUserType();
-  const isSuperAdmin = userType?.toLowerCase() === "superadmin";
+  const type = (getUserType() || "").toLowerCase();
+  const user = getUser() || {};
+  const role = (user.role || "").toLowerCase();
+  
+  // High-level check: Anyone with 'admin' in their role or type can manage staff
+  const canAddAdmin = type.includes("admin") || role.includes("admin");
 
   const PAGE_SIZE = 12;
   const lastElementRef = useRef(null);
@@ -124,15 +128,13 @@ export default function Admin() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Administrators</h1>
           <p className="text-slate-500 text-sm mt-1">Manage platform administrators and their permissions</p>
         </div>
-        {isSuperAdmin && (
-          <button
-            onClick={handleAdd}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm font-medium w-full sm:w-auto"
-          >
-            <UserPlus size={18} />
-            Add Admin
-          </button>
-        )}
+        <button
+          onClick={handleAdd}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm font-medium w-full sm:w-auto"
+        >
+          <UserPlus size={18} />
+          Add Admin
+        </button>
       </div>
 
       {/* FILTER BAR */}
@@ -245,12 +247,22 @@ export default function Admin() {
 
                 <div className="flex-1 min-w-0 pr-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                       {admin.firstName} {admin.lastName}
+                      {admin.isModuleHead && (
+                        <span className="bg-indigo-600 text-white p-1 rounded-md" title="Module Leader">
+                          <ShieldCheck size={10} />
+                        </span>
+                      )}
                     </h3>
-                    <p className="text-xs font-medium text-slate-400 flex items-center gap-1">
-                      @{admin.username}
-                    </p>
+                    <div className="flex items-center gap-2">
+                       <p className="text-xs font-medium text-slate-400">@{admin.username}</p>
+                       {admin.isModuleHead && (
+                         <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-1.5 py-0.5 rounded-md">
+                           Leader
+                         </span>
+                       )}
+                    </div>
                   </div>
 
                   <div className="mt-3 space-y-1.5">

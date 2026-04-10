@@ -10,10 +10,7 @@ import { getUser, getUserType } from "./services/auth.service";
 function App() {
   const user = getUser();
   const userType = getUserType();
-  const userRole = user?.role?.toLowerCase() || null;
-
-  // Add this check - if no valid user, don't pass userRole at all
-  const isAuthenticated = user && user.role;
+  const isAuthenticated = !!user;
 
   return (
     <BrowserRouter>
@@ -33,7 +30,7 @@ function App() {
             <Layout>
               <ConfigRoutes
                 config={routeConfig}
-                userRole={isAuthenticated ? userType.toLowerCase() : null}
+                userRole={isAuthenticated ? (userType || "").toLowerCase().replace(/_/g, "") : null}
               />
             </Layout>
           }

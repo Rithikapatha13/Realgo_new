@@ -14,6 +14,13 @@ export const getUsersNames = async () => {
     return data;
 };
 
+export const getPotentialParents = async () => {
+    const { data } = await axios.get(`${API_URL}/user/potential-parents`, {
+        headers: getAuthHeader(),
+    });
+    return data;
+};
+
 export const getTeamTree = async (id, role) => {
     try {
         const params = {};

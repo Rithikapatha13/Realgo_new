@@ -50,11 +50,9 @@ const TeamTree = () => {
   ) || [];
 
   // Filter roles
-  const loggedUserRoleNumber = roleData?.items?.role || 999;
+  const loggedUserRoleNumber = roleData?.items?.role || 0;
   const filteredRoles = rolesData?.roles?.filter(
-    (item) =>
-      !['admin', 'pro', 'company', 'accounts'].includes(item.roleName?.toLowerCase()) &&
-      item.roleNo > loggedUserRoleNumber
+    (item) => item.roleNo >= loggedUserRoleNumber
   ) || [];
 
   useEffect(() => {

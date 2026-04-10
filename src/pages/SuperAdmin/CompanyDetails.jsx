@@ -157,24 +157,43 @@ export default function CompanyDetails() {
           </section>
         </div>
 
-        {/* RIGHT COLUMN: ADDITIONAL CONTEXT */}
-        {/* <div className="space-y-6">
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-white shadow-xl bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
-            <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-4">Subscription Status</h3>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/30">
-                <ShieldCheck size={24} />
+        {/* RIGHT COLUMN: PRIMARY ADMINISTRATOR */}
+        <div className="space-y-6">
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-white shadow-xl">
+            <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-6 border-b border-indigo-500/20 pb-2">Primary Administrator</h3>
+            
+            {companyData.clientAdmins?.[0] ? (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold">
+                      {companyData.clientAdmins[0].firstName} {companyData.clientAdmins[0].lastName}
+                    </p>
+                    <p className="text-xs text-slate-400">Company Owner</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-slate-800">
+                  <AdminInfoField icon={Phone} label="Phone" value={companyData.clientAdmins[0].phone} />
+                  <AdminInfoField icon={Mail} label="Email" value={companyData.clientAdmins[0].email} />
+                  <AdminInfoField 
+                    icon={ShieldCheck} 
+                    label="Status" 
+                    value={companyData.clientAdmins[0].status} 
+                    color="text-emerald-400"
+                  />
+                </div>
               </div>
-              <div>
-                <p className="text-xl font-bold">Premium Enterprise</p>
-                <p className="text-xs text-slate-400">Unlimited access to core features</p>
+            ) : (
+              <div className="text-center py-6">
+                <AlertCircle size={32} className="text-slate-600 mx-auto mb-2" />
+                <p className="text-sm text-slate-400">No admin assigned yet.</p>
+                <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-tighter">Click Edit Company to Add Owner</p>
               </div>
-            </div>
-            <div className="space-y-3">
-              <BenefitItem label="Dynamic Sidebar Filtering" />
-              <BenefitItem label="Multi-User Management" />
-              <BenefitItem label="Advanced Inventory Tracking" />
-            </div>
+            )}
           </section>
 
           <section className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm text-center">
@@ -182,9 +201,9 @@ export default function CompanyDetails() {
                <Calendar size={32} className="text-slate-400" />
             </div>
             <h4 className="text-slate-800 font-bold">Registration Reference</h4>
-            <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest">{companyData.id}</p>
+            <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest break-all font-mono">{companyData.id}</p>
           </section>
-        </div> */}
+        </div>
       </div>
 
       {/* EDIT MODAL */}
@@ -260,6 +279,18 @@ function BenefitItem({ label }) {
     <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
       <div className="w-1 h-1 rounded-full bg-indigo-400" />
       {label}
+    </div>
+  );
+}
+
+function AdminInfoField({ icon: Icon, label, value, color = "text-slate-300" }) {
+  return (
+    <div className="flex items-center gap-3">
+      <Icon size={14} className="text-indigo-400" />
+      <div>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{label}</p>
+        <p className={`text-xs font-medium ${color}`}>{value}</p>
+      </div>
     </div>
   );
 }

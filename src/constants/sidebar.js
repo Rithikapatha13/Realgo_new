@@ -71,6 +71,13 @@ export const commonMenu = {
       icon: BarChart3,
       pageTitle: "Reports",
       subtitle: "Generate and view various reports",
+    },
+    {
+      label: "Performance",
+      link: "/performance",
+      icon: TrendingUp,
+      pageTitle: "Performance Tracking",
+      subtitle: "Track module-wise performance metrics",
     }
   ],
 };
@@ -132,6 +139,32 @@ export const venturesMenu = {
   ],
 };
 
+export const financeMenu = {
+  label: "Finance",
+  icon: Wallet,
+  module: "FINANCE",
+  children: [
+    {
+      label: "Ledgers",
+      link: "/ledgers",
+      icon: ListChecks,
+      pageTitle: "Ledgers",
+    },
+    {
+      label: "Transactions",
+      link: "/transactions",
+      icon: Receipt,
+      pageTitle: "Transactions",
+    },
+    {
+      label: "Parties",
+      link: "/parties",
+      icon: Users,
+      pageTitle: "Parties",
+    },
+  ],
+};
+
 export const administrationMenu = {
   label: "Administration",
   icon: User,
@@ -141,8 +174,8 @@ export const administrationMenu = {
       label: "Admin",
       link: "/admin",
       icon: UserPlus,
-      pageTitle: "Admin",
-      subtitle: "Administration Dashboard",
+      pageTitle: "Client Administration",
+      subtitle: "Client Administration Dashboard",
     },
     {
       label: "Requests",
@@ -219,13 +252,100 @@ export const siteVisitsMenu = {
   ],
 };
 
+export const crmMenu = {
+  label: "Leadflow CRM",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    {
+      label: "CRM Dashboard",
+      link: "/crm-dashboard",
+      icon: LayoutDashboard,
+      pageTitle: "CRM Dashboard",
+    },
+    {
+      label: "Leads",
+      link: "/leads",
+      icon: ClipboardCheck,
+      pageTitle: "Leads",
+    },
+    {
+      label: "Upload Leads",
+      link: "/leads/upload",
+      icon: Send,
+      pageTitle: "Upload Leads",
+    },
+    {
+      label: "Pending Leads",
+      link: "/leads/pending",
+      icon: Clock,
+      pageTitle: "Pending Leads",
+    },
+    {
+      label: "Follow-ups",
+      link: "/leads/followups",
+      icon: Calendar,
+      pageTitle: "Follow-ups",
+    },
+  ],
+};
+
+// ==================== CUSTOM ADMIN MENUS ====================
+export const telecallerAdministrationMenu = {
+  label: "Administration",
+  icon: User,
+  module: "ADMINISTRATION",
+  children: [
+    {
+      label: "Users",
+      link: "/users",
+      icon: Users,
+      pageTitle: "Users",
+      subtitle: "Manage and view all users",
+    }
+  ],
+};
+
 // ==================== ROLE-BASED MENUS ====================
 export const adminMenu = [
+  // 3. Marketing Admin
   commonMenu,
   venturesMenu,
   administrationMenu,
   mediaMenu,
   siteVisitsMenu,
+  crmMenu,
+];
+
+export const telecallerAdminMenu = [
+  // 4. Telecaller Admin
+  commonMenu,
+  venturesMenu,
+  telecallerAdministrationMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  crmMenu,
+];
+
+export const financeAdminMenu = [
+  // 5. Finance Admin
+  commonMenu,
+  venturesMenu,
+  financeMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  crmMenu,
+];
+
+export const clientAdminMenu = [
+  // Client/Company Admin
+  commonMenu,
+  venturesMenu,
+  financeMenu,
+  administrationMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  crmMenu,
 ];
 
 export const systemManagementMenu = {
@@ -250,26 +370,78 @@ export const systemManagementMenu = {
   ],
 };
 
-// Cleaned up redundant superAdminMenu definition below
+// ==================== USER-LEVEL MENUS ====================
+export const accountsMenu = [
+  // Regular Finance User
+  commonMenu,
+  financeMenu,
+];
 
+export const telecallerMenu = [
+  // Regular Telecaller User
+  commonMenu,
+  mediaMenu,
+  crmMenu,
+  siteVisitsMenu,
+];
 
 export const associateMenu = [
+  // Regular Associate User
   commonMenu,
   venturesMenu,
   mediaMenu,
   siteVisitsMenu,
+  crmMenu,
 ];
 
 // ==================== HELPER FUNCTION ====================
-export const getMenuByRole = (role) => {
-  const menus = {
-    admin: adminMenu,
+export const getMenuByRole = (role, userModules = [], userType = "user") => {
+  const roleKey = role?.toLowerCase().replace(/_/g, "");
+  const uType = (userType || "user").toLowerCase();
+  
+  // Base menus for each role type
+  const baseMenus = {
+    // Admins
+    admin: adminMenu, // Marketing
+    marketingadmin: adminMenu,
     superadmin: superAdminMenu,
+    companyadmin: clientAdminMenu,
+    clientadmin: clientAdminMenu,
+
+    // Specific Admins vs Users
+    telecaller: uType === "admin" ? telecallerAdminMenu : telecallerMenu,
+    accounts: uType === "admin" ? financeAdminMenu : accountsMenu,
+    finance: uType === "admin" ? financeAdminMenu : accountsMenu,
+
+    // Users
     associate: associateMenu,
     user: associateMenu,
+    salesmanager: adminMenu, 
+    manager: adminMenu,
+    teamlead: associateMenu,
   };
 
-  return menus[role?.toLowerCase()] || associateMenu;
+  const menu = baseMenus[roleKey] || (uType === "admin" ? adminMenu : associateMenu);
+
+  // Filter menu based on userModules
+  // If userModules is ["ALL"], skip filtering
+  if (userModules.includes("ALL")) return menu;
+
+  // Cleanup: Remove any empty strings or nulls from the module array
+  const activeModules = (userModules || []).filter(m => m && m.trim() !== "");
+
+  // Migration Fallback: If NO valid modules are defined yet, show everything
+  if (activeModules.length === 0) {
+    return menu;
+  }
+
+  return menu.filter(item => {
+    // General and System modules are always allowed
+    if (item.module === "GENERAL" || item.module === "SYSTEM") return true;
+    
+    // Check if the specific module is enabled for this user's role
+    return activeModules.includes(item.module);
+  });
 };
 
 export default {

@@ -10,7 +10,7 @@ export default function ProtectedRoute({
   }
 
   if (allowedRoles.length && !allowedRoles.includes(userRole)) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Component />;

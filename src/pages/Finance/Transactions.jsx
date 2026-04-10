@@ -39,7 +39,7 @@ const Transactions = () => {
         <div className="p-6 bg-slate-50/50 min-h-screen">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Transactions</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Financial Transactions</h1>
                     <p className="text-slate-500 text-sm mt-1">Track Receipts, Payments, and Journals</p>
                 </div>
 
@@ -55,7 +55,7 @@ const Transactions = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px] relative">
                     <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <select 
@@ -93,43 +93,43 @@ const Transactions = () => {
             ) : isError ? (
                 <div className="text-center py-20 text-red-500 font-medium">Error loading data.</div>
             ) : transactions.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center text-slate-500">
+                <div className="bg-white border border-dashed border-slate-300 rounded-xl py-20 text-center text-slate-500">
                     <Receipt className="mx-auto mb-4 text-slate-300" size={48} />
                     <h3 className="text-lg font-bold text-slate-900">No Transactions Found</h3>
                     <p className="mt-1">Financial entries will appear here once recorded.</p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date / Ref</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Type</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Party / Project</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Ledger Heads</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Amount</th>
+                                <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">Date / Ref</th>
+                                <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">Type</th>
+                                <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">Party / Project</th>
+                                <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">Ledger Heads</th>
+                                <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Amount</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {transactions.map((tx) => (
                                 <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-2.5">
                                         <div className="font-bold text-slate-900 text-sm">{dayjs(tx.transactionDate).format("DD MMM YYYY")}</div>
                                         <div className="text-[10px] text-slate-400 font-mono mt-0.5">{tx.referenceNumber || "#NOREF"}</div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-2.5">
                                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider border ${getStatusColor(tx.transactionType)}`}>
                                             {tx.transactionType === 'RECEIPT' ? <ArrowDownLeft size={10} /> : tx.transactionType === 'PAYMENT' ? <ArrowUpRight size={10} /> : <FileText size={10} />}
                                             {tx.transactionType}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-2.5">
                                         <div className="text-sm font-semibold text-slate-700 truncate max-w-[150px]">{tx.party?.name || "—"}</div>
                                         <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-1">
                                             <Landmark size={10} /> {tx.project?.projectName || "General"}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-2.5">
                                         <div className="space-y-1">
                                             {tx.entries?.slice(0, 2).map((entry, idx) => (
                                                 <div key={idx} className="text-xs text-slate-600 flex items-center gap-2">
@@ -140,7 +140,7 @@ const Transactions = () => {
                                             {tx.entries?.length > 2 && <div className="text-[10px] text-indigo-500 font-bold">+{tx.entries.length - 2} MORE</div>}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-2.5 text-right">
                                         <div className="text-sm font-bold text-slate-900">₹{tx.totalAmount.toLocaleString('en-IN')}</div>
                                         <div className="text-[10px] text-slate-400 line-clamp-1">{tx.narration || "No narration"}</div>
                                     </td>
@@ -297,7 +297,7 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                 ))}
             </div>
 
-            <div className="bg-slate-900 rounded-2xl p-4 text-white shadow-xl">
+            <div className="bg-slate-900 rounded-xl p-4 text-white shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Balancing Summary</span>
                     {Math.abs(totals.debit - totals.credit) < 0.01 ? (
@@ -310,7 +310,7 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                         </span>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2 gap-5">
                     <div>
                         <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">Total Debit</div>
                         <div className="text-xl font-bold">₹{totals.debit.toLocaleString('en-IN')}</div>
@@ -326,7 +326,7 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                 <button 
                     disabled={isAdding || Math.abs(totals.debit - totals.credit) > 0.01} 
                     type="submit" 
-                    className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 active:scale-95 disabled:opacity-50"
+                    className="w-full bg-primary-600 text-white py-3.5 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm shadow-indigo-100 active:scale-95 disabled:opacity-50"
                 >
                     {isAdding && <Loader2 className="animate-spin" size={18} />}
                     Record Transaction

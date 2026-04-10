@@ -11,6 +11,7 @@ import {
     useGetProfitLoss, useGetBalanceSheet
 } from "@/hooks/useFinance";
 import dayjs from "dayjs";
+import DateRangePicker from "@/components/Common/DateRangePicker";
 
 const FinanceReports = () => {
     const [activeTab, setActiveTab] = useState("ledger");
@@ -32,7 +33,7 @@ const FinanceReports = () => {
         <div className="p-6 bg-slate-50/50 min-h-screen">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Reports</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Financial Reports</h1>
                     <p className="text-slate-500 text-sm mt-1">Analyze your company's financial health</p>
                 </div>
 
@@ -49,14 +50,14 @@ const FinanceReports = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 bg-white p-1 rounded-2xl border border-slate-200 mb-8 w-fit shadow-sm">
+            <div className="flex gap-1 bg-white p-1 rounded-xl border border-slate-200 mb-8 w-fit shadow-sm">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                             activeTab === tab.id 
-                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
+                            ? "bg-primary-600 text-white shadow-sm shadow-indigo-100" 
                             : "text-slate-500 hover:bg-slate-50"
                         }`}
                     >
@@ -68,7 +69,7 @@ const FinanceReports = () => {
 
             {/* Filter Bar (Conditional) */}
             {(activeTab === 'ledger' || activeTab === 'pl') && (
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-4">
+                <div className="bg-white border border-slate-200 rounded-xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-4">
                     {activeTab === 'ledger' && (
                         <>
                             <div className="flex-1 min-w-[200px]">
@@ -86,12 +87,11 @@ const FinanceReports = () => {
                             </div>
                         </>
                     )}
-                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl">
-                        <Calendar size={16} className="text-slate-400" />
-                        <input type="date" value={filters.startDate} onChange={e => setFilters({...filters, startDate: e.target.value})} className="bg-transparent text-xs font-medium outline-none" />
-                        <span className="text-slate-300">to</span>
-                        <input type="date" value={filters.endDate} onChange={e => setFilters({...filters, endDate: e.target.value})} className="bg-transparent text-xs font-medium outline-none" />
-                    </div>
+                    <DateRangePicker 
+                        startDate={filters.startDate} 
+                        endDate={filters.endDate} 
+                        onChange={(start, end) => setFilters({ ...filters, startDate: start, endDate: end })} 
+                    />
                 </div>
             )}
 
@@ -137,7 +137,7 @@ const LedgerStatementReport = ({ filters }) => {
     const entries = data?.items || [];
 
     if (!filters.ledgerId) return (
-        <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center text-slate-400">
+        <div className="bg-white border border-dashed border-slate-300 rounded-xl py-20 text-center text-slate-400">
             Select a ledger head to view statement
         </div>
     );
@@ -147,15 +147,15 @@ const LedgerStatementReport = ({ filters }) => {
     let runningBalance = 0;
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-slate-50 border-b border-slate-200">
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Date</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Particulars</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Debit</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Credit</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Balance</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase">Date</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase">Particulars</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase text-right">Debit</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase text-right">Credit</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase text-right">Balance</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -166,18 +166,18 @@ const LedgerStatementReport = ({ filters }) => {
 
                         return (
                             <tr key={entry.id} className="text-sm hover:bg-slate-50/50">
-                                <td className="px-6 py-4 whitespace-nowrap">{dayjs(entry.transaction.transactionDate).format("DD-MM-YYYY")}</td>
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-2.5 whitespace-nowrap">{dayjs(entry.transaction.transactionDate).format("DD-MM-YYYY")}</td>
+                                <td className="px-6 py-2.5">
                                     <div className="font-medium text-slate-900">{entry.transaction.narration || "No narration"}</div>
                                     <div className="text-[10px] text-slate-400">Ref: {entry.transaction.referenceNumber || "#NOREF"}</div>
                                 </td>
-                                <td className="px-6 py-4 text-right font-medium text-indigo-600">
+                                <td className="px-6 py-2.5 text-right font-medium text-indigo-600">
                                     {entry.entryType === 'DEBIT' ? `₹${amount.toLocaleString()}` : '—'}
                                 </td>
-                                <td className="px-6 py-4 text-right font-medium text-amber-600">
+                                <td className="px-6 py-2.5 text-right font-medium text-amber-600">
                                     {entry.entryType === 'CREDIT' ? `₹${amount.toLocaleString()}` : '—'}
                                 </td>
-                                <td className="px-6 py-4 text-right font-bold text-slate-900">
+                                <td className="px-6 py-2.5 text-right font-bold text-slate-900">
                                     ₹{Math.abs(runningBalance).toLocaleString()} {runningBalance >= 0 ? '(Dr)' : '(Cr)'}
                                 </td>
                             </tr>
@@ -199,31 +199,31 @@ const TrialBalanceReport = () => {
     const totalCr = items.reduce((sum, i) => sum + i.totalCredit, 0);
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-slate-50 border-b border-slate-200">
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Ledger Account</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Account Type</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Debit Balance</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Credit Balance</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase">Ledger Account</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase">Account Type</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase text-right">Debit Balance</th>
+                        <th className="px-6 py-2.5 text-xs font-bold text-slate-500 uppercase text-right">Credit Balance</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                     {items.map((item) => (
                         <tr key={item.id} className="text-sm hover:bg-slate-50/50">
-                            <td className="px-6 py-4 font-medium text-slate-900">{item.name}</td>
-                            <td className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{item.accountType}</td>
-                            <td className="px-6 py-4 text-right font-medium">{item.netBalance > 0 ? `₹${item.netBalance.toLocaleString()}` : '—'}</td>
-                            <td className="px-6 py-4 text-right font-medium">{item.netBalance < 0 ? `₹${Math.abs(item.netBalance).toLocaleString()}` : '—'}</td>
+                            <td className="px-6 py-2.5 font-medium text-slate-900">{item.name}</td>
+                            <td className="px-6 py-2.5 text-xs font-bold text-slate-400 uppercase tracking-widest">{item.accountType}</td>
+                            <td className="px-6 py-2.5 text-right font-medium">{item.netBalance > 0 ? `₹${item.netBalance.toLocaleString()}` : '—'}</td>
+                            <td className="px-6 py-2.5 text-right font-medium">{item.netBalance < 0 ? `₹${Math.abs(item.netBalance).toLocaleString()}` : '—'}</td>
                         </tr>
                     ))}
                 </tbody>
                 <tfoot>
-                    <tr className="bg-slate-900 text-white font-bold">
-                        <td colSpan="2" className="px-6 py-4">TOTAL</td>
-                        <td className="px-6 py-4 text-right">₹{totalDr.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-right">₹{totalCr.toLocaleString()}</td>
+                    <tr className="bg-white/80 border border-slate-200 text-slate-800 font-bold">
+                        <td colSpan="2" className="px-6 py-2.5">TOTAL</td>
+                        <td className="px-6 py-2.5 text-right">₹{totalDr.toLocaleString()}</td>
+                        <td className="px-6 py-2.5 text-right">₹{totalCr.toLocaleString()}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -240,7 +240,7 @@ const ProfitLossReport = ({ filters }) => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <TrendingUp className="text-emerald-500" /> Income
                 </h3>
@@ -258,7 +258,7 @@ const ProfitLossReport = ({ filters }) => {
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <TrendingDown className="text-rose-500" /> Expense
                 </h3>
@@ -276,12 +276,12 @@ const ProfitLossReport = ({ filters }) => {
                 </div>
             </div>
 
-            <div className={`md:col-span-2 p-6 rounded-2xl shadow-lg flex items-center justify-between ${report.netProfit >= 0 ? 'bg-emerald-600' : 'bg-rose-600'} text-white`}>
+            <div className={`md:col-span-2 p-6 rounded-xl shadow-sm flex items-center justify-between ${report.netProfit >= 0 ? 'bg-emerald-600' : 'bg-rose-600'} text-white`}>
                 <div>
                     <h4 className="text-sm font-bold uppercase tracking-widest opacity-80 mb-1">Net {report.netProfit >= 0 ? 'Profit' : 'Loss'}</h4>
-                    <div className="text-4xl font-black">₹{Math.abs(report.netProfit).toLocaleString()}</div>
+                    <div className="text-4xl font-semibold">₹{Math.abs(report.netProfit).toLocaleString()}</div>
                 </div>
-                <div className="bg-white/20 p-4 rounded-2xl">
+                <div className="bg-white/20 p-4 rounded-xl">
                     {report.netProfit >= 0 ? <TrendingUp size={48} /> : <TrendingDown size={48} />}
                 </div>
             </div>
@@ -298,7 +298,7 @@ const BalanceSheetReport = () => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-widest">Assets</h3>
                 <div className="space-y-3">
                     {report.assets.map((a, idx) => (
@@ -314,7 +314,7 @@ const BalanceSheetReport = () => {
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-widest">Liabilities & Equity</h3>
                 <div className="space-y-3">
                     {report.liabilities.map((l, idx) => (

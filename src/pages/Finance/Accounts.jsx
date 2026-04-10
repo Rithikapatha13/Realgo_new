@@ -99,7 +99,7 @@ const Accounts = () => {
         <div className="p-6 bg-slate-50/50 min-h-screen">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Account Tree</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Account Tree</h1>
                     <p className="text-slate-500 text-sm mt-1">Hierarchical Chart of Accounts (COA)</p>
                 </div>
 
@@ -126,20 +126,20 @@ const Accounts = () => {
                     <p className="text-slate-500 font-medium">Loading Account Tree...</p>
                 </div>
             ) : isError ? (
-                <div className="bg-white border rounded-2xl p-10 text-center max-w-md mx-auto">
+                <div className="bg-white border rounded-xl p-10 text-center max-w-md mx-auto">
                     <AlertCircle className="text-red-500 mx-auto mb-4" size={40} />
                     <h3 className="text-lg font-bold text-slate-900">Error Loading Data</h3>
                     <p className="text-slate-500 mt-2">Could not load the chart of accounts. Please check your connection.</p>
-                    <button onClick={() => refetch()} className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-xl font-medium">Retry</button>
+                    <button onClick={() => refetch()} className="mt-6 px-6 py-2 bg-primary-600 text-white rounded-xl font-medium">Retry</button>
                 </div>
             ) : accounts.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center text-slate-500 max-w-lg mx-auto">
+                <div className="bg-white border border-dashed border-slate-300 rounded-xl py-20 text-center text-slate-500 max-w-lg mx-auto">
                     <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                          <RefreshCw className="text-slate-400" size={32} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900">No Accounts Found</h3>
                     <p className="mt-1">Start by creating your first root account (e.g., Assets, Liabilities).</p>
-                    <button onClick={() => handleAddClick(null)} className="mt-6 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition-all shadow-md active:scale-95">Add Root Account</button>
+                    <button onClick={() => handleAddClick(null)} className="mt-6 px-6 py-2.5 bg-primary-600 text-white rounded-xl font-medium transition-all shadow-md active:scale-95">Add Root Account</button>
                 </div>
             ) : (
                 <div className="max-w-4xl mx-auto space-y-2">
@@ -233,7 +233,7 @@ const AccountForm = ({ parentId, parentType, onClose, onRefetch }) => {
                 <button 
                     disabled={isAdding} 
                     type="submit" 
-                    className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
+                    className="w-full bg-primary-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-sm shadow-indigo-100 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
                 >
                     {isAdding ? <Loader2 className="animate-spin" size={20} /> : <Plus size={20} />}
                     {parentId ? "Add Sub-Account" : "Create Root Account"}

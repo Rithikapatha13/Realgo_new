@@ -30,7 +30,7 @@ const Ledgers = () => {
         <div className="p-6 bg-slate-50/50 min-h-screen">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Ledgers</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Ledgers</h1>
                     <p className="text-slate-500 text-sm mt-1">Specific ledger accounts for grouping transactions</p>
                 </div>
 
@@ -83,11 +83,11 @@ const Ledgers = () => {
                     <p className="text-slate-500 font-medium">Loading ledgers...</p>
                 </div>
             ) : isError ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-red-200">
+                <div className="text-center py-20 bg-white rounded-xl border border-dashed border-red-200">
                     <p className="text-red-500 font-medium">Error loading ledgers. Please try again.</p>
                 </div>
             ) : filteredLedgers.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center text-slate-500">
+                <div className="bg-white border border-dashed border-slate-300 rounded-xl py-20 text-center text-slate-500">
                     <Layers className="mx-auto mb-4 text-slate-300" size={48} />
                     <h3 className="text-lg font-bold text-slate-900">No Ledgers Found</h3>
                     <p className="max-w-xs mx-auto mt-2">Create ledgers under your account tree to start tracking transactions.</p>
@@ -95,7 +95,7 @@ const Ledgers = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredLedgers.map((ledger) => (
-                        <div key={ledger.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                        <div key={ledger.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
                             <div>
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
@@ -210,7 +210,7 @@ const SubLedgerForm = ({ ledgerId, onClose, onRefetch }) => {
             <button 
                 disabled={isAdding} 
                 type="submit" 
-                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-70"
+                className="w-full bg-primary-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-sm shadow-indigo-100 active:scale-[0.98] disabled:opacity-70"
             >
                 {isAdding && <Loader2 className="animate-spin" size={20} />}
                 Add Sub-ledger
@@ -290,7 +290,7 @@ const LedgerForm = ({ accounts, onClose, onRefetch }) => {
                 <button 
                     disabled={isAdding} 
                     type="submit" 
-                    className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
+                    className="w-full bg-primary-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-sm shadow-indigo-100 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
                 >
                     {isAdding && <Loader2 className="animate-spin" size={20} />}
                     Create Ledger Account

@@ -120,3 +120,100 @@ export const useGetBalanceSheet = () => {
   });
 };
 
+// ================= BANKS =================
+
+export const useGetBanks = () => {
+    return useQuery({
+        queryKey: ["finance", "banks"],
+        queryFn: financeService.getBanks,
+    });
+};
+
+export const useAddBank = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: financeService.addBank,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+        },
+    });
+};
+
+// ================= CHEQUE SERIES =================
+
+export const useGetChequeSeries = () => {
+    return useQuery({
+        queryKey: ["finance", "cheque-series"],
+        queryFn: financeService.getChequeSeries,
+    });
+};
+
+export const useAddChequeSeries = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: financeService.addChequeSeries,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["finance", "cheque-series"] });
+        },
+    });
+};
+
+// ================= SPECIALIZED TRANSACTIONS =================
+
+export const useAddReceipt = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: financeService.addReceipt,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["finance", "transactions"] });
+        },
+    });
+};
+
+export const useAddPayment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: financeService.addPayment,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["finance", "transactions"] });
+        },
+    });
+};
+
+export const useGetChequeDetails = () => {
+    return useQuery({
+        queryKey: ["finance", "cheque-details"],
+        queryFn: financeService.getChequeDetails,
+    });
+};
+
+// ================= ADVANCED REPORTS =================
+
+export const useGetCashBook = (params) => {
+    return useQuery({
+        queryKey: ["finance", "reports", "cash-book", params],
+        queryFn: () => financeService.getCashBook(params),
+    });
+};
+
+export const useGetBankBook = (params) => {
+    return useQuery({
+        queryKey: ["finance", "reports", "bank-book", params],
+        queryFn: () => financeService.getBankBook(params),
+    });
+};
+
+export const useGetDayBook = (params) => {
+    return useQuery({
+        queryKey: ["finance", "reports", "day-book", params],
+        queryFn: () => financeService.getDayBook(params),
+    });
+};
+
+export const useGetBRS = () => {
+    return useQuery({
+        queryKey: ["finance", "reports", "brs"],
+        queryFn: financeService.getBRS,
+    });
+};
+

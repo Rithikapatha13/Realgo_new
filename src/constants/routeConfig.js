@@ -32,6 +32,16 @@ import Ledgers from "../pages/Finance/Ledgers";
 import Parties from "../pages/Finance/Parties";
 import Transactions from "../pages/Finance/Transactions";
 import FinanceReports from "../pages/Finance/FinanceReports";
+import GeneralReceipt from "../pages/Finance/GeneralReceipt";
+import PaymentVoucher from "../pages/Finance/PaymentVoucher";
+import JournalVoucher from "../pages/Finance/JournalVoucher";
+import BankConfig from "../pages/Finance/BankConfig";
+import ChequeSeriesConfig from "../pages/Finance/ChequeSeriesConfig";
+import CashBook from "../pages/Finance/CashBook";
+import BankBook from "../pages/Finance/BankBook";
+import DayBook from "../pages/Finance/DayBook";
+import BRS from "../pages/Finance/BRS";
+import FinanceHome from "../pages/Finance/FinanceHome";
 
 
 export const publicRoutes = {
@@ -46,7 +56,7 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -62,7 +72,7 @@ export const routeConfig = {
   },
   Administration: {
     basePath: "/",
-    allowedRoles: ["admin", "superadmin"],
+    allowedRoles: ["admin", "superadmin", "accounts"],
     routes: [
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
@@ -72,7 +82,7 @@ export const routeConfig = {
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -83,12 +93,12 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts"],
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -96,7 +106,7 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {
@@ -110,13 +120,28 @@ export const routeConfig = {
   },
   Finance: {
     basePath: "/finance",
-    allowedRoles: ["admin", "superadmin"],
+    allowedRoles: ["accounts", "admin", "superadmin"],
     routes: [
+      { path: "", component: FinanceHome },
       { path: "/accounts", component: Accounts },
       { path: "/ledgers", component: Ledgers },
+      { path: "/subledgers", component: Ledgers }, // Reusing Ledgers for now or create SubLedgers
       { path: "/parties", component: Parties },
       { path: "/transactions", component: Transactions },
       { path: "/reports", component: FinanceReports },
+      { path: "/bank", component: BankConfig },
+      { path: "/cheque-series", component: ChequeSeriesConfig },
+      { path: "/general-receipt", component: GeneralReceipt },
+      { path: "/payment-voucher", component: PaymentVoucher },
+      { path: "/journal-voucher", component: JournalVoucher },
+      { path: "/cheque-details", component: BRS }, // Reusing BRS or create ChequeDetails
+      { path: "/reports/cash-book", component: CashBook },
+      { path: "/reports/bank-book", component: BankBook },
+      { path: "/reports/day-book", component: DayBook },
+      { path: "/reports/brs", component: BRS },
+      { path: "/reports/trial-balance", component: FinanceReports },
+      { path: "/reports/profit-loss", component: FinanceReports },
+      { path: "/reports/balance-sheet", component: FinanceReports },
     ],
   },
 };

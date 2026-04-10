@@ -35,7 +35,7 @@ const Parties = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Parties</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Parties</h1>
                     <p className="text-slate-500 text-sm mt-1">Manage Vendors, Customers, and financial entities</p>
                 </div>
 
@@ -88,13 +88,13 @@ const Parties = () => {
                     <button onClick={() => refetch()} className="mt-4 text-indigo-600 underline">Retry</button>
                 </div>
             ) : filteredParties.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-20 text-center text-slate-500">
+                <div className="bg-white border border-dashed border-slate-300 rounded-xl py-20 text-center text-slate-500">
                     No parties found matching your criteria.
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredParties.map((party) => (
-                        <div key={party.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div key={party.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
                                     <User size={24} />
@@ -209,7 +209,7 @@ const PartyForm = ({ onClose, onRefetch }) => {
                 </div>
             </div>
 
-            <button disabled={isAdding} type="submit" className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+            <button disabled={isAdding} type="submit" className="w-full bg-primary-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
                 {isAdding && <Loader2 className="animate-spin" size={18} />}
                 Add Party
             </button>

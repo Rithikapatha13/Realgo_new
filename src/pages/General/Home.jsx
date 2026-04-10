@@ -6,7 +6,8 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import SystemDashboard from "../SuperAdmin/SystemDashboard";
-import { getUserType } from "@/services/auth.service";
+import FinanceHome from "../Finance/FinanceHome";
+import { getUser, getUserType } from "@/services/auth.service";
 
 /* ================= QUICK ACCESS CARDS ================= */
 const cards = [
@@ -39,6 +40,8 @@ export default function Home() {
   const navigate = useNavigate();
   const [openPending, setOpenPending] = useState(false);
   const userType = getUserType()?.toLowerCase();
+  const user = getUser();
+  const role = user?.role?.toLowerCase();
 
   // If superadmin, render the SystemDashboard instead of the regular Home view
   if (userType === "superadmin" || userType === "super-admin") {
@@ -47,6 +50,11 @@ export default function Home() {
         <SystemDashboard />
       </div>
     );
+  }
+
+  // If accounts, render the FinanceHome
+  if (role === "accounts") {
+    return <FinanceHome />;
   }
 
   return (

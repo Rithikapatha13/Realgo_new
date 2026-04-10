@@ -129,7 +129,12 @@ export default function Login() {
 
       toast.success("Login successful! Redirecting...");
       await delay(1500);
-      window.location.href = "/";
+
+      if (res.user?.role?.toLowerCase() === "accounts") {
+        window.location.href = "/finance";
+      } else {
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Login error:", error);
       setError(

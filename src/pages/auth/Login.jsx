@@ -27,11 +27,13 @@ export default function Login() {
   const [companies, setCompanies] = useState([]);
   const [companyId, setCompanyId] = useState("");
   const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   // UI states
   const [showPassword, setShowPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
@@ -110,13 +112,6 @@ export default function Login() {
     try {
       const res = await login(phone, companyId, password);
 
-      // Check if password change is required
-      if (res.message?.toLowerCase().includes("change")) {
-        toast("Password change required");
-        setStep(STEPS.CHANGE_PASSWORD);
-        return;
-      }
-
       // Successful login
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
@@ -136,6 +131,14 @@ export default function Login() {
         window.location.href = "/";
       }
     } catch (error) {
+      const status = error?.response?.status;
+      // 403 means password not changed yet → go to Change Password step
+      if (status === 403) {
+        setOldPassword(password); // pre-fill old password from what they just typed
+        setStep(STEPS.CHANGE_PASSWORD);
+        clearError();
+        return;
+      }
       console.error("Login error:", error);
       setError(
         error?.response?.data?.message || "Invalid password. Please try again."
@@ -149,13 +152,18 @@ export default function Login() {
   // STEP 4: CHANGE PASSWORD
   // ===============================
   const handleChangePassword = async () => {
-    if (!newPassword || !confirmPassword) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
       setError("Please fill in all password fields");
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
+      setError("New password must be at least 6 characters long");
+      return;
+    }
+
+    if (newPassword === oldPassword) {
+      setError("New password must be different from your current password");
       return;
     }
 
@@ -168,14 +176,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await changepassword(phone, companyId, newPassword);
+      const res = await changepassword(phone, companyId, oldPassword, newPassword);
 
       if (res.success) {
         toast.success(
-          "Password changed successfully! Please login with your new password."
+          "Password changed! Please login with your new password."
         );
-        // Reset password fields and go back to password step
         setPassword("");
+        setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
         setStep(STEPS.PASSWORD);
@@ -202,6 +210,7 @@ export default function Login() {
       setCompanyId("");
     } else if (step === STEPS.CHANGE_PASSWORD) {
       setStep(STEPS.PASSWORD);
+      setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
     }
@@ -234,7 +243,7 @@ export default function Login() {
       case STEPS.PASSWORD:
         return "Enter your password to access your account";
       case STEPS.CHANGE_PASSWORD:
-        return "Please set a new password for your account";
+        return "For security, set a new password before continuing. Your current password is Realgo@123";
       default:
         return "";
     }
@@ -396,13 +405,35 @@ export default function Login() {
             {/* STEP 4: CHANGE PASSWORD */}
             {step === STEPS.CHANGE_PASSWORD && (
               <>
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-amber-800">
-                    For security reasons, you need to change your password
-                    before continuing.
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-2">
+                  <p className="text-sm text-amber-800 font-medium">🔐 First-time setup required</p>
+                  <p className="text-xs text-amber-700 mt-1">
+                    Your account uses a default password. Please set a new one to continue.
                   </p>
                 </div>
 
+                {/* Current Password */}
+                <div className="relative">
+                  <FormInput
+                    label="Current Password"
+                    type={showOldPassword ? "text" : "password"}
+                    value={oldPassword}
+                    onChange={(e) => {
+                      setOldPassword(e.target.value);
+                      clearError();
+                    }}
+                    placeholder="Enter your current / default password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                {/* New Password */}
                 <div className="relative">
                   <FormInput
                     label="New Password"
@@ -412,7 +443,7 @@ export default function Login() {
                       setNewPassword(e.target.value);
                       clearError();
                     }}
-                    placeholder="Enter new password"
+                    placeholder="Enter new password (min. 6 characters)"
                   />
                   <button
                     type="button"
@@ -423,16 +454,17 @@ export default function Login() {
                   </button>
                 </div>
 
+                {/* Confirm Password */}
                 <div className="relative">
                   <FormInput
-                    label="Confirm Password"
+                    label="Confirm New Password"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => {
                       setConfirmPassword(e.target.value);
                       clearError();
                     }}
-                    placeholder="Confirm new password"
+                    placeholder="Re-enter new password"
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleChangePassword()
                     }
@@ -454,9 +486,9 @@ export default function Login() {
                   onClick={handleChangePassword}
                   className="w-full"
                   loading={loading}
-                  disabled={!newPassword || !confirmPassword}
+                  disabled={!oldPassword || !newPassword || !confirmPassword}
                 >
-                  Update Password
+                  Set New Password
                 </Button>
               </>
             )}

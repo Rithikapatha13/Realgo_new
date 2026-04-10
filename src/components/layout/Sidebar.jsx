@@ -22,18 +22,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const user = getUser();
   const userType = getUserType()?.toLowerCase();
   const isSuperAdmin = userType === "superadmin" || user?.role?.toLowerCase() === "superadmin" || userType === "super-admin";
-  const isAdmin = userType === "admin" || user?.role?.toLowerCase() === "admin";
-  const rawSidebarMenu = getMenuByRole(isSuperAdmin ? "superadmin" : user?.role || "associate");
-
-  // Filter menu based on company modules
-  const companyModules = user?.company?.modules || [];
-  const sidebarMenu = rawSidebarMenu.filter((item) => {
-    // SuperAdmin, Admin or ALWAYS visible modules
-    if (isSuperAdmin || isAdmin || item.module === "GENERAL" || item.module === "SYSTEM") return true;
-    
-    // Check if module is enabled for company
-    return companyModules.includes(item.module);
-  });
+  const isClientAdmin = userType === "clientadmin" || user?.role?.toLowerCase() === "companyadmin" || user?.role?.toLowerCase() === "clientadmin";
+  const isAdmin = userType === "admin" || user?.role?.toLowerCase() === "admin" || isClientAdmin;
+  const userModules = user?.roleModules || [];
+  const sidebarMenu = getMenuByRole(
+    isSuperAdmin ? "superadmin" : (user?.role || userType || "associate").toLowerCase(),
+    isSuperAdmin || isAdmin ? ["ALL"] : userModules,
+    userType
+  );
 
   const toggleSection = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));

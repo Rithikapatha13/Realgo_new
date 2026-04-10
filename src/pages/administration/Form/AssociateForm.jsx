@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useAddUser, useUpdateUser } from "@/hooks/useUser";
+import { useAddUser, useUpdateUser, useGetPotentialParents } from "@/hooks/useUser";
 import { useGetAllRoles } from "@/hooks/useRoles";
 import { getUser } from "@/services/auth.service";
 import { resolveImageUrl } from "@/utils/common";
 import toast from "react-hot-toast";
-import { User, Mail, Phone, Shield, Calendar, MapPin, Save, X, Loader2, Maximize2 } from "lucide-react";
+import { User, Mail, Phone, Shield, Calendar, MapPin, Save, X, Loader2, Maximize2, Users } from "lucide-react";
 import FileUpload from "@/components/Common/FileUpload";
 
 export default function AssociateForm({ item, action, onClose, onRefetch }) {
@@ -13,10 +13,15 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
     const { mutateAsync: addUser, isPending: isAdding } = useAddUser();
     const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
     const { data: rolesResponse } = useGetAllRoles();
+    const { data: parentsResponse } = useGetPotentialParents();
     const [zoomImage, setZoomImage] = useState(null);
 
     const loggedInUser = getUser();
+    const roleName = (loggedInUser?.role || "").toUpperCase();
+    const isAdmin = roleName === "COMPANY_ADMIN" || roleName === "ADMIN" || roleName === "SUPERADMIN";
+
     const rolesList = rolesResponse?.roles || [];
+    const parentsList = parentsResponse?.data?.items || [];
     const watchedImage = watch("image");
 
     useEffect(() => {
@@ -29,6 +34,7 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
                 phone: item?.phone || "",
                 alternativePhone: item?.alternativePhone || "",
                 roleId: item?.roleId || item?.role?.id || "",
+                referId: item?.referId || item?.teamHeadId || "",
                 status: item?.status || "PENDING",
                 gender: item?.gender || "",
                 bloodGroup: item?.bloodGroup || "",
@@ -53,6 +59,8 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
             const payload = {
                 ...data,
                 companyId: loggedInUser.companyId,
+                // Default referId to current user if not provided (for non-admins)
+                referId: data.referId || (isAdmin ? null : loggedInUser.id),
             };
 
             if (action === "Update") {
@@ -252,6 +260,22 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
                         </select>
                         {errors.roleId && <span className="text-[10px] font-bold text-red-500 ml-1">{errors.roleId.message}</span>}
                     </div>
+
+                    {isAdmin && (
+                        <div className="space-y-1">
+                            <label className={labelClasses}>Team Leader / Referrer</label>
+                            <select
+                                {...register("referId")}
+                                disabled={isView}
+                                className={inputClasses}
+                            >
+                                <option value="">Direct (No Leader)</option>
+                                {parentsList.map(parent => (
+                                    <option key={parent.id} value={parent.id}>{parent.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     <div className="space-y-1">
                         <label className={labelClasses}>Account Status</label>

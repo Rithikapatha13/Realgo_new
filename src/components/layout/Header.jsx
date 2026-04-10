@@ -143,10 +143,15 @@ export default function Header({
             <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center ring-2 ring-secondary-500 ring-offset-2">
               <User size={16} className="text-white" />
             </div>
-            <div className="hidden md:block text-left">
-              <p className="text-sm font-medium">{user?.userName || "Guest"}</p>
-              <br></br>
-              <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+            <div className="hidden md:block text-left leading-tight">
+              <p className="text-sm font-bold text-slate-800">
+                {(user?.firstName || user?.lastName) 
+                  ? `${user?.firstName || ''} ${user?.lastName || ''}`.trim() 
+                  : (user?.userName || "Guest")}
+              </p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                {user?.role === "COMPANY_ADMIN" ? "CLIENT_ADMIN" : (user?.role || "associate")}
+              </p>
             </div>
           </button>
 

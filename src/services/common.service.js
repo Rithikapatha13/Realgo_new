@@ -3,13 +3,10 @@ import apiClient from "../config/apiClient";
 /**
  * Update profile
  */
-export const updateProfile = async (id, username, image, email, isAdmin) => {
+export const updateProfile = async (data) => {
   const res = await apiClient.post("/common/update-profile", {
-    username,
-    image,
-    email,
-    id,
-    isAdmin,
+    ...data,
+    userType: data.userType || (data.isAdmin ? "admin" : "user"),
   });
   return res.data;
 };

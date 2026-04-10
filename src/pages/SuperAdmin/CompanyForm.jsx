@@ -53,6 +53,19 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
     openingBalance: "",
     openingBalanceDate: "",
     openingBalanceType: "DEBIT",
+    // Owner Details
+    ownerFirstName: "",
+    ownerLastName: "",
+    ownerFatherOrHusband: "",
+    ownerGender: "",
+    ownerDob: "",
+    ownerBloodGroup: "",
+    ownerAadharNo: "",
+    ownerPanNo: "",
+    ownerBankName: "",
+    ownerBankAccountNo: "",
+    ownerIfsc: "",
+    ownerBranch: "",
   });
 
   const [uploading, setUploading] = useState(false);
@@ -76,10 +89,22 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
         authIdPrefix: company.authIdPrefix || "",
         transactionPrefix: company.transactionPrefix || "",
         openingBalance: company.openingBalance || "",
-        openingBalanceDate: company.openingBalanceDate
-          ? new Date(company.openingBalanceDate).toISOString().split("T")[0]
-          : "",
         openingBalanceType: company.openingBalanceType || "DEBIT",
+        // Populate owner details if they exist (from company.clientAdmins[0])
+        ownerFirstName: company.clientAdmins?.[0]?.firstName || "",
+        ownerLastName: company.clientAdmins?.[0]?.lastName || "",
+        ownerFatherOrHusband: company.clientAdmins?.[0]?.fatherOrHusband || "",
+        ownerGender: company.clientAdmins?.[0]?.gender || "",
+        ownerDob: company.clientAdmins?.[0]?.dob
+          ? new Date(company.clientAdmins[0].dob).toISOString().split("T")[0]
+          : "",
+        ownerBloodGroup: company.clientAdmins?.[0]?.bloodGroup || "",
+        ownerAadharNo: company.clientAdmins?.[0]?.aadharNo || "",
+        ownerPanNo: company.clientAdmins?.[0]?.panNo || "",
+        ownerBankName: company.clientAdmins?.[0]?.bankName || "",
+        ownerBankAccountNo: company.clientAdmins?.[0]?.bankAccountNo || "",
+        ownerIfsc: company.clientAdmins?.[0]?.ifsc || "",
+        ownerBranch: company.clientAdmins?.[0]?.branch || "",
       });
       if (company.img) {
         setSelectedImage(resolveImageUrl(company.img));
@@ -211,6 +236,79 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
           className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:text-gray-500"
           required
         />
+      </div>
+
+      {/* OWNER DETAILS SECTION */}
+      <div className="space-y-6 pt-6 border-t-2 border-slate-100">
+          <div className="bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+            Owner / Primary Administrator Details
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Owner First Name<span className="text-red-500">*</span></label>
+              <input type="text" name="ownerFirstName" value={formData.ownerFirstName} onChange={handleChange} required className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Owner Last Name</label>
+              <input type="text" name="ownerLastName" value={formData.ownerLastName} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Father/Husband Name</label>
+              <input type="text" name="ownerFatherOrHusband" value={formData.ownerFatherOrHusband} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Gender</label>
+                <select name="ownerGender" value={formData.ownerGender} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50">
+                  <option value="">Select</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">DOB</label>
+                <input type="date" name="ownerDob" value={formData.ownerDob} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50" />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Aadhar Number</label>
+              <input type="text" name="ownerAadharNo" value={formData.ownerAadharNo} onChange={handleChange} placeholder="0000-0000-0000" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">PAN Number</label>
+              <input type="text" name="ownerPanNo" value={formData.ownerPanNo} onChange={handleChange} placeholder="ABCDE1234F" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+            </div>
+          </div>
+
+          <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <label className="block text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2">Owner Banking Information</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Bank Name</label>
+                <input type="text" name="ownerBankName" value={formData.ownerBankName} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-white uppercase font-medium" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Account Number</label>
+                <input type="text" name="ownerBankAccountNo" value={formData.ownerBankAccountNo} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-white uppercase font-medium" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">IFSC Code</label>
+                <input type="text" name="ownerIfsc" value={formData.ownerIfsc} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-white uppercase font-medium" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Branch</label>
+                <input type="text" name="ownerBranch" value={formData.ownerBranch} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-white uppercase font-medium" />
+              </div>
+            </div>
+        </div>
       </div>
 
       {/* 2. Address */}

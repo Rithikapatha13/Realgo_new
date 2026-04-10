@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MoreVertical, Search, Plus, Filter, SlidersHorizontal, X,
   UserPlus, Shield, UserCheck, UserX, UserMinus, Eye, Pencil,
-  Trash2, Key, TrendingUp, Phone, Contact, Network, Loader2, CheckCircle, Clock, XCircle, Mail
+  Trash2, Key, TrendingUp, Phone, Contact, Network, Loader2, CheckCircle, Clock, XCircle, Mail, Upload
 } from "lucide-react";
 import { useGetUsersData, useDeleteUser, useResetPassword } from "@/hooks/useUser";
 import { useGetAllRoles } from "@/hooks/useRoles";
@@ -25,8 +26,14 @@ const STATUS_CONFIG = {
 };
 
 export default function Users() {
+  const navigate = useNavigate();
   const loggedInUser = getUser();
-  const isAdminOrPro = ["admin", "pro", "superadmin", "accounts"].includes(loggedInUser?.userType?.toLowerCase() || loggedInUser?.role?.toLowerCase() || loggedInUser?.roleName?.toLowerCase());
+  const userType = (loggedInUser?.userType || "").toLowerCase();
+  const rawRole = (loggedInUser?.roleName || loggedInUser?.role?.roleName || loggedInUser?.role || "").toUpperCase();
+  const canManageUsers = 
+    userType.includes("admin") || 
+    rawRole.includes("ADMIN") || 
+    rawRole === "PRO";
 
   // --- Search & Filters State ---
   const [search, setSearch] = useState("");
@@ -113,9 +120,7 @@ export default function Users() {
 
   // --- Handlers ---
   const handleAddAssociate = () => {
-    setSelectedUser(null);
-    setFormAction("Create");
-    setIsFormOpen(true);
+    navigate("/users/add");
   };
 
   const handleEdit = (user) => {
@@ -185,14 +190,23 @@ export default function Users() {
         </div>
 
         <div className="flex items-center gap-2">
-          {isAdminOrPro && (
-            <button
-              onClick={handleAddAssociate}
-              className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-md shadow-indigo-200 active:scale-95 text-sm"
-            >
-              <Plus size={20} />
-              <span>Add New Associate</span>
-            </button>
+          {canManageUsers && (
+            <>
+              <button
+                onClick={handleAddAssociate}
+                className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-md shadow-indigo-200 active:scale-95 text-sm"
+              >
+                <Plus size={20} />
+                <span>Add Associate</span>
+              </button>
+              <button
+                onClick={() => window.location.href = "/user/add-bulk-associates"}
+                className="inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-xl font-medium transition-all shadow-sm active:scale-95 text-sm"
+              >
+                <Upload size={20} className="text-indigo-600" />
+                <span>Bulk Upload</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -296,7 +310,7 @@ export default function Users() {
                 className="group bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative"
               >
                 {/* MENU TOGGLE */}
-                {isAdminOrPro && (
+                {canManageUsers && (
                   <div className="absolute top-4 right-4">
                     <button onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
                       className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">

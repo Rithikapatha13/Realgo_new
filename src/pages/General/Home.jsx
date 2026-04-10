@@ -6,7 +6,11 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import SystemDashboard from "../SuperAdmin/SystemDashboard";
+<<<<<<< HEAD
 import FinanceHome from "../Finance/FinanceHome";
+=======
+import ClientAdminDashboard from "../administration/ClientAdminDashboard";
+>>>>>>> deploy
 import { getUser, getUserType } from "@/services/auth.service";
 
 /* ================= QUICK ACCESS CARDS ================= */
@@ -39,12 +43,20 @@ const COLORS = ["#ff0000", "#ffa500", "#228b22", "#808080"];
 export default function Home() {
   const navigate = useNavigate();
   const [openPending, setOpenPending] = useState(false);
+  const user = getUser();
   const userType = getUserType()?.toLowerCase();
+<<<<<<< HEAD
   const user = getUser();
   const role = user?.role?.toLowerCase();
+=======
+  
+  const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
+  const userRoleStr = user?.role?.toLowerCase() || "";
+  const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin";
+>>>>>>> deploy
 
   // If superadmin, render the SystemDashboard instead of the regular Home view
-  if (userType === "superadmin" || userType === "super-admin") {
+  if (isSuperAdmin) {
     return (
       <div className="min-h-screen">
         <SystemDashboard />
@@ -58,9 +70,9 @@ export default function Home() {
   }
 
   return (
-    <div className=" space-y-5 min-h-screen">
+    <div className="space-y-5 min-h-screen pb-10">
       {/* ================= BANNER ================= */}
-      <div className="relative w-full h-[38vh] rounded-xl overflow-hidden">
+      <div className="relative w-full h-[38vh] rounded-xl overflow-hidden shadow-sm">
         {/* Image */}
         <img
           src=" /assets/Banner/banner.jpg"
@@ -73,19 +85,19 @@ export default function Home() {
 
         {/* Text */}
         <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">
+          <div className="text-2xl sm:text-3xl font-semibold text-slate-900 leading-tight">
             <Typewriter
               onInit={(typewriter) => {
-                typewriter.typeString("Welcome to Grupe").start();
+                typewriter.typeString(`Welcome to grupe, ${user?.firstName || 'Admin'}`).start();
               }}
               options={{
                 delay: 70,
                 cursor: "",
               }}
             />
-          </h1>
+          </div>
 
-          <p className="mt-1 text-sm sm:text-base text-slate-800">
+          <div className="mt-1 text-sm sm:text-base text-slate-800">
             <Typewriter
               onInit={(typewriter) => {
                 typewriter
@@ -98,7 +110,7 @@ export default function Home() {
                 cursor: "",
               }}
             />
-          </p>
+          </div>
         </div>
       </div>
 
@@ -107,12 +119,12 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setOpenPending(false)}
           />
 
           {/* Modal */}
-          <div className="relative bg-white rounded-xl w-full max-w-md shadow-lg">
+          <div className="relative bg-white rounded-xl w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b">
               <h2 className="text-base font-semibold text-slate-800">
@@ -152,25 +164,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      {/* ================= KPI STATS (MINIMAL) ================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
-        <div className="relative">
-          <MinimalKpi title="Total Associates" value="424" icon={Users} />
-
-          {/* SMALL BUTTON */}
-          <button
-            onClick={() => setOpenPending(true)}
-            className="absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center"
-            title="View pending associates"
-          >
-            <Plus size={12} className="text-slate-600" />
-          </button>
-        </div>
-
-        <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
-        <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
-      </div>
 
       {/* ================= QUICK ACCESS ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -224,120 +217,147 @@ export default function Home() {
         />
       </div>
 
-      {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Plot Bookings */}
-        <CompactCalendar />
-
-        {/* SALES OVERVIEW */}
-        <div className="bg-white/80 rounded-xl border border-slate-200 p-4">
-          <h2 className="text-base font-semibold text-slate-800 mb-4">
-            Sales Overview
-          </h2>
-
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={salesData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  innerRadius={45}
-                  paddingAngle={3}
-                >
-                  {salesData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index]} />
-                  ))}
-                </Pie>
-
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+      {isClientAdmin ? (
+        /* ================= CLIENT ADMIN VIEW ================= */
+        <div className="pt-2">
+           <ClientAdminDashboard />
         </div>
+      ) : (
+        /* ================= REGULAR ADMIN / ASSOCIATE VIEW ================= */
+        <div className="space-y-5">
+           {/* ================= KPI STATS (MINIMAL) ================= */}
+           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+             <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
+             <div className="relative">
+               <MinimalKpi title="Total Associates" value="424" icon={Users} />
+               {/* SMALL BUTTON */}
+               <button
+                 onClick={() => setOpenPending(true)}
+                 className="absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shadow-sm"
+                 title="View pending associates"
+               >
+                 <Plus size={12} className="text-slate-600" />
+               </button>
+             </div>
+             <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
+             <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
+           </div>
 
-        {/* PROJECT STATUS */}
-        <div className="bg-white/80 rounded-lg border border-slate-200 p-3">
-          <h2 className="text-base font-semibold text-slate-800 mb-3">
-            Project Status
-          </h2>
+           {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+             {/* Plot Bookings */}
+             <CompactCalendar />
 
-          <div className="space-y-4">
-            <StatusRow label="Available" value={258} color="bg-primary-500" />
-            <StatusRow label="Sold" value={89} color="bg-emerald-500" />
-            <StatusRow label="Booked" value={42} color="bg-secondary-500" />
-            <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
-          </div>
+             {/* SALES OVERVIEW */}
+             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+               <h2 className="text-base font-semibold text-slate-800 mb-4">
+                 Sales Overview
+               </h2>
+
+               <div className="h-56 min-w-0" style={{ minHeight: '224px' }}>
+                 <ResponsiveContainer width="99%" height="100%">
+                   <PieChart>
+                     <Pie
+                       data={salesData}
+                       dataKey="value"
+                       nameKey="name"
+                       cx="50%"
+                       cy="50%"
+                       outerRadius={80}
+                       innerRadius={45}
+                       paddingAngle={3}
+                     >
+                       {salesData.map((_, index) => (
+                         <Cell key={index} fill={COLORS[index]} />
+                       ))}
+                     </Pie>
+                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                   </PieChart>
+                 </ResponsiveContainer>
+               </div>
+             </div>
+
+             {/* PROJECT STATUS */}
+             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+               <h2 className="text-base font-semibold text-slate-800 mb-3">
+                 Project Status
+               </h2>
+
+               <div className="space-y-4 pt-2">
+                 <StatusRow label="Available" value={258} color="bg-primary-500" />
+                 <StatusRow label="Sold" value={89} color="bg-emerald-500" />
+                 <StatusRow label="Booked" value={42} color="bg-secondary-500" />
+                 <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
+               </div>
+             </div>
+           </div>
+
+           {/* ================= LOWER SECTION ================= */}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pb-10">
+             {/* LATEST NEWS */}
+             <div className="lg:col-span-2 bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+               <h2 className="text-base font-semibold text-slate-800 mb-3">
+                 Latest News
+               </h2>
+
+               <div className="space-y-3 pt-2">
+                 {[1, 2, 3].map((i) => (
+                   <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
+                     <p className="text-sm font-medium text-slate-800">
+                       New project launch announced in sector {i * 10}
+                     </p>
+                     <p className="text-xs text-slate-500 mt-1">{i * 2} hours ago</p>
+                   </div>
+                 ))}
+               </div>
+             </div>
+
+             {/* RIGHT COLUMN */}
+             <div className="space-y-4">
+               {/* PENDING ASSOCIATES */}
+               <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                 <h2 className="text-base font-semibold text-slate-800 mb-3">
+                   Pending Associates
+                 </h2>
+
+                 <div className="space-y-3 pt-1">
+                   {[1, 2, 3].map((i) => (
+                     <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                       <div>
+                         <p className="text-[13px] font-bold text-slate-800">
+                           Associate #{i + 104}
+                         </p>
+                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
+                       </div>
+                       <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
+                         Pending
+                       </span>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+
+               {/* FOLLOW UPS */}
+               <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                 <h2 className="text-base font-semibold text-slate-800 mb-3">
+                   Follow Ups
+                 </h2>
+
+                 <div className="space-y-3 pt-1">
+                   {[1, 2].map((i) => (
+                     <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                       <p className="text-[13px] font-bold text-slate-800">
+                         Client follow-up zoom call
+                       </p>
+                       <p className="text-[11px] text-indigo-500 font-medium mt-1">Today at {3 + i}:00 PM</p>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             </div>
+           </div>
         </div>
-      </div>
-
-      {/* ================= LOWER SECTION ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* LATEST NEWS */}
-        <div className="lg:col-span-2 bg-white/80 rounded-lg border border-slate-200 p-3">
-          <h2 className="text-base font-semibold text-slate-800 mb-3">
-            Latest News
-          </h2>
-
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="border-b last:border-0 pb-2">
-                <p className="text-sm font-medium text-slate-800">
-                  New project launch announced
-                </p>
-                <p className="text-xs text-slate-500">2 hours ago</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="space-y-4">
-          {/* PENDING ASSOCIATES */}
-          <div className="bg-white/80 rounded-lg border border-slate-200 p-3">
-            <h2 className="text-base font-semibold text-slate-800 mb-3">
-              Pending Associates
-            </h2>
-
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      Associate Name
-                    </p>
-                    <p className="text-xs text-slate-500">Awaiting approval</p>
-                  </div>
-                  <span className="text-xs bg-secondary-500/10 text-secondary-500 px-2 rounded font-medium">
-                    Pending
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FOLLOW UPS */}
-          <div className="bg-white/80 rounded-lg border border-slate-200 p-3">
-            <h2 className="text-base font-semibold text-slate-800 mb-3">
-              Follow Ups
-            </h2>
-
-            <div className="space-y-2">
-              {[1, 2].map((i) => (
-                <div key={i}>
-                  <p className="text-sm font-medium text-slate-800">
-                    Client follow-up call
-                  </p>
-                  <p className="text-xs text-slate-500">Today at 4:00 PM</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

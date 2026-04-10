@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Pencil, Trash2, Plus, Eye } from "lucide-react";
 import { useGetAllRoles, useDeleteRole } from "@/hooks/useRoles";
 import ModalWrapper from "@/components/Common/ModalWrapper";
+import DeleteConfirmationModal from "@/components/Common/DeleteConfirmationModal";
 import RoleForm from "./RoleForm";
 import Button from "@/components/Common/Button";
 import { toast } from "react-hot-toast";
@@ -11,8 +12,10 @@ export default function Roles() {
   const deleteRoleMutation = useDeleteRole();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState("Create");
   const [selectedRole, setSelectedRole] = useState(null);
+  const [roleToDelete, setRoleToDelete] = useState(null);
 
   const roles = rolesResponse?.roles || [];
 
@@ -34,15 +37,22 @@ export default function Roles() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (role) => {
-    if (window.confirm(`Are you sure you want to delete the role "${role.roleName}"?`)) {
-      try {
-        await deleteRoleMutation.mutateAsync(role.id);
-        toast.success("Role deleted successfully");
-        refetch();
-      } catch (error) {
-        toast.error(error?.response?.data?.message || "Failed to delete role");
-      }
+  const handleDelete = (role) => {
+    setRoleToDelete(role);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!roleToDelete) return;
+    
+    try {
+      await deleteRoleMutation.mutateAsync(roleToDelete.id);
+      toast.success(`Role "${roleToDelete.roleName}" deleted successfully`);
+      setIsDeleteModalOpen(false);
+      setRoleToDelete(null);
+      refetch();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete role");
     }
   };
 
@@ -163,6 +173,16 @@ export default function Roles() {
           onRefetch={refetch}
         />
       </ModalWrapper>
+
+      <DeleteConfirmationModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Role"
+        itemName={roleToDelete?.roleName}
+        warningText="This will permanently remove access for all users assigned to this role."
+        isLoading={deleteRoleMutation.isPending}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import UserReport from "./../pages/Reports/UserReport";
 import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
 import PlotsReport from "./../pages/Reports/PlotsReport";
 import SalesReport from "./../pages/Reports/SalesReport";
+import PerformanceDashboard from "./../pages/Reports/PerformanceDashboard";
 
 import Greetings from "./../pages/Media/Greetings";
 import News from "./../pages/Media/News";
@@ -27,6 +28,7 @@ import Login from "../pages/auth/Login";
 import Companies from "../pages/SuperAdmin/Companies";
 import SystemDashboard from "../pages/SuperAdmin/SystemDashboard";
 import CompanyDetails from "../pages/SuperAdmin/CompanyDetails";
+<<<<<<< HEAD
 import Accounts from "../pages/Finance/Accounts";
 import Ledgers from "../pages/Finance/Ledgers";
 import Parties from "../pages/Finance/Parties";
@@ -43,6 +45,14 @@ import DayBook from "../pages/Finance/DayBook";
 import BRS from "../pages/Finance/BRS";
 import FinanceHome from "../pages/Finance/FinanceHome";
 
+=======
+import ClientAdminDashboard from "../pages/administration/ClientAdminDashboard";
+import Leads from "../pages/CRM/Leads";
+import UploadLeads from "../pages/CRM/UploadLeads";
+import CRMDashboard from "../pages/CRM/CRMDashboard";
+
+import AddAssociate from "../pages/administration/AddAssociate";
+>>>>>>> deploy
 
 export const publicRoutes = {
   auth: {
@@ -56,7 +66,11 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
+<<<<<<< HEAD
     allowedRoles: ["admin", "associate", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -68,21 +82,32 @@ export const routeConfig = {
       { path: "/reports/company-users", component: CompanyUsersReport },
       { path: "/reports/plots", component: PlotsReport },
       { path: "/reports/sales", component: SalesReport },
+      { path: "/performance", component: PerformanceDashboard },
     ],
   },
   Administration: {
     basePath: "/",
+<<<<<<< HEAD
     allowedRoles: ["admin", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [
+      { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
       { path: "/roles", component: Roles },
       { path: "requests", component: Requests },
+      { path: "/users/add", component: AddAssociate },
     ],
   },
   Media: {
     basePath: "/",
+<<<<<<< HEAD
     allowedRoles: ["admin", "associate", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -93,12 +118,20 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
+<<<<<<< HEAD
     allowedRoles: ["admin", "associate", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
+<<<<<<< HEAD
     allowedRoles: ["admin", "associate", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -106,7 +139,11 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
+<<<<<<< HEAD
     allowedRoles: ["admin", "associate", "superadmin", "accounts"],
+=======
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin"],
+>>>>>>> deploy
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {
@@ -118,6 +155,7 @@ export const routeConfig = {
       { path: "system-dashboard", component: SystemDashboard },
     ]
   },
+<<<<<<< HEAD
   Finance: {
     basePath: "/finance",
     allowedRoles: ["accounts", "admin", "superadmin"],
@@ -144,4 +182,17 @@ export const routeConfig = {
       { path: "/reports/balance-sheet", component: FinanceReports },
     ],
   },
+=======
+  CRM: {
+    basePath: "/",
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller"],
+    routes: [
+      { path: "/crm-dashboard", component: CRMDashboard },
+      { path: "/leads", component: Leads },
+      { path: "/leads/upload", component: UploadLeads },
+      { path: "/leads/pending", component: Leads },
+      { path: "/leads/followups", component: Leads },
+    ]
+  }
+>>>>>>> deploy
 };

@@ -116,31 +116,6 @@ export const venturesMenu = {
   ],
 };
 
-export const financeMenu = {
-  label: "Finance",
-  icon: Wallet,
-  module: "FINANCE",
-  children: [
-    {
-      label: "Ledgers",
-      link: "/ledgers",
-      icon: ListChecks,
-      pageTitle: "Ledgers",
-    },
-    {
-      label: "Transactions",
-      link: "/transactions",
-      icon: Receipt,
-      pageTitle: "Transactions",
-    },
-    {
-      label: "Parties",
-      link: "/parties",
-      icon: Users,
-      pageTitle: "Parties",
-    },
-  ],
-};
 
 export const administrationMenu = {
   label: "Administration",
@@ -229,7 +204,6 @@ export const siteVisitsMenu = {
   ],
 };
 
-<<<<<<< HEAD
 export const financeMenu = {
   label: "Finance",
   icon: Wallet,
@@ -275,7 +249,10 @@ export const financeMenu = {
       icon: BarChart3,
       pageTitle: "Financial Reports",
       subtitle: "View various financial statements",
-=======
+    },
+  ],
+};
+
 export const crmMenu = {
   label: "Leadflow CRM",
   icon: Megaphone,
@@ -326,7 +303,6 @@ export const telecallerAdministrationMenu = {
       icon: Users,
       pageTitle: "Users",
       subtitle: "Manage and view all users",
->>>>>>> deploy
     }
   ],
 };
@@ -395,7 +371,6 @@ export const systemManagementMenu = {
   ],
 };
 
-<<<<<<< HEAD
 export const financeConfigMenu = {
   label: "Configuration",
   icon: Settings,
@@ -534,14 +509,13 @@ export const financeReportMenu = {
   ]
 };
 
+// ==================== USER-LEVEL MENUS ====================
 export const accountsMenu = [
   commonMenu,
   financeConfigMenu,
   financeTransactionMenu,
   financeReportMenu,
 ];
-
-// Cleaned up redundant superAdminMenu definition below
 
 export const superAdminMenu = [
   commonMenu,
@@ -550,12 +524,6 @@ export const superAdminMenu = [
   mediaMenu,
   siteVisitsMenu,
   systemManagementMenu,
-=======
-// ==================== USER-LEVEL MENUS ====================
-export const accountsMenu = [
-  // Regular Finance User
-  commonMenu,
-  financeMenu,
 ];
 
 export const telecallerMenu = [
@@ -564,7 +532,6 @@ export const telecallerMenu = [
   mediaMenu,
   crmMenu,
   siteVisitsMenu,
->>>>>>> deploy
 ];
 
 export const associateMenu = [
@@ -578,18 +545,15 @@ export const associateMenu = [
 
 // ==================== HELPER FUNCTION ====================
 export const getMenuByRole = (role, userModules = [], userType = "user") => {
-  const roleKey = role?.toLowerCase().replace(/_/g, "");
+  const roleKey = (role || "").toLowerCase().replace(/_/g, "");
   const uType = (userType || "user").toLowerCase();
-  
+
   // Base menus for each role type
   const baseMenus = {
     // Admins
     admin: adminMenu, // Marketing
     marketingadmin: adminMenu,
     superadmin: superAdminMenu,
-<<<<<<< HEAD
-    accounts: accountsMenu,
-=======
     companyadmin: clientAdminMenu,
     clientadmin: clientAdminMenu,
 
@@ -599,10 +563,9 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
     finance: uType === "admin" ? financeAdminMenu : accountsMenu,
 
     // Users
->>>>>>> deploy
     associate: associateMenu,
     user: associateMenu,
-    salesmanager: adminMenu, 
+    salesmanager: adminMenu,
     manager: adminMenu,
     teamlead: associateMenu,
   };
@@ -624,7 +587,7 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
   return menu.filter(item => {
     // General and System modules are always allowed
     if (item.module === "GENERAL" || item.module === "SYSTEM") return true;
-    
+
     // Check if the specific module is enabled for this user's role
     return activeModules.includes(item.module);
   });
@@ -636,3 +599,4 @@ export default {
   associateMenu,
   getMenuByRole,
 };
+

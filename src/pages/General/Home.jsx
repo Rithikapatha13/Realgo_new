@@ -6,11 +6,8 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import SystemDashboard from "../SuperAdmin/SystemDashboard";
-<<<<<<< HEAD
 import FinanceHome from "../Finance/FinanceHome";
-=======
 import ClientAdminDashboard from "../administration/ClientAdminDashboard";
->>>>>>> deploy
 import { getUser, getUserType } from "@/services/auth.service";
 
 /* ================= QUICK ACCESS CARDS ================= */
@@ -45,15 +42,11 @@ export default function Home() {
   const [openPending, setOpenPending] = useState(false);
   const user = getUser();
   const userType = getUserType()?.toLowerCase();
-<<<<<<< HEAD
-  const user = getUser();
   const role = user?.role?.toLowerCase();
-=======
   
   const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
-  const userRoleStr = user?.role?.toLowerCase() || "";
+  const userRoleStr = role || "";
   const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin";
->>>>>>> deploy
 
   // If superadmin, render the SystemDashboard instead of the regular Home view
   if (isSuperAdmin) {

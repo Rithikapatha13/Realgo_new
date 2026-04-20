@@ -1,33 +1,35 @@
 import React, { useState } from 'react';
-import { 
-    Plus, Search, BookOpen, Layers, 
-    MoreVertical, Loader2, Filter, RefreshCw
+import {
+    MoreVertical, Loader2, Filter, RefreshCw, ArrowLeft, Plus, Search, Layers, BookOpen
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetLedgers, useAddLedger, useGetAccounts } from "@/hooks/useFinance";
 import { ModalWrapper } from "@/components/Common";
 import toast from "react-hot-toast";
 
 const Ledgers = () => {
+    const navigate = useNavigate();
     const [selectedAccountTree, setSelectedAccountTree] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isSubFormOpen, setIsSubFormOpen] = useState(false);
     const [selectedLedgerForSub, setSelectedLedgerForSub] = useState(null);
 
-    
+
     const { data, isLoading, isError, refetch } = useGetLedgers(selectedAccountTree);
     const { data: accountsData } = useGetAccounts();
-    
+
     const ledgers = data?.items || [];
     const accounts = accountsData?.items || [];
 
-    const filteredLedgers = ledgers.filter(l => 
+    const filteredLedgers = ledgers.filter(l =>
         l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         l.accountTree?.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <div className="p-6 bg-slate-50/50 min-h-screen">
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-xl font-bold text-slate-900 tracking-tight">Ledgers</h1>
@@ -42,7 +44,7 @@ const Ledgers = () => {
                         <Plus size={20} />
                         <span>Add New Ledger</span>
                     </button>
-                    <button 
+                    <button
                         onClick={() => refetch()}
                         className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm"
                     >
@@ -64,8 +66,8 @@ const Ledgers = () => {
                 </div>
 
                 <div className="w-full lg:w-64">
-                    <select 
-                        value={selectedAccountTree} 
+                    <select
+                        value={selectedAccountTree}
                         onChange={(e) => setSelectedAccountTree(e.target.value)}
                         className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
                     >
@@ -116,7 +118,7 @@ const Ledgers = () => {
                                     <div className="space-y-2 mb-4">
                                         <div className="flex items-center justify-between">
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sub-ledgers</span>
-                                            <button 
+                                            <button
                                                 onClick={() => {
                                                     setSelectedLedgerForSub(ledger);
                                                     setIsSubFormOpen(true);
@@ -139,7 +141,7 @@ const Ledgers = () => {
                                     </div>
                                 )}
                             </div>
-                            
+
                             <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                                 <span>{ledger.transactionEntries?.length || 0} Entries</span>
                                 <button className="text-indigo-600 hover:underline">View History</button>
@@ -155,10 +157,10 @@ const Ledgers = () => {
                 title="Add New Ledger Account"
                 width="max-w-md"
             >
-                <LedgerForm 
-                    accounts={accounts.filter(a => !a.children || a.children.length === 0)} 
-                    onClose={() => setIsFormOpen(false)} 
-                    onRefetch={refetch} 
+                <LedgerForm
+                    accounts={accounts.filter(a => !a.children || a.children.length === 0)}
+                    onClose={() => setIsFormOpen(false)}
+                    onRefetch={refetch}
                 />
             </ModalWrapper>
 
@@ -168,10 +170,10 @@ const Ledgers = () => {
                 title={`Add Sub-ledger for "${selectedLedgerForSub?.name}"`}
                 width="max-w-md"
             >
-                <SubLedgerForm 
+                <SubLedgerForm
                     ledgerId={selectedLedgerForSub?.id}
-                    onClose={() => setIsSubFormOpen(false)} 
-                    onRefetch={refetch} 
+                    onClose={() => setIsSubFormOpen(false)}
+                    onRefetch={refetch}
                 />
             </ModalWrapper>
         </div>
@@ -198,18 +200,18 @@ const SubLedgerForm = ({ ledgerId, onClose, onRefetch }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
             <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Sub-ledger Name *</label>
-                <input 
-                    required 
-                    type="text" 
+                <input
+                    required
+                    type="text"
                     placeholder="e.g. Employee Name, Vehicle Number"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                    value={name} 
-                    onChange={e => setName(e.target.value)} 
+                    value={name}
+                    onChange={e => setName(e.target.value)}
                 />
             </div>
-            <button 
-                disabled={isAdding} 
-                type="submit" 
+            <button
+                disabled={isAdding}
+                type="submit"
                 className="w-full bg-primary-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-sm shadow-indigo-100 active:scale-[0.98] disabled:opacity-70"
             >
                 {isAdding && <Loader2 className="animate-spin" size={20} />}
@@ -230,7 +232,7 @@ const LedgerForm = ({ accounts, onClose, onRefetch }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.accountTreeId) return toast.error("Please select an Account Head");
-        
+
         try {
             await addLedger(formData);
             toast.success("Ledger created successfully");
@@ -245,22 +247,22 @@ const LedgerForm = ({ accounts, onClose, onRefetch }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
             <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Ledger Name *</label>
-                <input 
-                    required 
-                    type="text" 
+                <input
+                    required
+                    type="text"
                     placeholder="e.g. ICICI Bank - 1234, Cash In Hand"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                    value={formData.name} 
-                    onChange={e => setFormData({...formData, name: e.target.value})} 
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                 />
             </div>
 
             <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Under Account Head *</label>
-                <select 
+                <select
                     required
-                    value={formData.accountTreeId} 
-                    onChange={e => setFormData({...formData, accountTreeId: e.target.value})}
+                    value={formData.accountTreeId}
+                    onChange={e => setFormData({ ...formData, accountTreeId: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                 >
                     <option value="">Select Account Head</option>
@@ -274,12 +276,12 @@ const LedgerForm = ({ accounts, onClose, onRefetch }) => {
             </div>
 
             <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <input 
-                    type="checkbox" 
+                <input
+                    type="checkbox"
                     id="bifurcated"
                     className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
                     checked={formData.bifurcated}
-                    onChange={e => setFormData({...formData, bifurcated: e.target.checked})}
+                    onChange={e => setFormData({ ...formData, bifurcated: e.target.checked })}
                 />
                 <label htmlFor="bifurcated" className="text-sm font-medium text-slate-700 cursor-pointer">
                     Enable Bifurcation?
@@ -287,9 +289,9 @@ const LedgerForm = ({ accounts, onClose, onRefetch }) => {
             </div>
 
             <div className="pt-4">
-                <button 
-                    disabled={isAdding} 
-                    type="submit" 
+                <button
+                    disabled={isAdding}
+                    type="submit"
                     className="w-full bg-primary-600 text-white py-3 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-sm shadow-indigo-100 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
                 >
                     {isAdding && <Loader2 className="animate-spin" size={20} />}

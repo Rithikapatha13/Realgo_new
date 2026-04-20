@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Plus, FileText, Calendar, Filter, Loader2,
-    RefreshCcw, Landmark, CheckCircle, AlertCircle, 
-    XCircle, Trash2
+    XCircle, Trash2, ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { 
     useGetLedgers, useGetSubledgers, useAddTransaction
 } from "@/hooks/useFinance";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
+import CustomSelect from "@/components/Common/CustomSelect";
+import { RefreshCcw, Loader2, CheckCircle } from "lucide-react";
 
 const JournalVoucher = () => {
+    const navigate = useNavigate();
     const { mutateAsync: addTransaction, isLoading: isAdding } = useAddTransaction();
     const { data: ledgersData } = useGetLedgers();
     
@@ -88,8 +90,9 @@ const JournalVoucher = () => {
     };
 
     return (
-        <div className="p-6 bg-slate-50 min-h-screen">
-            <div className="max-w-5xl mx-auto">
+        <div className="p-0.5 sm:p-6 bg-slate-50 min-h-screen">
+            <div className="max-w-5xl mx-auto px-0.5 sm:px-4">
+                
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-xl font-semibold text-slate-900 tracking-tight flex items-center gap-3">
@@ -103,7 +106,7 @@ const JournalVoucher = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8 pb-20">
-                    <section className="bg-white/80 p-5 rounded-lg border border-slate-200 grid grid-cols-2 gap-6">
+                    <section className="bg-white/80 p-5 rounded-lg border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">Voucher Date</label>
                             <input required type="date" value={formData.transactionDate} onChange={e => setFormData({...formData, transactionDate: e.target.value})}
@@ -152,7 +155,7 @@ const JournalVoucher = () => {
                         </div>
                     </section>
 
-                    <div className="sticky bottom-6 z-10 flex items-center justify-between gap-6 p-6 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-xl shadow-md">
+                    <div className="sticky bottom-4 md:bottom-6 z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 p-4 md:p-6 bg-white/90 backdrop-blur-xl border border-slate-200 rounded-xl shadow-lg">
                         <div className="flex-1">
                             <textarea placeholder="Reason for adjustment / Narration..." value={formData.narration} onChange={e => setFormData({...formData, narration: e.target.value})}
                                 className="w-full bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-medium focus:ring-1 focus:ring-indigo-500/20 outline-none resize-none h-12" />
@@ -178,33 +181,38 @@ const EntryRow = ({ entry, ledgers, onUpdate, onRemove, showRemove }) => {
     const subledgers = subledgersData?.items || [];
 
     return (
-        <div className="grid grid-cols-12 gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50/50 items-center">
-            <div className="col-span-2">
-                <select value={entry.entryType} onChange={e => onUpdate("entryType", e.target.value)}
-                    className={`w-full border-none rounded-xl px-3 py-2 text-[10px] font-semibold tracking-widest focus:ring-2 outline-none appearance-none cursor-pointer ${
-                        entry.entryType === 'DEBIT' ? 'bg-primary-600 text-white ring-indigo-500/20' : 'bg-slate-200 text-slate-600 ring-slate-500/20'
-                    }`}>
-                    <option value="DEBIT">DEBIT</option>
-                    <option value="CREDIT">CREDIT</option>
-                </select>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-3 sm:p-4 rounded-xl border border-slate-100 bg-slate-50/50 items-center">
+            <div className="col-span-1 md:col-span-2">
+                <CustomSelect
+                    label="Type"
+                    value={entry.entryType}
+                    onChange={(val) => onUpdate("entryType", val)}
+                    options={[
+                        { label: "DEBIT", value: "DEBIT" },
+                        { label: "CREDIT", value: "CREDIT" }
+                    ]}
+                    className={entry.entryType === 'DEBIT' ? 'bg-primary-600 text-white' : 'bg-slate-200 text-slate-600'}
+                />
             </div>
-            <div className="col-span-4">
-                <select value={entry.ledgerId} onChange={e => onUpdate("ledgerId", e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none">
-                    <option value="">Select Ledger Head</option>
-                    {ledgers.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </select>
+            <div className="col-span-1 md:col-span-4">
+                <CustomSelect
+                    label="Ledger Head"
+                    value={entry.ledgerId}
+                    onChange={(val) => onUpdate("ledgerId", val)}
+                    options={ledgers.map(l => ({ label: l.name, value: l.id }))}
+                />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1 md:col-span-3">
                 {selectedLedger?.bifurcated && (
-                    <select value={entry.subledgerId} onChange={e => onUpdate("subledgerId", e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none">
-                        <option value="">Select Sub-ledger</option>
-                        {subledgers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </select>
+                    <CustomSelect
+                        label="Sub-ledger"
+                        value={entry.subledgerId}
+                        onChange={(val) => onUpdate("subledgerId", val)}
+                        options={subledgers.map(s => ({ label: s.name, value: s.id }))}
+                    />
                 )}
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
                 <input type="number" placeholder="0.00" value={entry.amount || ''} onChange={e => onUpdate("amount", e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-semibold text-right focus:ring-1 focus:ring-indigo-500 outline-none" />
             </div>

@@ -1,13 +1,20 @@
 import apiClient from "../config/apiClient";
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return { Authorization: `Bearer ${token}` };
+export const getPerformanceStats = async () => {
+  const res = await apiClient.get("/performance/stats");
+  return res.data;
 };
 
-export const getPerformanceStats = async () => {
-  const res = await apiClient.get("/performance/stats", {
-    headers: getAuthHeader(),
+/**
+ * Fetch telecaller-specific performance data.
+ * @param {object} params
+ * @param {string} [params.telecallerId]  - filter by a specific telecaller ID (optional)
+ * @param {string} [params.startDate]     - ISO date string (optional)
+ * @param {string} [params.endDate]       - ISO date string (optional)
+ */
+export const getTelecallerPerformance = async (params = {}) => {
+  const res = await apiClient.get("/performance/telecaller", {
+    params
   });
   return res.data;
 };

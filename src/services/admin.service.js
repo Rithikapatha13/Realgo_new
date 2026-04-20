@@ -1,43 +1,25 @@
 import apiClient from "@/config/apiClient";
 
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
-
 export const getAdmins = (params) => {
-    return apiClient.get("/admins", {
-        params,
-        headers: getAuthHeader(),
-    });
+    return apiClient.get("/admins", { params });
 };
 
 export const addAdminUser = (userData) => {
-    return apiClient.post("/add-admin", userData, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.post("/add-admin", userData);
 };
 
 export const getAdminById = (id) => {
-    return apiClient.get(`/admin/${id}`, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.get(`/admin/${id}`);
 };
 
 export const updateAdminUser = (userData) => {
-    return apiClient.put("/admin", userData, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.put("/admin", userData);
 };
 
 export const updateAdminStatus = (userData) => {
-    return apiClient.put("/admin-status", userData, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.put("/admin-status", userData);
 };
 
 export const deleteAdminUser = (id) => {
-    return apiClient.delete(`/admin/${id}`, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.delete(`/admin/${id}`);
 };

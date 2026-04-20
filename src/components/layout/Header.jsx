@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMenuByRole } from "../../constants/sidebar";
 import { getUser } from "../../services/auth.service";
+import { resolveImageUrl } from "../../utils/common";
 
 export default function Header({
   onMenuClick,
@@ -140,8 +141,16 @@ export default function Header({
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-2.5 pl-3 pr-2 py-1 border-l border-slate-200 hover:bg-slate-100 rounded-lg"
           >
-            <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center ring-2 ring-secondary-500 ring-offset-2">
-              <User size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center ring-2 ring-secondary-500 ring-offset-2 flex-shrink-0 overflow-hidden bg-slate-100">
+              {user?.image ? (
+                <img 
+                  src={resolveImageUrl(user.image)} 
+                  alt="Profile" 
+                  className="w-full h-full object-contain bg-white p-0.5"
+                />
+              ) : (
+                <User size={16} className="text-secondary-500" />
+              )}
             </div>
             <div className="hidden md:block text-left leading-tight">
               <p className="text-sm font-bold text-slate-800">

@@ -49,18 +49,18 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* Header with Logo and Collapse Button */}
       <div className="h-fit px-4 flex items-center justify-between border-b border-slate-200">
         {!collapsed && (
-          <div className="h-20 w-full sm:h-25 px-2 rounded-lg flex items-center justify-center">
+          <div className="h-20 w-full sm:h-25 px-2 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
             {isSuperAdmin ? (
               <img
                 src="https://app.realgo.in/assets/images/brandwar.png"
                 alt="Brandwar logo"
-                className="w-full h-full object-contain p-2"
+                className="w-full h-full object-contain p-4"
               />
             ) : (
               <img
                 src={resolveImageUrl(user?.companyImg)}
                 alt="Company logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain p-1"
               />
             )}
           </div>
@@ -166,19 +166,19 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             );
           })}
         </div>
-        
+
         {/* Logout Button Pushed to Bottom */}
         <div className="mt-8 pt-4 border-t border-slate-200">
-           <button
-             onClick={handleLogout}
-             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-             title={collapsed ? "Logout" : ""}
-           >
-             <LogOut size={20} className="text-slate-500" />
-             {!collapsed && (
-               <span className="text-sm font-medium">Logout</span>
-             )}
-           </button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+            title={collapsed ? "Logout" : ""}
+          >
+            <LogOut size={20} className="text-slate-500" />
+            {!collapsed && (
+              <span className="text-sm font-medium">Logout</span>
+            )}
+          </button>
         </div>
       </nav>
     </div>

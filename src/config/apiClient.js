@@ -23,5 +23,24 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Add a response interceptor to handle errors globally
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear local storage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("usertype");
+      
+      // Prevent infinite redirect loops
+      if (!window.location.pathname.includes("/auth/login")) {
+        window.location.href = "/auth/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;
 

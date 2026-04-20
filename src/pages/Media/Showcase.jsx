@@ -11,8 +11,10 @@ import {
   Layers,
   ChevronRight,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetShowcasesData, useDeleteShowcase } from "@/hooks/useShowcase";
 import { LoadingIndicator } from "@/components";
 import { getUser } from "@/services/auth.service";
@@ -20,6 +22,7 @@ import toast from "react-hot-toast";
 import ShowcaseFormDialog from "@/components/media/ShowcaseFormDialog";
 
 export default function Showcase() {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const user = getUser();
@@ -50,6 +53,7 @@ export default function Showcase() {
 
   return (
     <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-10 font-sans">
+      
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* Modern Header Section */}

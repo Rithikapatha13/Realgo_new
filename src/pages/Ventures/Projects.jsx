@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { getAllHighways, getProjects } from "../../services/project.service";
-import { X, MapPin, Layout, Layers, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, MapPin, Layout, Layers, Loader2, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/Common/ModalWrapper";
 import ProjectDetails from "./ProjectDetails";
+import { getAllHighways, getProjects } from "../../services/project.service";
+
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [highways, setHighways] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +66,7 @@ export default function Projects() {
 
   return (
     <div className="p-4 md:p-8 space-y-8 bg-[#fdfdfd] min-h-screen">
+      
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="flex flex-col gap-2">
@@ -86,7 +90,7 @@ export default function Projects() {
       </div>
 
       {/* Highways Filter - Horizontal Scroll */}
-      <div className="flex items-start gap-5 overflow-x-auto pb-4 hide-scrollbar">
+      <div className="flex items-start gap-5 overflow-x-auto pb-4 hide-scrollbar w-full max-w-full min-w-0">
         <div
           onClick={() => setSelectedHighwayId("")}
           className="flex flex-col items-center gap-3 cursor-pointer group min-w-[90px]"
@@ -106,7 +110,7 @@ export default function Projects() {
             onClick={() => setSelectedHighwayId(highway.id)}
             className="flex flex-col items-center gap-3 cursor-pointer group min-w-[90px]"
           >
-            <div className={`w-15 h-15 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm
+            <div className={`w-15 h-15 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm flex-shrink-0
                             ${selectedHighwayId === highway.id
                 ? 'border-primary-600 ring-4 ring-primary-500/10 scale-105 shadow-primary-500/20'
                 : 'border-gray-100 group-hover:border-primary-300 group-hover:shadow-md'}`}>

@@ -1,21 +1,10 @@
-import axios from "axios";
-
-// Using the same base URL as other services
-const API_URL = import.meta.env.VITE_API_URL;
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
+import apiClient from "../config/apiClient";
 
 /**
  * Fetch the list of team members
  */
 export const getMyTeam = async (params) => {
-    const { data } = await axios.get(`${API_URL}/my-team`, {
-        headers: getAuthHeader(),
-        params
-    });
+    const { data } = await apiClient.get(`/my-team`, { params });
     return data;
 };
 
@@ -29,15 +18,22 @@ export const getTeamTree = async (id, status, roleId) => {
         if (status) params.status = status;
         if (roleId) params.roleId = roleId;
 
-        const { data } = await axios.get(`${API_URL}/associates-tree`, {
-            headers: getAuthHeader(),
-            params: params
-        });
+        const { data } = await apiClient.get(`/associates-tree`, { params });
 
         console.log("Tree API Response:", data);
-        return data; // Return full data so component can check success/items
+        return data; 
     } catch (error) {
         console.error('Error fetching team tree:', error);
         throw error;
     }
+};
+
+export const deleteRequestToAdmin = async (userData) => {
+    const { data } = await apiClient.post(`/user/delete-request`, userData);
+    return data;
+};
+
+export const inactiveRequestToAdmin = async (userData) => {
+    const { data } = await apiClient.post(`/user/inactive-request`, userData);
+    return data;
 };

@@ -1,23 +1,12 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
+import apiClient from "../config/apiClient";
 
 export const getUsersNames = async () => {
-    const { data } = await axios.get(`${API_URL}/user/names`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/user/names`);
     return data;
 };
 
 export const getPotentialParents = async () => {
-    const { data } = await axios.get(`${API_URL}/user/potential-parents`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/user/potential-parents`);
     return data;
 };
 
@@ -27,11 +16,7 @@ export const getTeamTree = async (id, role) => {
         if (id) params.id = id;
         if (role) params.role = role;
 
-        const { data } = await axios.get(`${API_URL}/tree/associates-tree`, {
-            headers: getAuthHeader(),
-            params: params
-        });
-
+        const { data } = await apiClient.get(`/tree/associates-tree`, { params });
         return data;
     } catch (error) {
         console.error('Error fetching team tree:', error);
@@ -44,44 +29,43 @@ export const getTeamTree = async (id, role) => {
 // ==========================================
 
 export const getUsersData = async ({ pageIndex, pageSize, name, status, role, username, phone, userAuthId, sortField, sortOrder }) => {
-    const { data } = await axios.get(`${API_URL}/user/associates`, {
-        headers: getAuthHeader(),
+    const { data } = await apiClient.get(`/user/associates`, {
         params: { page: pageIndex, size: pageSize, name, status, role, username, phone, userAuthId, sortField, sortOrder }
     });
     return data;
 };
 
 export const getUserById = async (id) => {
-    const { data } = await axios.get(`${API_URL}/user/associate/${id}`, { headers: getAuthHeader() });
+    const { data } = await apiClient.get(`/user/associate/${id}`);
     return data;
 };
 
 export const addUser = async (userData) => {
-    const { data } = await axios.post(`${API_URL}/user/add-associate`, userData, { headers: getAuthHeader() });
+    const { data } = await apiClient.post(`/user/add-associate`, userData);
     return data;
 };
 
 export const updateUser = async (userData) => {
-    const { data } = await axios.post(`${API_URL}/user/add-associate`, userData, { headers: getAuthHeader() });
+    const { data } = await apiClient.post(`/user/add-associate`, userData);
     return data;
 };
 
 export const updateUserStatus = async (userData) => {
-    const { data } = await axios.put(`${API_URL}/user/associate-status`, userData, { headers: getAuthHeader() });
+    const { data } = await apiClient.put(`/user/associate-status`, userData);
     return data;
 };
 
 export const promoteUser = async (userData) => {
-    const { data } = await axios.put(`${API_URL}/user/associate-promote`, userData, { headers: getAuthHeader() });
+    const { data } = await apiClient.put(`/user/associate-promote`, userData);
     return data;
 };
 
 export const deleteUser = async (id) => {
-    const { data } = await axios.delete(`${API_URL}/user/associate-delete/${id}`, { headers: getAuthHeader() });
+    const { data } = await apiClient.delete(`/user/associate-delete/${id}`);
     return data;
 };
 
 export const resetPassword = async (userData) => {
-    const { data } = await axios.post(`${API_URL}/user/reset-password`, userData, { headers: getAuthHeader() });
+    const { data } = await apiClient.post(`/user/reset-password`, userData);
     return data;
 };

@@ -5,12 +5,9 @@ import { useAddUser, useGetPotentialParents } from "@/hooks/useUser";
 import { useGetAllRoles } from "@/hooks/useRoles";
 import { getUser } from "@/services/auth.service";
 import toast from "react-hot-toast";
-import { 
-  User, Mail, Phone, Shield, Calendar, MapPin, Save, X, 
-  Loader2, ChevronRight, ChevronLeft, Check, Award, Landmark,
-  Briefcase, Heart, Fingerprint
-} from "lucide-react";
+import { User, Mail, Phone, Shield, Calendar, MapPin, Save, X, Loader2, ChevronRight, ChevronLeft, Check, Award, Landmark, Briefcase, Heart, Fingerprint, ArrowLeft } from "lucide-react";
 import FileUpload from "@/components/Common/FileUpload";
+import CustomSelect from "@/components/Common/CustomSelect";
 
 const STEPS = [
   { id: 1, title: "Basic Info", icon: User },
@@ -38,15 +35,19 @@ export default function AddAssociate() {
   const rolesList = rolesResponse?.roles || [];
   const parentsList = parentsResponse?.data?.items || [];
 
-  const nextStep = async () => {
-    // Validate current step before moving
-    let fieldsToValidate = [];
-    if (currentStep === 1) fieldsToValidate = ["firstName", "username", "phone", "email", "dob"];
-    if (currentStep === 4) fieldsToValidate = ["roleId"];
+    const nextStep = async () => {
+        // Validate current step before moving
+        let fieldsToValidate = [];
+        if (currentStep === 1) fieldsToValidate = ["firstName", "username", "phone", "email", "dob"];
+        if (currentStep === 4) fieldsToValidate = ["roleId"];
 
-    const isValid = await trigger(fieldsToValidate);
-    if (isValid) setCurrentStep((prev) => Math.min(prev + 1, 4));
-  };
+        const isValid = await trigger(fieldsToValidate);
+        if (isValid) {
+            setCurrentStep((prev) => Math.min(prev + 1, 4));
+        } else {
+            toast.error("Please fill all required fields correctly before proceeding");
+        }
+    };
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
@@ -72,8 +73,9 @@ export default function AddAssociate() {
   const labelClasses = "block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1";
 
   return (
-    <div className="p-6 min-h-screen bg-slate-50/50">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-slate-50/50">
+      <div className="max-w-4xl mx-auto px-0 sm:px-4 py-4 sm:py-8">
+        
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Add New Associate</h1>
@@ -88,7 +90,7 @@ export default function AddAssociate() {
         </div>
 
         {/* STEPPER INDICATOR */}
-        <div className="flex items-center justify-between mb-12 relative px-4">
+        <div className="flex items-center justify-between mb-8 md:mb-12 relative px-2 sm:px-4">
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2" />
             {STEPS.map((step) => {
                 const Icon = step.icon;
@@ -114,7 +116,7 @@ export default function AddAssociate() {
         </div>
 
         {/* FORM CONTENT */}
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/50">
+        <div className="bg-white border-y sm:border border-slate-200 rounded-none sm:rounded-[2.5rem] p-4 sm:p-8 md:p-12 shadow-xl shadow-slate-200/50">
           <form onSubmit={handleSubmit(onSubmit)}>
             
             {/* STEP 1: PERSONAL INFO */}
@@ -135,12 +137,21 @@ export default function AddAssociate() {
                     <input {...register("username", { required: "Required" })} className={inputClasses} placeholder="unique_username" />
                   </div>
                   <div className="space-y-1">
-                    <label className={labelClasses}>Gender</label>
-                    <select {...register("gender")} className={inputClasses}>
-                      <option value="MALE">Male</option>
-                      <option value="FEMALE">Female</option>
-                      <option value="OTHER">Other</option>
-                    </select>
+                    <Controller
+                      name="gender"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          label="Gender"
+                          {...field}
+                          options={[
+                            { label: "Male", value: "MALE" },
+                            { label: "Female", value: "FEMALE" },
+                            { label: "Other", value: "OTHER" }
+                          ]}
+                        />
+                      )}
+                    />
                   </div>
                   <div className="space-y-1">
                     <label className={labelClasses}>Phone Number *</label>
@@ -148,24 +159,34 @@ export default function AddAssociate() {
                   </div>
                   <div className="space-y-1">
                     <label className={labelClasses}>Email Address</label>
-                    <input {...register("email")} className={inputClasses} placeholder="example@mail.com" />
+                    <input {...register("email", { required: "Required" })} className={inputClasses} placeholder="example@mail.com" />
+                    {errors.email && <span className="text-red-500 text-[10px] font-bold ml-1">{errors.email.message}</span>}
                   </div>
                   <div className="space-y-1">
                     <label className={labelClasses}>Date of Birth *</label>
                     <input type="date" {...register("dob", { required: "Required" })} className={inputClasses} />
                   </div>
                   <div className="space-y-1">
-                    <label className={labelClasses}>Blood Group</label>
-                    <select {...register("bloodGroup")} className={inputClasses}>
-                      <option value="A_POS">A+</option>
-                      <option value="A_NEG">A-</option>
-                      <option value="B_POS">B+</option>
-                      <option value="B_NEG">B-</option>
-                      <option value="O_POS">O+</option>
-                      <option value="O_NEG">O-</option>
-                      <option value="AB_POS">AB+</option>
-                      <option value="AB_NEG">AB-</option>
-                    </select>
+                    <Controller
+                      name="bloodGroup"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          label="Blood Group"
+                          {...field}
+                          options={[
+                            { label: "A+", value: "A_POS" },
+                            { label: "A-", value: "A_NEG" },
+                            { label: "B+", value: "B_POS" },
+                            { label: "B-", value: "B_NEG" },
+                            { label: "O+", value: "O_POS" },
+                            { label: "O-", value: "O_NEG" },
+                            { label: "AB+", value: "AB_POS" },
+                            { label: "AB-", value: "AB_NEG" }
+                          ]}
+                        />
+                      )}
+                    />
                   </div>
                 </div>
               </div>
@@ -250,23 +271,42 @@ export default function AddAssociate() {
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1">
-                    <label className={labelClasses}>Assigned Role *</label>
-                    <select {...register("roleId", { required: "Role is required" })} className={inputClasses}>
-                      <option value="">Select a Role</option>
-                      {rolesList.map(role => (
-                        <option key={role.id} value={role.id}>{role.displayName || role.roleName}</option>
-                      ))}
-                    </select>
-                    {errors.roleId && <span className="text-red-500 text-[10px] font-bold ml-1">{errors.roleId.message}</span>}
+                    <Controller
+                      name="roleId"
+                      control={control}
+                      rules={{ required: "Role is required" }}
+                      render={({ field }) => (
+                        <CustomSelect
+                          label="Assigned Role"
+                          required
+                          {...field}
+                          error={errors.roleId?.message}
+                          options={rolesList.map(role => ({
+                            label: role.displayName || role.roleName,
+                            value: role.id
+                          }))}
+                        />
+                      )}
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label className={labelClasses}>Immediate Leader / Upliner</label>
-                    <select {...register("referId")} className={inputClasses}>
-                      <option value="">Direct (No Leader)</option>
-                      {parentsList.map(parent => (
-                        <option key={parent.id} value={parent.id}>{parent.label}</option>
-                      ))}
-                    </select>
+                    <Controller
+                      name="referId"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          label="Immediate Leader / Upliner"
+                          {...field}
+                          options={[
+                            { label: "Direct (No Leader)", value: "" },
+                            ...parentsList.map(parent => ({
+                              label: parent.label,
+                              value: parent.id
+                            }))
+                          ]}
+                        />
+                      )}
+                    />
                   </div>
                   
                   <div className="md:col-span-2 pt-6">

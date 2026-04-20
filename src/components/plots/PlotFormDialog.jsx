@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, LandPlot, MapPin, Ruler, Box, Compass, Save, Eye, Plus, Pencil, SlidersHorizontal, User, CreditCard, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
+import CustomSelect from "../Common/CustomSelect";
 import { useCreatePlot, useUpdatePlot, useGetPhases } from "../../hooks/usePlot";
 
 export default function PlotFormDialog({ isOpen, onClose, action, plotData, projects }) {
@@ -103,7 +104,7 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
             <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
 
                 {/* HEADER */}
-                <div className="flex items-center justify-between p-7 border-b border-slate-100 bg-slate-50/30">
+                <div className="flex items-center justify-between p-5 sm:p-7 border-b border-slate-100 bg-slate-50/30">
                     <div className="flex items-center gap-4">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${action === "Create" ? "bg-blue-600 text-white shadow-blue-200" :
                                 action === "Update" ? "bg-amber-500 text-white shadow-amber-100" : "bg-indigo-600 text-white shadow-indigo-100"
@@ -123,8 +124,8 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                 </div>
 
                 {/* FORM */}
-                <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
 
                         {/* LEFT COLUMN: Physical Details */}
                         <div className="space-y-8">
@@ -149,51 +150,69 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-400 ml-1">Select Project *</label>
-                                    <select name="projectId" value={form.projectId} onChange={handleChange} disabled={isView} required
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
-                                        <option value="">Choose a Project</option>
-                                        {projects.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        label="Select Project"
+                                        required
+                                        value={form.projectId}
+                                        onChange={(val) => {
+                                            const proj = projects.find((p) => p.id === val);
+                                            setForm(prev => ({ ...prev, projectId: val, projectName: proj?.projectName || "", phaseId: "" }));
+                                        }}
+                                        disabled={isView}
+                                        options={projects.map(p => ({ label: p.projectName, value: p.id }))}
+                                    />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-400 ml-1">Phase</label>
-                                        <select name="phaseId" value={form.phaseId} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
-                                            <option value="">Select Phase</option>
-                                            {phases.map((ph) => <option key={ph.id} value={ph.id}>{ph.phaseName}</option>)}
-                                        </select>
+                                        <CustomSelect
+                                            label="Phase"
+                                            value={form.phaseId}
+                                            onChange={(val) => setForm(prev => ({ ...prev, phaseId: val }))}
+                                            disabled={isView}
+                                            options={phases.map(ph => ({ label: ph.phaseName, value: ph.id }))}
+                                        />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-400 ml-1">Facing</label>
-                                        <select name="facing" value={form.facing} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
-                                            <option value="">Select Facing</option>
-                                            <option value="east">East</option><option value="west">West</option>
-                                            <option value="north">North</option><option value="south">South</option>
-                                            <option value="corner">Corner</option><option value="northeast">NE</option>
-                                            <option value="northwest">NW</option><option value="southeast">SE</option>
-                                            <option value="southwest">SW</option>
-                                        </select>
+                                        <CustomSelect
+                                            label="Facing"
+                                            value={form.facing}
+                                            onChange={(val) => setForm(prev => ({ ...prev, facing: val }))}
+                                            disabled={isView}
+                                            options={[
+                                                { label: "East", value: "east" },
+                                                { label: "West", value: "west" },
+                                                { label: "North", value: "north" },
+                                                { label: "South", value: "south" },
+                                                { label: "Corner", value: "corner" },
+                                                { label: "NE", value: "northeast" },
+                                                { label: "NW", value: "northwest" },
+                                                { label: "SE", value: "southeast" },
+                                                { label: "SW", value: "southwest" }
+                                            ]}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-400 ml-1">Plot Category *</label>
-                                    <select name="plotCategory" value={form.plotCategory} onChange={handleChange} disabled={isView} required
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
-                                        <option value="residential">Residential</option>
-                                        <option value="premium">Premium</option>
-                                        <option value="executive">Executive</option>
-                                        <option value="commercial">Commercial</option>
-                                        <option value="semicommercial">Semi Commercial</option>
-                                        <option value="supercommercial">Super Commercial</option>
-                                        <option value="vip">VIP</option>
-                                        <option value="villaplots">Villa Plots</option>
-                                        <option value="mortgage">Mortgage</option>
-                                    </select>
+                                    <CustomSelect
+                                        label="Plot Category"
+                                        required
+                                        value={form.plotCategory}
+                                        onChange={(val) => setForm(prev => ({ ...prev, plotCategory: val }))}
+                                        disabled={isView}
+                                        options={[
+                                            { label: "Residential", value: "residential" },
+                                            { label: "Premium", value: "premium" },
+                                            { label: "Executive", value: "executive" },
+                                            { label: "Commercial", value: "commercial" },
+                                            { label: "Semi Commercial", value: "semicommercial" },
+                                            { label: "Super Commercial", value: "supercommercial" },
+                                            { label: "VIP", value: "vip" },
+                                            { label: "Villa Plots", value: "villaplots" },
+                                            { label: "Mortgage", value: "mortgage" }
+                                        ]}
+                                    />
                                 </div>
                             </div>
 
@@ -299,7 +318,7 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
 
                 {/* FOOTER */}
                 {!isView && (
-                    <div className="p-7 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-4">
+                    <div className="p-5 sm:p-7 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-3 sm:gap-4">
                         <button type="button" onClick={onClose}
                             className="px-8 py-3 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-200 transition-all active:scale-95">
                             Discard Changes

@@ -10,6 +10,7 @@ import {
     X, Loader2, Maximize2, Landmark, CreditCard, Heart, CheckSquare, Eye, EyeOff 
 } from "lucide-react";
 import FileUpload from "@/components/Common/FileUpload";
+import CustomSelect from "@/components/Common/CustomSelect";
 
 export default function AdminForm({ action, item, onClose, onRefetch }) {
     const { register, handleSubmit, reset, control, formState: { errors }, watch } = useForm();
@@ -98,7 +99,7 @@ export default function AdminForm({ action, item, onClose, onRefetch }) {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 bg-white p-2 max-h-[80vh] overflow-y-auto no-scrollbar">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-10 bg-white px-0.5 sm:px-2 py-4 max-h-[80vh] overflow-y-auto no-scrollbar">
 
             {/* SECTION: PROFILE PHOTO */}
             <div className="space-y-5">
@@ -143,7 +144,7 @@ export default function AdminForm({ action, item, onClose, onRefetch }) {
             </div>
 
             {/* SECTION: PERSONAL INFORMATION */}
-            <div className="space-y-5">
+            <div className="space-y-4 md:space-y-5">
                 <h3 className={sectionHeaderClasses}>
                     <User size={18} className="text-indigo-600" />
                     Personal Information
@@ -162,26 +163,47 @@ export default function AdminForm({ action, item, onClose, onRefetch }) {
                         <input type="text" {...register("fatherOrHusband")} className={inputClasses} />
                     </div>
                     <div className="space-y-1">
-                        <label className={labelClasses}>Gender</label>
-                        <select {...register("gender")} className={inputClasses}>
-                            <option value="">Select</option>
-                            <option value="MALE">Male</option>
-                            <option value="FEMALE">Female</option>
-                            <option value="OTHER">Other</option>
-                        </select>
+                        <Controller
+                            name="gender"
+                            control={control}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Gender"
+                                    {...field}
+                                    options={[
+                                        { label: "Male", value: "MALE" },
+                                        { label: "Female", value: "FEMALE" },
+                                        { label: "Other", value: "OTHER" }
+                                    ]}
+                                />
+                            )}
+                        />
                     </div>
                     <div className="space-y-1">
                         <label className={labelClasses}>Date of Birth</label>
                         <input type="date" {...register("dob")} className={inputClasses} />
                     </div>
                     <div className="space-y-1">
-                        <label className={labelClasses}>Blood Group</label>
-                        <select {...register("bloodGroup")} className={inputClasses}>
-                            <option value="">Select</option>
-                            {["A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG", "O_POS", "O_NEG"].map(bg => (
-                                <option key={bg} value={bg}>{bg.replace("_", " ")}</option>
-                            ))}
-                        </select>
+                        <Controller
+                            name="bloodGroup"
+                            control={control}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Blood Group"
+                                    {...field}
+                                    options={[
+                                        { label: "A+", value: "A_POS" },
+                                        { label: "A-", value: "A_NEG" },
+                                        { label: "B+", value: "B_POS" },
+                                        { label: "B-", value: "B_NEG" },
+                                        { label: "O+", value: "O_POS" },
+                                        { label: "O-", value: "O_NEG" },
+                                        { label: "AB+", value: "AB_POS" },
+                                        { label: "AB-", value: "AB_NEG" }
+                                    ]}
+                                />
+                            )}
+                        />
                     </div>
                 </div>
             </div>
@@ -198,13 +220,23 @@ export default function AdminForm({ action, item, onClose, onRefetch }) {
                         <input type="text" {...register("username", { required: "Required" })} className={inputClasses} />
                     </div>
                     <div className="space-y-1">
-                        <label className={labelClasses}>Assigned Role <span className="text-red-500">*</span></label>
-                        <select {...register("roleId", { required: "Required" })} className={inputClasses}>
-                            <option value="">Choose a Role</option>
-                            {rolesList.map(role => (
-                                <option key={role.id} value={role.id}>{role.displayName || role.roleName}</option>
-                            ))}
-                        </select>
+                        <Controller
+                            name="roleId"
+                            control={control}
+                            rules={{ required: "Required" }}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Assigned Role"
+                                    required
+                                    {...field}
+                                    error={errors.roleId?.message}
+                                    options={rolesList.map(role => ({
+                                        label: role.displayName || role.roleName,
+                                        value: role.id
+                                    }))}
+                                />
+                            )}
+                        />
                     </div>
                     {action !== "Update" && (
                         <div className="space-y-1 relative">
@@ -259,7 +291,7 @@ export default function AdminForm({ action, item, onClose, onRefetch }) {
                         <label className={labelClasses}>Address</label>
                         <textarea {...register("address")} rows={2} className={`${inputClasses} resize-none`} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4 md:col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:col-span-2">
                         <div className="space-y-1">
                             <label className={labelClasses}>City</label>
                             <input type="text" {...register("city")} className={inputClasses} />

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { 
     Plus, Receipt, Loader2, Save, Trash2, 
-    AlertCircle, CheckCircle, Hash, Layers, XCircle
+    AlertCircle, CheckCircle, Hash, Layers, XCircle, ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetChequeSeries, useAddChequeSeries, useGetBanks } from "@/hooks/useFinance";
 import toast from "react-hot-toast";
 
 const ChequeSeriesConfig = () => {
+    const navigate = useNavigate();
     const { data, isLoading, isError, refetch } = useGetChequeSeries();
     const { mutateAsync: addSeries, isLoading: isAdding } = useAddChequeSeries();
     const series = data?.items || [];
@@ -35,6 +37,7 @@ const ChequeSeriesConfig = () => {
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
+            
             <div className="max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div>

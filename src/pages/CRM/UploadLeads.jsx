@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, FileText, Download, CheckCircle, X, Plus, Users2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Upload, FileText, Download, CheckCircle, X, Plus, Users2, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { getUser } from '@/services/auth.service';
@@ -13,6 +14,7 @@ const SRC_OPTS = {
 };
 
 export default function UploadLeads() {
+    const navigate = useNavigate();
     const user = getUser();
     const token = localStorage.getItem("token");
     const [drag, setDrag] = useState(false);
@@ -86,6 +88,7 @@ export default function UploadLeads() {
 
     return (
         <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+            
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
                     <Upload size={24} className="text-primary-600" />
@@ -98,7 +101,7 @@ export default function UploadLeads() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                 {/* CSV UPLOAD */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col">
+                <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                             <FileText size={18} className="text-primary-600" />
@@ -155,14 +158,14 @@ export default function UploadLeads() {
                 </div>
 
                 {/* MANUAL ENTRY */}
-                <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                     <div className="mb-6">
                         <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                             <Plus size={18} className="text-primary-600" />
                             Manual Single Entry
                         </h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Name *</label>
                             <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 

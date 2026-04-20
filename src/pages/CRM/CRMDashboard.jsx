@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Users, Flame, Thermometer, Handshake, DollarSign, Inbox, Snowflake, Clock, Activity, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { Users, Flame, Thermometer, Handshake, DollarSign, Inbox, Snowflake, Clock, Activity, TrendingUp, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { getStats, getActivities } from "@/services/crm.service";
 import { formatDistanceToNow } from "date-fns";
 
 export default function CRMDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +40,7 @@ export default function CRMDashboard() {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">CRM Executive Overview</h1>
         <p className="text-sm text-slate-500 mt-1">Real-time performance metrics and pipeline health.</p>

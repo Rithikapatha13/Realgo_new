@@ -5,6 +5,7 @@ import FormInput from "@/components/Common/FormInput";
 import { toast } from "react-hot-toast";
 import { useAddRole, useUpdateRole } from "@/hooks/useRoles";
 import { getUser } from "@/services/auth.service";
+import CustomSelect from "@/components/Common/CustomSelect";
 
 const MODULES_LIST = [
     "VENTURES",
@@ -109,7 +110,7 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
     const isView = action === "View";
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 px-0.5 sm:px-2 py-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInput
                     label="Role Name"
@@ -139,17 +140,17 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
                     disabled={isView}
                     placeholder="e.g. Sales Manager"
                 />
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700">Status</label>
-                    <select
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                <div className="flex flex-col gap-1.5">
+                    <CustomSelect
+                        label="Status"
                         value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        onChange={(val) => setFormData({ ...formData, status: val })}
                         disabled={isView}
-                    >
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
-                    </select>
+                        options={[
+                            { label: "Active", value: "ACTIVE" },
+                            { label: "Inactive", value: "INACTIVE" }
+                        ]}
+                    />
                 </div>
             </div>
 
@@ -171,7 +172,7 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {MODULES_LIST.map((module) => (
                         <div
                             key={module}

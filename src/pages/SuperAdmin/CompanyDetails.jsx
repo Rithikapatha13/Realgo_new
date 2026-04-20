@@ -43,15 +43,7 @@ export default function CompanyDetails() {
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* BACK BUTTON & ACTIONS */}
       <div className="flex items-center justify-between px-2">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors font-medium group"
-        >
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-            <ArrowLeft size={18} />
-          </div>
-          Back to Companies
-        </button>
+        
 
         <Button
           variant="primary"

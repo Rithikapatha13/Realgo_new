@@ -13,6 +13,7 @@ import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
 import PlotsReport from "./../pages/Reports/PlotsReport";
 import SalesReport from "./../pages/Reports/SalesReport";
 import PerformanceDashboard from "./../pages/Reports/PerformanceDashboard";
+import TelecallerPerformanceReport from "./../pages/Reports/TelecallerPerformanceReport";
 
 import Greetings from "./../pages/Media/Greetings";
 import News from "./../pages/Media/News";
@@ -48,6 +49,7 @@ import Leads from "../pages/CRM/Leads";
 import UploadLeads from "../pages/CRM/UploadLeads";
 import CRMDashboard from "../pages/CRM/CRMDashboard";
 import AddAssociate from "../pages/administration/AddAssociate";
+import BulkAssociateForm from "../pages/administration/Form/BulkAssociateForm";
 
 export const publicRoutes = {
   auth: {
@@ -61,7 +63,7 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -73,12 +75,13 @@ export const routeConfig = {
       { path: "/reports/company-users", component: CompanyUsersReport },
       { path: "/reports/plots", component: PlotsReport },
       { path: "/reports/sales", component: SalesReport },
+      { path: "/reports/telecaller-performance", component: TelecallerPerformanceReport },
       { path: "/performance", component: PerformanceDashboard },
     ],
   },
   Administration: {
     basePath: "/",
-    allowedRoles: ["admin", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin"],
     routes: [
       { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },
@@ -86,11 +89,12 @@ export const routeConfig = {
       { path: "/roles", component: Roles },
       { path: "requests", component: Requests },
       { path: "/users/add", component: AddAssociate },
+      { path: "/user/add-bulk-associates", component: BulkAssociateForm },
     ],
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -101,12 +105,12 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -114,7 +118,7 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {

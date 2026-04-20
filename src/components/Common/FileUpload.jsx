@@ -355,7 +355,7 @@ export default function FileInput({
                 <img
                   src={resolveImageUrl(preview)}
                   alt="Preview"
-                  className="h-32 w-32 object-cover rounded-lg border-2 border-gray-200"
+                  className="h-32 w-32 object-contain rounded-lg border-2 border-gray-200"
                 />
                 <button
                   type="button"

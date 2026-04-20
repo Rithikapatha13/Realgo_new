@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { FileDown, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { FileDown, X, ArrowLeft } from "lucide-react";
 import { getCompanyDashboard } from "@/services/company.service";
 import Button from "@/components/Common/Button";
 import * as XLSX from "xlsx";
 import dayjs from "dayjs";
 
 export default function SuperAdminReports() {
+  const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
@@ -63,6 +65,7 @@ export default function SuperAdminReports() {
 
   return (
     <div className="p-6 space-y-8 max-w-5xl mx-auto">
+      
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>

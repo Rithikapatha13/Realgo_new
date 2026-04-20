@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { 
-    Plus, Search, User, Mail, Phone, MapPin, 
-    Briefcase, Loader2, MoreVertical, Filter,
-    CheckCircle, XCircle, Clock
+    CheckCircle, XCircle, Clock, ArrowLeft, Plus, Search, Loader2, User, Phone, Mail, MapPin
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetParties, useAddParty } from "@/hooks/useFinance";
 import { ModalWrapper } from "@/components/Common";
 import toast from "react-hot-toast";
 
 const Parties = () => {
+    const navigate = useNavigate();
     const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -32,6 +32,7 @@ const Parties = () => {
 
     return (
         <div className="p-6 bg-slate-50/50 min-h-screen">
+            
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>

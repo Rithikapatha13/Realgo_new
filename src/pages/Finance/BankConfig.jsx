@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
-    Plus, Landmark, Loader2, Save, Trash2,
-    AlertCircle, CheckCircle, CreditCard, Building2,
-    XCircle
+    XCircle, ArrowLeft, Plus, Loader2, Save, Landmark, CreditCard, Building2
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetBanks, useAddBank } from "@/hooks/useFinance";
 import toast from "react-hot-toast";
 
 const BankConfig = () => {
+    const navigate = useNavigate();
     const { data, isLoading, isError, refetch } = useGetBanks();
     const { mutateAsync: addBank, isLoading: isAdding } = useAddBank();
     const banks = data?.items || [];
@@ -35,6 +35,7 @@ const BankConfig = () => {
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
+            
             <div className="max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div>

@@ -1,37 +1,23 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
+import apiClient from "../config/apiClient";
 
 export const getAllHighways = async () => {
-    const { data } = await axios.get(`${API_URL}/highways`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/highways`);
     return data;
 };
 
 export const getProjects = async (params = {}) => {
-    const { data } = await axios.get(`${API_URL}/projects`, {
-        params,
-        headers: getAuthHeader(),
+    const { data } = await apiClient.get(`/projects`, {
+        params
     });
     return data;
 };
 
 export const getProjectById = async (id) => {
-    const { data } = await axios.get(`${API_URL}/projects/${id}`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/projects/${id}`);
     return data;
 };
 
 export const updateProject = async (id, projectData) => {
-    const { data } = await axios.put(`${API_URL}/projects/${id}`, projectData, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.put(`/projects/${id}`, projectData);
     return data;
 };

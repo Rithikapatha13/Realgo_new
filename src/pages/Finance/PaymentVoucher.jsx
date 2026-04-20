@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Plus, CreditCard, Calendar, Filter, Loader2,
-    ArrowUpRight, Landmark, CheckCircle, AlertCircle, 
-    XCircle, Trash2, Wallet, Globe, Banknote, Receipt
+    XCircle, Trash2, Wallet, Globe, Banknote, Receipt, ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { 
     useGetLedgers, useGetParties, useGetSubledgers,
     useAddPayment, useGetBanks
 } from "@/hooks/useFinance";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
+import CustomSelect from "@/components/Common/CustomSelect";
+import { Loader2, CheckCircle } from "lucide-react";
 
 const PaymentVoucher = () => {
+    const navigate = useNavigate();
     const { mutateAsync: addPayment, isLoading: isAdding } = useAddPayment();
     const { data: ledgersData } = useGetLedgers();
     const { data: partiesData } = useGetParties();
@@ -106,8 +108,9 @@ const PaymentVoucher = () => {
     };
 
     return (
-        <div className="p-6 bg-slate-50 min-h-screen">
-            <div className="max-w-5xl mx-auto">
+        <div className="p-0.5 sm:p-6 bg-slate-50 min-h-screen">
+            <div className="max-w-5xl mx-auto px-0.5 sm:px-4">
+                
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-xl font-semibold text-slate-900 tracking-tight flex items-center gap-3">
@@ -122,7 +125,7 @@ const PaymentVoucher = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-8 pb-20">
                     {/* Basic Info */}
-                    <section className="bg-white/80 p-5 rounded-lg border border-slate-200 grid grid-cols-3 gap-6">
+                    <section className="bg-white/80 p-4 sm:p-5 rounded-lg border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                         <div className="col-span-1">
                             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">Payment Date</label>
                             <input required type="date" value={formData.transactionDate} onChange={e => setFormData({...formData, transactionDate: e.target.value})}
@@ -134,17 +137,17 @@ const PaymentVoucher = () => {
                                 className="w-full bg-slate-50 border-none rounded-xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 outline-none transition-all" />
                         </div>
                         <div className="col-span-1">
-                            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">Paid To (Party)</label>
-                            <select value={formData.partyId} onChange={e => setFormData({...formData, partyId: e.target.value})}
-                                className="w-full bg-slate-50 border-none rounded-xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">Select Party</option>
-                                {parties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                            </select>
+                            <CustomSelect
+                                label="Paid To (Party)"
+                                value={formData.partyId}
+                                onChange={(val) => setFormData({ ...formData, partyId: val })}
+                                options={parties.map(p => ({ label: p.name, value: p.id }))}
+                            />
                         </div>
                     </section>
 
                     {/* Journal Entries */}
-                    <section className="bg-white/80 p-5 rounded-lg border border-slate-200">
+                    <section className="bg-white/80 p-4 sm:p-5 rounded-lg border border-slate-200">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-widest flex items-center gap-2">
                                 <div className="w-2 h-2 bg-indigo-500 rounded-full" />
@@ -186,7 +189,7 @@ const PaymentVoucher = () => {
                     </section>
 
                     {/* Payment Mode Details */}
-                    <section className="bg-white/80 p-5 rounded-lg border border-slate-200">
+                    <section className="bg-white/80 p-4 sm:p-5 rounded-lg border border-slate-200">
                         <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-widest flex items-center gap-2 mb-6">
                             <div className="w-2 h-2 bg-rose-500 rounded-full" />
                             Payment Modes
@@ -205,7 +208,7 @@ const PaymentVoucher = () => {
                     </section>
 
                     {/* Summary & Submit */}
-                    <div className="sticky bottom-6 z-10 flex items-center justify-between gap-6 p-6 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-xl shadow-md">
+                    <div className="sticky bottom-4 md:bottom-6 z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 p-4 md:p-6 bg-white/90 backdrop-blur-xl border border-slate-200 rounded-xl shadow-lg">
                         <div className="flex-1">
                             <textarea placeholder="Payment Narration..." value={formData.narration} onChange={e => setFormData({...formData, narration: e.target.value})}
                                 className="w-full bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-medium focus:ring-1 focus:ring-rose-500/20 outline-none resize-none h-12" />
@@ -237,29 +240,31 @@ const EntryRow = ({ entry, ledgers, onUpdate, onRemove, showRemove }) => {
     const subledgers = subledgersData?.items || [];
 
     return (
-        <div className={`grid grid-cols-12 gap-3 p-4 rounded-xl border transition-all ${entry.entryType === 'DEBIT' ? 'bg-slate-50 border-slate-200' : 'bg-slate-50/30 border-slate-100'}`}>
-            <div className="col-span-2">
+        <div className={`grid grid-cols-1 md:grid-cols-12 gap-3 p-3 sm:p-4 rounded-xl border transition-all ${entry.entryType === 'DEBIT' ? 'bg-slate-50 border-slate-200' : 'bg-slate-50/30 border-slate-100'}`}>
+            <div className="col-span-1 md:col-span-2">
                 <span className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-semibold tracking-widest ${entry.entryType === 'DEBIT' ? 'bg-rose-600 text-white' : 'bg-primary-600 text-white'}`}>
                     {entry.entryType}
                 </span>
             </div>
-            <div className="col-span-4">
-                <select value={entry.ledgerId} onChange={e => onUpdate("ledgerId", e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:ring-1 focus:ring-rose-500 outline-none appearance-none">
-                    <option value="">Select Ledger Head</option>
-                    {ledgers.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </select>
+            <div className="col-span-1 md:col-span-4">
+                <CustomSelect
+                    label="Ledger Head"
+                    value={entry.ledgerId}
+                    onChange={(val) => onUpdate("ledgerId", val)}
+                    options={ledgers.map(l => ({ label: l.name, value: l.id }))}
+                />
             </div>
             {selectedLedger?.bifurcated ? (
-                <div className="col-span-3">
-                    <select value={entry.subledgerId} onChange={e => onUpdate("subledgerId", e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:ring-1 focus:ring-rose-500 outline-none appearance-none">
-                        <option value="">Select Sub-ledger</option>
-                        {subledgers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </select>
+                <div className="col-span-1 md:col-span-3">
+                    <CustomSelect
+                        label="Sub-ledger"
+                        value={entry.subledgerId}
+                        onChange={(val) => onUpdate("subledgerId", val)}
+                        options={subledgers.map(s => ({ label: s.name, value: s.id }))}
+                    />
                 </div>
-            ) : <div className="col-span-3" />}
-            <div className="col-span-2">
+            ) : <div className="hidden md:block md:col-span-3" />}
+            <div className="col-span-1 md:col-span-2">
                 <input type="number" placeholder="Amount" value={entry.amount || ''} onChange={e => onUpdate("amount", e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-semibold text-right focus:ring-1 focus:ring-rose-500 outline-none" />
             </div>
@@ -289,7 +294,7 @@ const ModeRow = ({ mode, banks, onUpdate }) => {
                 </button>
             </div>
 
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                     <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Mode Amount</label>
                     <input type="number" value={mode.amount || ''} onChange={e => onUpdate("amount", e.target.value)}
@@ -297,20 +302,20 @@ const ModeRow = ({ mode, banks, onUpdate }) => {
                 </div>
 
                 {mode.mode === 'CASH' && (
-                    <div className="col-span-3 py-6 text-slate-400 text-xs italic font-medium flex items-center gap-2">
+                    <div className="md:col-span-3 sm:col-span-2 py-6 text-slate-400 text-xs italic font-medium flex items-center gap-2">
                         <AlertCircle size={14} /> Disbursed directly from standard cash ledge.
                     </div>
                 )}
 
                 {mode.mode === 'CHEQUE' && (
                     <>
-                        <div className="col-span-2">
-                            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Paid From Bank</label>
-                            <select value={mode.companyBankId} onChange={e => onUpdate("companyBankId", e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:ring-1 focus:ring-rose-500 outline-none appearance-none cursor-pointer">
-                                <option value="">Select Company Bank</option>
-                                {banks.map(b => <option key={b.id} value={b.id}>{b.name} ({b.accountNumber})</option>)}
-                            </select>
+                        <div className="md:col-span-2 sm:col-span-2">
+                            <CustomSelect
+                                label="Paid From Bank"
+                                value={mode.companyBankId}
+                                onChange={(val) => onUpdate("companyBankId", val)}
+                                options={banks.map(b => ({ label: `${b.name} (${b.accountNumber})`, value: b.id }))}
+                            />
                         </div>
                         <div>
                             <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Cheque Number</label>
@@ -322,13 +327,13 @@ const ModeRow = ({ mode, banks, onUpdate }) => {
 
                 {mode.mode === 'ONLINE' && (
                     <>
-                        <div className="col-span-2">
-                            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Paid From Bank</label>
-                            <select value={mode.companyBankId} onChange={e => onUpdate("companyBankId", e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:ring-1 focus:ring-rose-500 outline-none appearance-none cursor-pointer">
-                                <option value="">Select Company Bank</option>
-                                {banks.map(b => <option key={b.id} value={b.id}>{b.name} ({b.accountNumber})</option>)}
-                            </select>
+                        <div className="md:col-span-2 sm:col-span-2">
+                            <CustomSelect
+                                label="Paid From Bank"
+                                value={mode.companyBankId}
+                                onChange={(val) => onUpdate("companyBankId", val)}
+                                options={banks.map(b => ({ label: `${b.name} (${b.accountNumber})`, value: b.id }))}
+                            />
                         </div>
                         <div>
                             <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">UTR / Ref #</label>

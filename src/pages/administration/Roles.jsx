@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Pencil, Trash2, Plus, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Pencil, Trash2, Plus, Eye, ArrowLeft } from "lucide-react";
 import { useGetAllRoles, useDeleteRole } from "@/hooks/useRoles";
 import ModalWrapper from "@/components/Common/ModalWrapper";
 import DeleteConfirmationModal from "@/components/Common/DeleteConfirmationModal";
@@ -8,6 +9,7 @@ import Button from "@/components/Common/Button";
 import { toast } from "react-hot-toast";
 
 export default function Roles() {
+  const navigate = useNavigate();
   const { data: rolesResponse, isLoading, refetch } = useGetAllRoles();
   const deleteRoleMutation = useDeleteRole();
 
@@ -66,6 +68,7 @@ export default function Roles() {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-8">
         <div>

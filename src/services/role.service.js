@@ -1,43 +1,26 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
+import apiClient from "../config/apiClient";
 
 export const getAllRoles = async () => {
-    const { data } = await axios.get(`${API_URL}/roles`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/roles`);
     return data;
 };
 
 export const getRoleById = async (id) => {
-    const { data } = await axios.get(`${API_URL}/roles/${id}`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.get(`/roles/${id}`);
     return data;
 };
 
 export const addRole = async (roleData) => {
-    const { data } = await axios.post(`${API_URL}/roles`, roleData, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.post(`/roles`, roleData);
     return data;
 };
 
 export const updateRole = async (id, roleData) => {
-    const { data } = await axios.put(`${API_URL}/roles/${id}`, roleData, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.put(`/roles/${id}`, roleData);
     return data;
 };
 
 export const deleteRole = async (id) => {
-    const { data } = await axios.delete(`${API_URL}/roles/${id}`, {
-        headers: getAuthHeader(),
-    });
+    const { data } = await apiClient.delete(`/roles/${id}`);
     return data;
 };

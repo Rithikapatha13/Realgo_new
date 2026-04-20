@@ -12,6 +12,17 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const TeamTree = () => {
   const navigate = useNavigate();
   const user = getUser();
+  
+  // Guard: Disable for Telecallers and Telecaller Admins
+  const roleName = (user?.role?.roleName || user?.role || "").toLowerCase();
+  const isTelecallerRole = roleName.includes("telecaller") || roleName.includes("teelcaller");
+
+  useEffect(() => {
+    if (isTelecallerRole) {
+      navigate('/myteam');
+    }
+  }, [isTelecallerRole, navigate]);
+
   const [id, setId] = useState(undefined);
   const [username, setUsername] = useState('');
   const [status, setStatus] = useState('VERIFIED');
@@ -88,13 +99,7 @@ const TeamTree = () => {
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-h-screen">
       <div className="mb-4">
-        <button 
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-500 hover:text-primary-500 transition-colors bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 w-fit"
-        >
-          <ArrowLeft size={16} />
-          <span className="text-sm font-medium">Back to Team</span>
-        </button>
+        
       </div>
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

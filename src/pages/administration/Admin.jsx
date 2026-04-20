@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { MoreVertical, Search, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2, UserPlus, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { MoreVertical, Search, Trash2, UserCog, CheckCircle, Clock, XCircle, Loader2, UserPlus, ShieldCheck, ArrowLeft } from "lucide-react";
 import { useGetAdmins, useDeleteAdminUser, useUpdateAdminStatus } from "@/hooks/useAdmin";
 import ModalWrapper from "@/components/Common/ModalWrapper";
 import AdminForm from "./AdminForm";
@@ -8,6 +9,7 @@ import { getUserType, getUser } from "@/services/auth.service";
 import { toast } from "react-hot-toast";
 
 export default function Admin() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -122,6 +124,7 @@ export default function Admin() {
 
   return (
     <div className="p-6 min-h-screen bg-slate-50/50">
+      
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -280,7 +283,7 @@ export default function Admin() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-[11px] font-bold tracking-tight text-slate-400 uppercase">
-                <span>{admin.role?.roleName || "ADMIN"}</span>
+                <span>{admin.role?.roleName || (type === "clientadmin" ? "COMPANY ADMIN" : "ADMIN")}</span>
                 <span>Joined {new Date(admin.createdAt).toLocaleDateString()}</span>
               </div>
             </div>

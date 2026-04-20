@@ -1,31 +1,30 @@
 import React, { useState } from 'react';
-import { 
-    Plus, Receipt, FileText, 
-    Calendar, Filter, Loader2,
-    ArrowUpRight, ArrowDownLeft, RefreshCcw, Landmark,
-    CheckCircle, AlertCircle, XCircle
+import {
+    CheckCircle, AlertCircle, XCircle, ArrowLeft, Plus, Filter, Calendar, RefreshCw, Receipt, Loader2, RefreshCcw
 } from "lucide-react";
-import { 
-    useGetTransactions, useAddTransaction, useGetLedgers, 
-    useGetParties, useGetSubledgers 
+import { useNavigate } from "react-router-dom";
+import {
+    useGetTransactions, useAddTransaction, useGetLedgers,
+    useGetParties, useGetSubledgers
 } from "@/hooks/useFinance";
 import { ModalWrapper } from "@/components/Common";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
 
 const Transactions = () => {
+    const navigate = useNavigate();
     const [params, setParams] = useState({
         type: "",
         startDate: "",
         endDate: "",
         projectId: ""
     });
-    
+
     const { data, isLoading, isError, refetch } = useGetTransactions(params);
     const transactions = data?.items || [];
 
     const getStatusColor = (type) => {
-        switch(type) {
+        switch (type) {
             case 'RECEIPT': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
             case 'PAYMENT': return 'text-rose-600 bg-rose-50 border-rose-100';
             case 'JOURNAL': return 'text-indigo-600 bg-indigo-50 border-indigo-100';
@@ -37,6 +36,7 @@ const Transactions = () => {
 
     return (
         <div className="p-6 bg-slate-50/50 min-h-screen">
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-xl font-bold text-slate-900 tracking-tight">Financial Transactions</h1>
@@ -58,9 +58,9 @@ const Transactions = () => {
             <div className="bg-white border border-slate-200 rounded-xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px] relative">
                     <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                    <select 
-                        value={params.type} 
-                        onChange={e => setParams({...params, type: e.target.value})}
+                    <select
+                        value={params.type}
+                        onChange={e => setParams({ ...params, type: e.target.value })}
                         className="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none appearance-none"
                     >
                         <option value="">All Types</option>
@@ -72,12 +72,12 @@ const Transactions = () => {
 
                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl">
                     <Calendar size={16} className="text-slate-400" />
-                    <input type="date" value={params.startDate} onChange={e => setParams({...params, startDate: e.target.value})} className="bg-transparent text-xs font-medium outline-none" />
+                    <input type="date" value={params.startDate} onChange={e => setParams({ ...params, startDate: e.target.value })} className="bg-transparent text-xs font-medium outline-none" />
                     <span className="text-slate-300">to</span>
-                    <input type="date" value={params.endDate} onChange={e => setParams({...params, endDate: e.target.value})} className="bg-transparent text-xs font-medium outline-none" />
+                    <input type="date" value={params.endDate} onChange={e => setParams({ ...params, endDate: e.target.value })} className="bg-transparent text-xs font-medium outline-none" />
                 </div>
 
-                <button onClick={() => setParams({type: "", startDate: "", endDate: "", projectId: ""})} className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors px-2">
+                <button onClick={() => setParams({ type: "", startDate: "", endDate: "", projectId: "" })} className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors px-2">
                     RESET
                 </button>
                 <button onClick={() => refetch()} className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
@@ -99,7 +99,8 @@ const Transactions = () => {
                     <p className="mt-1">Financial entries will appear here once recorded.</p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200">
@@ -149,6 +150,7 @@ const Transactions = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>
             )}
 
             <ModalWrapper
@@ -167,7 +169,7 @@ const TransactionForm = ({ onClose, onRefetch }) => {
     const { mutateAsync: addTransaction, isLoading: isAdding } = useAddTransaction();
     const { data: ledgersData } = useGetLedgers();
     const { data: partiesData } = useGetParties();
-    
+
     const ledgers = ledgersData?.items || [];
     const parties = partiesData?.items || [];
 
@@ -188,12 +190,12 @@ const TransactionForm = ({ onClose, onRefetch }) => {
         const lastType = formData.entries[formData.entries.length - 1]?.entryType;
         setFormData({
             ...formData,
-            entries: [...formData.entries, { 
-                ledgerId: "", 
-                subledgerId: "", 
-                amount: 0, 
-                entryType: lastType === "DEBIT" ? "CREDIT" : "DEBIT", 
-                narration: "" 
+            entries: [...formData.entries, {
+                ledgerId: "",
+                subledgerId: "",
+                amount: 0,
+                entryType: lastType === "DEBIT" ? "CREDIT" : "DEBIT",
+                narration: ""
             }]
         });
     };
@@ -201,11 +203,11 @@ const TransactionForm = ({ onClose, onRefetch }) => {
     const updateEntry = (index, field, value) => {
         const newEntries = [...formData.entries];
         newEntries[index][field] = value;
-        
+
         if (field === "ledgerId") {
             newEntries[index].subledgerId = "";
         }
-        
+
         let dr = 0;
         let cr = 0;
         newEntries.forEach(e => {
@@ -216,15 +218,15 @@ const TransactionForm = ({ onClose, onRefetch }) => {
 
         setTotals({ debit: dr, credit: cr });
         setFormData({
-            ...formData, 
-            entries: newEntries, 
+            ...formData,
+            entries: newEntries,
             totalAmount: dr
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (Math.abs(totals.debit - totals.credit) > 0.01) {
             return toast.error(`Transaction not balanced! Difference: ₹${Math.abs(totals.debit - totals.credit).toFixed(2)}`);
         }
@@ -245,10 +247,10 @@ const TransactionForm = ({ onClose, onRefetch }) => {
 
     return (
         <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[85vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Type *</label>
-                    <select value={formData.transactionType} onChange={e => setFormData({...formData, transactionType: e.target.value})}
+                    <select value={formData.transactionType} onChange={e => setFormData({ ...formData, transactionType: e.target.value })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none">
                         <option value="RECEIPT">Receipt</option>
                         <option value="PAYMENT">Payment</option>
@@ -257,15 +259,15 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Date *</label>
-                    <input required type="date" value={formData.transactionDate} onChange={e => setFormData({...formData, transactionDate: e.target.value})}
+                    <input required type="date" value={formData.transactionDate} onChange={e => setFormData({ ...formData, transactionDate: e.target.value })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none" />
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Party</label>
-                    <select value={formData.partyId} onChange={e => setFormData({...formData, partyId: e.target.value})}
+                    <select value={formData.partyId} onChange={e => setFormData({ ...formData, partyId: e.target.value })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none">
                         <option value="">Select Party</option>
                         {parties.map(p => <option key={p.id} value={p.id}>{p.name} ({p.type})</option>)}
@@ -273,7 +275,7 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Reference #</label>
-                    <input type="text" placeholder="Bill/Cheque number" value={formData.referenceNumber} onChange={e => setFormData({...formData, referenceNumber: e.target.value})}
+                    <input type="text" placeholder="Bill/Cheque number" value={formData.referenceNumber} onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none" />
                 </div>
             </div>
@@ -286,12 +288,12 @@ const TransactionForm = ({ onClose, onRefetch }) => {
                     </button>
                 </div>
                 {formData.entries.map((entry, idx) => (
-                    <EntryRow 
-                        key={idx} 
-                        entry={entry} 
-                        ledgers={ledgers} 
+                    <EntryRow
+                        key={idx}
+                        entry={entry}
+                        ledgers={ledgers}
                         onUpdate={(field, value) => updateEntry(idx, field, value)}
-                        onRemove={() => setFormData({...formData, entries: formData.entries.filter((_, i) => i !== idx)})}
+                        onRemove={() => setFormData({ ...formData, entries: formData.entries.filter((_, i) => i !== idx) })}
                         showRemove={idx > 0}
                     />
                 ))}
@@ -323,9 +325,9 @@ const TransactionForm = ({ onClose, onRefetch }) => {
             </div>
 
             <div className="pt-4 border-t border-slate-100">
-                <button 
-                    disabled={isAdding || Math.abs(totals.debit - totals.credit) > 0.01} 
-                    type="submit" 
+                <button
+                    disabled={isAdding || Math.abs(totals.debit - totals.credit) > 0.01}
+                    type="submit"
                     className="w-full bg-primary-600 text-white py-3.5 rounded-xl font-bold tracking-wide hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm shadow-indigo-100 active:scale-95 disabled:opacity-50"
                 >
                     {isAdding && <Loader2 className="animate-spin" size={18} />}

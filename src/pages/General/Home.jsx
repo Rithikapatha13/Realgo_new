@@ -1,14 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import { Users, Briefcase, UserCheck, ShieldCheck } from "lucide-react";
+import { Users, Briefcase, UserCheck, ShieldCheck, Activity, Clock, Flame, ClipboardList, MessageSquare, Calendar, ArrowLeft } from "lucide-react";
+
+
 import CompactCalendar from "../../components/Calendar/CompactCalendar";
 import Typewriter from "typewriter-effect";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import SystemDashboard from "../SuperAdmin/SystemDashboard";
 import FinanceHome from "../Finance/FinanceHome";
 import ClientAdminDashboard from "../administration/ClientAdminDashboard";
+import { getStats, getActivities } from "@/services/crm.service";
+import { formatDistanceToNow } from 'date-fns';
 import { getUser, getUserType } from "@/services/auth.service";
+
 
 /* ================= QUICK ACCESS CARDS ================= */
 const cards = [
@@ -43,10 +48,42 @@ export default function Home() {
   const user = getUser();
   const userType = getUserType()?.toLowerCase();
   const role = user?.role?.toLowerCase();
-  
+
   const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
-  const userRoleStr = role || "";
-  const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin";
+  const userRoleStr = (user?.role?.roleName || user?.role || "").toLowerCase().replace(/\s/g, '');
+
+  const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userType === "admin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin" || userRoleStr.includes("admin");
+  const isTelecaller = userRoleStr === "telecaller";
+  const isTelecallerAdmin = userRoleStr === "telecalleradmin";
+
+  // CRM State
+  const [crmStats, setCrmStats] = useState(null);
+  const [crmActivities, setCrmActivities] = useState([]);
+  const [loadingCrm, setLoadingCrm] = useState(false);
+
+  useEffect(() => {
+    if (isTelecaller || isTelecallerAdmin) {
+      fetchCrmData();
+      const interval = setInterval(fetchCrmData, 45000); // Poll every 45s
+      return () => clearInterval(interval);
+    }
+  }, [isTelecaller, isTelecallerAdmin]);
+
+  async function fetchCrmData() {
+    try {
+      setLoadingCrm(true);
+      const [statsRes, actsRes] = await Promise.all([
+        getStats(),
+        getActivities()
+      ]);
+      setCrmStats(statsRes.stats || null);
+      setCrmActivities(actsRes.activities || []);
+    } catch (error) {
+      console.error("Home CRM fetch failed", error);
+    } finally {
+      setLoadingCrm(false);
+    }
+  }
 
   // If superadmin, render the SystemDashboard instead of the regular Home view
   if (isSuperAdmin) {
@@ -68,7 +105,7 @@ export default function Home() {
       <div className="relative w-full h-[38vh] rounded-xl overflow-hidden shadow-sm">
         {/* Image */}
         <img
-          src=" /assets/Banner/banner.jpg"
+          src="/assets/Banner/banner.jpg"
           alt="Grupe Banner"
           className="w-full h-full object-cover object-bottom"
         />
@@ -160,195 +197,335 @@ export default function Home() {
 
       {/* ================= QUICK ACCESS ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <QuickAccessTile
-          title="Projects"
-          subtitle="Manage ventures"
-          icon={Briefcase}
-          bg="bg-blue-100"
-          iconBg="bg-blue-500"
-          onClick={() => navigate("/projects")}
-        />
-        <QuickAccessTile
-          title="Team"
-          subtitle="Your associates"
-          icon={Users}
-          bg="bg-purple-100"
-          iconBg="bg-purple-500"
-          onClick={() => navigate("/myteam")}
-        />
-        <QuickAccessTile
-          title="Designs"
-          subtitle="Media & creatives"
-          icon={UserCheck}
-          bg="bg-pink-100"
-          iconBg="bg-pink-500"
-          onClick={() => navigate("/greetings")}
-        />
-        <QuickAccessTile
-          title="News"
-          subtitle="Latest updates"
-          icon={Users}
-          bg="bg-emerald-100"
-          iconBg="bg-emerald-500"
-          onClick={() => navigate("/news")}
-        />
-        <QuickAccessTile
-          title="Reports"
-          subtitle="View analytics"
-          icon={Briefcase}
-          bg="bg-amber-100"
-          iconBg="bg-amber-500"
-          onClick={() => navigate("/reports")}
-        />
-        <QuickAccessTile
-          title="Services"
-          subtitle="Manage offerings"
-          icon={ShieldCheck}
-          bg="bg-indigo-100"
-          iconBg="bg-indigo-500"
-          onClick={() => navigate("/services-home")}
-        />
+        {isTelecaller ? (
+          <>
+            <QuickAccessTile
+              title="Leads"
+              subtitle={`${crmStats?.total || 0} Total Leads`}
+              icon={Users}
+              bg="bg-blue-100"
+              iconBg="bg-blue-500"
+              onClick={() => navigate("/leads")}
+            />
+            <QuickAccessTile
+              title="Pending"
+              subtitle={`${crmStats?.pending || 0} Leads`}
+              icon={Clock}
+              bg="bg-amber-100"
+              iconBg="bg-amber-500"
+              onClick={() => navigate("/leads/pending")}
+            />
+            <QuickAccessTile
+              title="Follow-ups"
+              subtitle={`${crmStats?.followups || 0} Scheduled`}
+              icon={Activity}
+              bg="bg-purple-100"
+              iconBg="bg-purple-500"
+              onClick={() => navigate("/leads/followups")}
+            />
+            <QuickAccessTile
+              title="Performance"
+              subtitle="View metrics"
+              icon={Activity}
+              bg="bg-indigo-100"
+              iconBg="bg-indigo-500"
+              onClick={() => navigate("/performance")}
+            />
+            <QuickAccessTile
+              title="My Team"
+              subtitle="Associates"
+              icon={UserCheck}
+              bg="bg-emerald-100"
+              iconBg="bg-emerald-500"
+              onClick={() => navigate("/myteam")}
+            />
+            <QuickAccessTile
+              title="Reports"
+              subtitle="CRM Analytics"
+              icon={Briefcase}
+              bg="bg-pink-100"
+              iconBg="bg-pink-500"
+              onClick={() => navigate("/reports")}
+            />
+          </>
+        ) : (
+          <>
+            <QuickAccessTile
+              title="Projects"
+              subtitle="Manage ventures"
+              icon={Briefcase}
+              bg="bg-blue-100"
+              iconBg="bg-blue-500"
+              onClick={() => navigate("/projects")}
+            />
+            <QuickAccessTile
+              title="Team"
+              subtitle="Your associates"
+              icon={Users}
+              bg="bg-purple-100"
+              iconBg="bg-purple-500"
+              onClick={() => navigate("/myteam")}
+            />
+            <QuickAccessTile
+              title="Designs"
+              subtitle="Media & creatives"
+              icon={UserCheck}
+              bg="bg-pink-100"
+              iconBg="bg-pink-500"
+              onClick={() => navigate("/greetings")}
+            />
+            <QuickAccessTile
+              title="News"
+              subtitle="Latest updates"
+              icon={Users}
+              bg="bg-emerald-100"
+              iconBg="bg-emerald-500"
+              onClick={() => navigate("/news")}
+            />
+            <QuickAccessTile
+              title="Reports"
+              subtitle="View analytics"
+              icon={Briefcase}
+              bg="bg-amber-100"
+              iconBg="bg-amber-500"
+              onClick={() => navigate("/reports")}
+            />
+            <QuickAccessTile
+              title="Services"
+              subtitle="Manage offerings"
+              icon={ShieldCheck}
+              bg="bg-indigo-100"
+              iconBg="bg-indigo-500"
+              onClick={() => navigate("/services-home")}
+            />
+          </>
+        )}
       </div>
+
 
       {isClientAdmin ? (
         /* ================= CLIENT ADMIN VIEW ================= */
         <div className="pt-2">
-           <ClientAdminDashboard />
+          <ClientAdminDashboard />
         </div>
       ) : (
         /* ================= REGULAR ADMIN / ASSOCIATE VIEW ================= */
         <div className="space-y-5">
-           {/* ================= KPI STATS (MINIMAL) ================= */}
-           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-             <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
-             <div className="relative">
-               <MinimalKpi title="Total Associates" value="424" icon={Users} />
-               {/* SMALL BUTTON */}
-               <button
-                 onClick={() => setOpenPending(true)}
-                 className="absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shadow-sm"
-                 title="View pending associates"
-               >
-                 <Plus size={12} className="text-slate-600" />
-               </button>
-             </div>
-             <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
-             <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
-           </div>
+          {/* ================= KPI STATS (MINIMAL) ================= */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {isTelecaller ? (
+              <>
+                <MinimalKpi title="Total Leads" value={crmStats?.total || '0'} icon={Users} />
+                <MinimalKpi title="Hot Leads" value={crmStats?.hot || '0'} icon={Flame} />
+                <MinimalKpi title="Pending" value={crmStats?.pending || '0'} icon={Clock} />
+                <MinimalKpi title="Follow-ups" value={crmStats?.followups || '0'} icon={Calendar} />
+              </>
+            ) : (
+              <>
+                <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
+                <div className="relative">
+                  <MinimalKpi title="Total Associates" value="424" icon={Users} />
+                  {/* SMALL BUTTON */}
+                  <button
+                    onClick={() => setOpenPending(true)}
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shadow-sm"
+                    title="View pending associates"
+                  >
+                    <Plus size={12} className="text-slate-600" />
+                  </button>
+                </div>
+                <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
+                <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
+              </>
+            )}
+          </div>
 
-           {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-             {/* Plot Bookings */}
-             <CompactCalendar />
+          {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Plot Bookings / CRM Pipeline */}
+            {isTelecaller ? (
+              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                <h2 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                  <ClipboardList size={18} className="text-primary-500" /> Lead Pipeline
+                </h2>
+                <div className="space-y-4">
+                  {['NEW', 'WARM', 'HOT', 'COLD'].map(s => {
+                    const count = crmStats?.[s.toLowerCase()] || 0;
+                    const total = crmStats?.total || 1;
+                    return <StatusRow key={s} label={s} value={count} max={total} color={s === 'HOT' ? 'bg-rose-500' : s === 'NEW' ? 'bg-emerald-500' : 'bg-primary-500'} />;
+                  })}
+                </div>
+              </div>
+            ) : (
+              <CompactCalendar />
+            )}
 
-             {/* SALES OVERVIEW */}
-             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-               <h2 className="text-base font-semibold text-slate-800 mb-4">
-                 Sales Overview
-               </h2>
+            {/* SALES OVERVIEW / DISTRIBUTION */}
+            <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-800 mb-4">
+                {isTelecaller ? "Lead Distribution" : "Sales Overview"}
+              </h2>
 
-               <div className="h-56 min-w-0" style={{ minHeight: '224px' }}>
-                 <ResponsiveContainer width="99%" height="100%">
-                   <PieChart>
-                     <Pie
-                       data={salesData}
-                       dataKey="value"
-                       nameKey="name"
-                       cx="50%"
-                       cy="50%"
-                       outerRadius={80}
-                       innerRadius={45}
-                       paddingAngle={3}
-                     >
-                       {salesData.map((_, index) => (
-                         <Cell key={index} fill={COLORS[index]} />
-                       ))}
-                     </Pie>
-                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                   </PieChart>
-                 </ResponsiveContainer>
-               </div>
-             </div>
+              <div className="h-56 min-w-0" style={{ minHeight: '224px' }}>
+                <ResponsiveContainer width="99%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={isTelecaller ? [
+                        { name: 'Hot', value: crmStats?.hot || 0 },
+                        { name: 'Warm', value: crmStats?.warm || 0 },
+                        { name: 'Cold', value: crmStats?.cold || 0 },
+                        { name: 'New', value: crmStats?.new || 0 },
+                      ] : salesData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={45}
+                      paddingAngle={3}
+                    >
+                      {(isTelecaller ? ['#f43f5e', '#f59e0b', '#94a3b8', '#10b981'] : COLORS).map((color, index) => (
+                        <Cell key={index} fill={color} />
+                      ))}
+                    </Pie>
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
 
-             {/* PROJECT STATUS */}
-             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-               <h2 className="text-base font-semibold text-slate-800 mb-3">
-                 Project Status
-               </h2>
+            {/* PROJECT STATUS / CRM TASKS */}
+            <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-800 mb-3">
+                {isTelecaller ? "Call Status" : "Project Status"}
+              </h2>
 
-               <div className="space-y-4 pt-2">
-                 <StatusRow label="Available" value={258} color="bg-primary-500" />
-                 <StatusRow label="Sold" value={89} color="bg-emerald-500" />
-                 <StatusRow label="Booked" value={42} color="bg-secondary-500" />
-                 <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
-               </div>
-             </div>
-           </div>
+              <div className="space-y-4 pt-2">
+                {isTelecaller ? (
+                  <>
+                    <StatusRow label="Pending Calls" value={crmStats?.pending || 0} color="bg-amber-500" />
+                    <StatusRow label="Follow-ups" value={crmStats?.followups || 0} color="bg-purple-500" />
+                    <StatusRow label="Site Visits" value={crmStats?.sitevisits || 0} color="bg-emerald-500" />
+                    <StatusRow label="Closed/Lost" value={crmStats?.closed || 0} color="bg-slate-400" />
+                  </>
+                ) : (
+                  <>
+                    <StatusRow label="Available" value={258} color="bg-primary-500" />
+                    <StatusRow label="Sold" value={89} color="bg-emerald-500" />
+                    <StatusRow label="Booked" value={42} color="bg-secondary-500" />
+                    <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
 
-           {/* ================= LOWER SECTION ================= */}
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pb-10">
-             {/* LATEST NEWS */}
-             <div className="lg:col-span-2 bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-               <h2 className="text-base font-semibold text-slate-800 mb-3">
-                 Latest News
-               </h2>
+          {/* ================= LOWER SECTION ================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pb-10">
+            {/* LATEST NEWS / CRM ACTIVITIES */}
+            <div className="lg:col-span-2 bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                {isTelecaller ? <><MessageSquare size={18} className="text-primary-500" /> Recent CRM Activities</> : "Latest News"}
+              </h2>
 
-               <div className="space-y-3 pt-2">
-                 {[1, 2, 3].map((i) => (
-                   <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
-                     <p className="text-sm font-medium text-slate-800">
-                       New project launch announced in sector {i * 10}
-                     </p>
-                     <p className="text-xs text-slate-500 mt-1">{i * 2} hours ago</p>
-                   </div>
-                 ))}
-               </div>
-             </div>
+              <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {isTelecaller ? (
+                  crmActivities.length > 0 ? crmActivities.map((a) => (
+                    <div key={a.id} className="border-b border-slate-100 last:border-0 pb-3">
+                      <p className="text-sm font-medium text-slate-800" dangerouslySetInnerHTML={{ __html: a.text }} />
+                      <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <Clock size={10} /> {formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}
+                      </p>
+                    </div>
+                  )) : (
+                    <div className="py-10 text-center opacity-30">
+                      <MessageSquare className="mx-auto mb-2 text-slate-300" size={24} />
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quiet for now</div>
+                    </div>
+                  )
+                ) : (
+                  [1, 2, 3].map((i) => (
+                    <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
+                      <p className="text-sm font-medium text-slate-800">
+                        New project launch announced in sector {i * 10}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">{i * 2} hours ago</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
 
-             {/* RIGHT COLUMN */}
-             <div className="space-y-4">
-               {/* PENDING ASSOCIATES */}
-               <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-                 <h2 className="text-base font-semibold text-slate-800 mb-3">
-                   Pending Associates
-                 </h2>
+            {/* RIGHT COLUMN */}
+            <div className="space-y-4">
+              {/* CRM QUEUE STATUS / PENDING */}
+              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                <h2 className="text-base font-semibold text-slate-800 mb-3">
+                  {isTelecaller ? "Lead Queue" : "Pending Associates"}
+                </h2>
 
-                 <div className="space-y-3 pt-1">
-                   {[1, 2, 3].map((i) => (
-                     <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                       <div>
-                         <p className="text-[13px] font-bold text-slate-800">
-                           Associate #{i + 104}
-                         </p>
-                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
-                       </div>
-                       <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
-                         Pending
-                       </span>
-                     </div>
-                   ))}
-                 </div>
-               </div>
+                <div className="space-y-3 pt-1">
+                  {isTelecaller ? (
+                    <>
+                      <div className="flex justify-between items-center bg-rose-50 p-2 rounded-lg border border-rose-100">
+                        <div>
+                          <p className="text-[13px] font-bold text-rose-700">Hot Leads</p>
+                          <p className="text-[10px] text-rose-500 uppercase tracking-widest mt-0.5">Urgent attention</p>
+                        </div>
+                        <span className="text-sm font-black text-rose-600 font-mono">{crmStats?.hot || 0}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100">
+                        <div>
+                          <p className="text-[13px] font-bold text-amber-700">Pending</p>
+                          <p className="text-[10px] text-amber-500 uppercase tracking-widest mt-0.5">Daily queue</p>
+                        </div>
+                        <span className="text-sm font-black text-amber-600 font-mono">{crmStats?.pending || 0}</span>
+                      </div>
+                    </>
+                  ) : (
+                    [1, 2, 3].map((i) => (
+                      <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                        <div>
+                          <p className="text-[13px] font-bold text-slate-800">Associate #{i + 104}</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">Pending</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
 
-               {/* FOLLOW UPS */}
-               <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-                 <h2 className="text-base font-semibold text-slate-800 mb-3">
-                   Follow Ups
-                 </h2>
+              {/* FOLLOW UPS */}
+              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                <h2 className="text-base font-semibold text-slate-800 mb-3">
+                  {isTelecaller ? "Daily Tasks" : "Follow Ups"}
+                </h2>
 
-                 <div className="space-y-3 pt-1">
-                   {[1, 2].map((i) => (
-                     <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
-                       <p className="text-[13px] font-bold text-slate-800">
-                         Client follow-up zoom call
-                       </p>
-                       <p className="text-[11px] text-indigo-500 font-medium mt-1">Today at {3 + i}:00 PM</p>
-                     </div>
-                   ))}
-                 </div>
-               </div>
-             </div>
-           </div>
+                <div className="space-y-3 pt-1">
+                  {isTelecaller ? (
+                    <>
+                      <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                        <p className="text-[13px] font-bold text-slate-800">Scheduled Follow-ups</p>
+                        <p className="text-[11px] text-indigo-500 font-medium mt-1">{crmStats?.followups || 0} Task(s) remaining</p>
+                      </div>
+                      <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50">
+                        <p className="text-[13px] font-bold text-slate-800">Site Visits Planned</p>
+                        <p className="text-[11px] text-emerald-500 font-medium mt-1">{crmStats?.sitevisits || 0} Scheduled</p>
+                      </div>
+                    </>
+                  ) : (
+                    [1, 2].map((i) => (
+                      <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                        <p className="text-[13px] font-bold text-slate-800">Client follow-up zoom call</p>
+                        <p className="text-[11px] text-indigo-500 font-medium mt-1">Today at {3 + i}:00 PM</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -402,7 +579,8 @@ function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
   );
 }
 
-function StatusRow({ label, value, color = "bg-primary-500" }) {
+function StatusRow({ label, value, max = 100, color = "bg-primary-500" }) {
+  const percentage = max > 0 ? (value / max) * 100 : 0;
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
@@ -410,8 +588,9 @@ function StatusRow({ label, value, color = "bg-primary-500" }) {
         <span className="font-semibold text-slate-900">{value}</span>
       </div>
       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className={`h-full ${color} rounded-full`} style={{ width: `${Math.min((value/350)*100, 100)}%` }} />
+        <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${Math.min(percentage, 100)}%` }} />
       </div>
     </div>
   );
 }
+

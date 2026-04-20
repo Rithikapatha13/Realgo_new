@@ -33,9 +33,9 @@ export default function AssociateStatusDialog({ isOpen, onClose, user }) {
             isOpen={isOpen}
             onClose={onClose}
             title={`Update Status: ${user?.username || ''}`}
-            width="max-w-md"
+            width="max-w-[280px]"
         >
-            <div className="space-y-6 py-4 px-2">
+            <div className="space-y-4 py-2 px-1">
                 <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex items-center gap-4">
                     <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
                         <Shield size={24} />

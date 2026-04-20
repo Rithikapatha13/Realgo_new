@@ -7,6 +7,7 @@ import { resolveImageUrl } from "@/utils/common";
 import toast from "react-hot-toast";
 import { User, Mail, Phone, Shield, Calendar, MapPin, Save, X, Loader2, Maximize2, Users } from "lucide-react";
 import FileUpload from "@/components/Common/FileUpload";
+import CustomSelect from "@/components/Common/CustomSelect";
 
 export default function AssociateForm({ item, action, onClose, onRefetch }) {
     const { register, handleSubmit, reset, control, formState: { errors }, watch } = useForm();
@@ -84,7 +85,7 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
     const labelClasses = "block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1";
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-white p-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8 bg-white px-0.5 sm:px-2 py-4">
 
             {/* SECTION: PROFILE PHOTO */}
             <div className="space-y-5">
@@ -116,28 +117,29 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
                         )}
                     </div>
 
-                    <div className="flex-1 w-full max-w-sm">
-                        <Controller
-                            name="image"
-                            control={control}
-                            render={({ field }) => (
-                                <FileUpload
-                                    label=""
-                                    existingFile={field.value}
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    disabled={isView}
-                                    showPreview={false} // Hidden as we use custom preview above
-                                />
-                            )}
-                        />
-                        {isView && <p className="text-[10px] text-slate-400 mt-2 font-medium italic">Note: Only displaying permanent profile photo</p>}
-                    </div>
+                    {!isView && (
+                        <div className="flex-1 w-full max-w-sm">
+                            <Controller
+                                name="image"
+                                control={control}
+                                render={({ field }) => (
+                                    <FileUpload
+                                        label=""
+                                        existingFile={field.value}
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        disabled={isView}
+                                        showPreview={false} // Hidden as we use custom preview above
+                                    />
+                                )}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* SECTION: PERSONAL INFORMATION */}
-            <div className="space-y-5">
+            <div className="space-y-4 md:space-y-5">
                 <h3 className="text-sm font-black text-slate-800 flex items-center gap-2 border-l-4 border-indigo-600 pl-3">
                     <User size={18} className="text-indigo-600" />
                     Personal Information
@@ -224,70 +226,118 @@ export default function AssociateForm({ item, action, onClose, onRefetch }) {
                     </div>
 
                     <div className="space-y-1">
-                        <label className={labelClasses}>Gender</label>
-                        <select
-                            {...register("gender")}
-                            disabled={isView}
-                            className={inputClasses}
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="MALE">Male</option>
-                            <option value="FEMALE">Female</option>
-                            <option value="OTHER">Other</option>
-                        </select>
+                        <Controller
+                            name="gender"
+                            control={control}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Gender"
+                                    {...field}
+                                    disabled={isView}
+                                    options={[
+                                        { label: "Male", value: "MALE" },
+                                        { label: "Female", value: "FEMALE" },
+                                        { label: "Other", value: "OTHER" }
+                                    ]}
+                                />
+                            )}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-4 md:space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1">
+                        <Controller
+                            name="bloodGroup"
+                            control={control}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Blood Group"
+                                    {...field}
+                                    disabled={isView}
+                                    options={[
+                                        { label: "A+", value: "A_POS" },
+                                        { label: "A-", value: "A_NEG" },
+                                        { label: "B+", value: "B_POS" },
+                                        { label: "B-", value: "B_NEG" },
+                                        { label: "O+", value: "O_POS" },
+                                        { label: "O-", value: "O_NEG" },
+                                        { label: "AB+", value: "AB_POS" },
+                                        { label: "AB-", value: "AB_NEG" }
+                                    ]}
+                                />
+                            )}
+                        />
                     </div>
                 </div>
             </div>
 
             {/* SECTION: ACCESS & ROLE */}
-            <div className="space-y-5">
+            <div className="space-y-4 md:space-y-5">
                 <h3 className="text-sm font-black text-slate-800 flex items-center gap-2 border-l-4 border-indigo-600 pl-3">
                     <Shield size={18} className="text-indigo-600" />
                     Access & Status
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1">
-                        <label className={labelClasses}>Assigned Role <span className="text-red-500">*</span></label>
-                        <select
-                            {...register("roleId", { required: "Role is required" })}
-                            disabled={isView}
-                            className={inputClasses}
-                        >
-                            <option value="">Choose a Role</option>
-                            {rolesList.map(role => (
-                                <option key={role.id} value={role.id}>{role.displayName || role.roleName}</option>
-                            ))}
-                        </select>
-                        {errors.roleId && <span className="text-[10px] font-bold text-red-500 ml-1">{errors.roleId.message}</span>}
+                        <Controller
+                            name="roleId"
+                            control={control}
+                            rules={{ required: "Role is required" }}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Assigned Role"
+                                    required
+                                    {...field}
+                                    error={errors.roleId?.message}
+                                    disabled={isView}
+                                    options={rolesList.map(role => ({
+                                        label: role.displayName || role.roleName,
+                                        value: role.id
+                                    }))}
+                                />
+                            )}
+                        />
                     </div>
 
                     {isAdmin && (
                         <div className="space-y-1">
-                            <label className={labelClasses}>Team Leader / Referrer</label>
-                            <select
-                                {...register("referId")}
-                                disabled={isView}
-                                className={inputClasses}
-                            >
-                                <option value="">Direct (No Leader)</option>
-                                {parentsList.map(parent => (
-                                    <option key={parent.id} value={parent.id}>{parent.label}</option>
-                                ))}
-                            </select>
+                            <Controller
+                                name="referId"
+                                control={control}
+                                render={({ field }) => (
+                                    <CustomSelect
+                                        label="Team Leader / Referrer"
+                                        {...field}
+                                        disabled={isView}
+                                        options={[
+                                            { label: "Direct (No Leader)", value: "" },
+                                            ...parentsList.map(p => ({
+                                                label: p.label,
+                                                value: p.id
+                                            }))
+                                        ]}
+                                    />
+                                )}
+                            />
                         </div>
                     )}
 
                     <div className="space-y-1">
-                        <label className={labelClasses}>Account Status</label>
-                        <select
-                            {...register("status")}
-                            disabled={isView}
-                            className={inputClasses}
-                        >
-                            {["VERIFIED", "PENDING", "REJECT", "HOLD", "INACTIVE"].map(status => (
-                                <option key={status} value={status}>{status}</option>
-                            ))}
-                        </select>
+                        <Controller
+                            name="status"
+                            control={control}
+                            render={({ field }) => (
+                                <CustomSelect
+                                    label="Account Status"
+                                    {...field}
+                                    disabled={isView}
+                                    options={["VERIFIED", "PENDING", "REJECT", "HOLD", "INACTIVE"]}
+                                />
+                            )}
+                        />
                     </div>
                 </div>
             </div>

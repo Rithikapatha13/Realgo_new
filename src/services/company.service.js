@@ -1,43 +1,25 @@
 import apiClient from "@/config/apiClient";
 
-const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
-
 export const getCompanies = (params) => {
-    return apiClient.get("/superadmin/companies", {
-        params,
-        headers: getAuthHeader(),
-    });
+    return apiClient.get("/superadmin/companies", { params });
 };
 
 export const getCompanyDashboard = () => {
-    return apiClient.get("/superadmin/companies/dashboard", {
-        headers: getAuthHeader(),
-    });
+    return apiClient.get("/superadmin/companies/dashboard");
 };
 
 export const createCompany = (companyData) => {
-    return apiClient.post("/superadmin/companies", companyData, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.post("/superadmin/companies", companyData);
 };
 
 export const getCompanyById = (id) => {
-    return apiClient.get(`/superadmin/companies/${id}`, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.get(`/superadmin/companies/${id}`);
 };
 
 export const updateCompany = (id, companyData) => {
-    return apiClient.put(`/superadmin/companies/${id}`, companyData, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.put(`/superadmin/companies/${id}`, companyData);
 };
 
 export const deleteCompany = (id) => {
-    return apiClient.delete(`/superadmin/companies/${id}`, {
-        headers: getAuthHeader(),
-    });
+    return apiClient.delete(`/superadmin/companies/${id}`);
 };

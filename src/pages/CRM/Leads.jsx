@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Plus, Upload, Phone, User, Calendar, Megaphone, Search, Filter, Clock } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Plus, Upload, Phone, User, Calendar, Megaphone, Search, Filter, Clock, ArrowLeft } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@/components/Common/Button";
 import { getUser, getUserType } from "@/services/auth.service";
 import { getLeads } from "@/services/crm.service";
@@ -9,6 +9,7 @@ import LeadModal from "@/components/CRM/LeadModal";
 import HistoryModal from "@/components/CRM/HistoryModal";
 
 export default function Leads() {
+  const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
   const userRole = (user?.role?.roleName || "").toUpperCase();
@@ -67,6 +68,7 @@ export default function Leads() {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-8 justify-between">
         <div>
@@ -170,7 +172,10 @@ export default function Leads() {
                       <div className="flex flex-col gap-1">
                         <div className="text-[11px] font-bold flex items-center gap-1 text-slate-600">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
-                          {lead.telecaller ? `${lead.telecaller.firstName}` : "Unassigned"}
+                          {lead.dedicatedTC ? `${lead.dedicatedTC.firstName}` : 
+                           lead.adminTC ? `${lead.adminTC.firstName}` :
+                           lead.telecaller ? `${lead.telecaller.firstName}` : 
+                           "Unassigned"}
                         </div>
                         <div className="text-[11px] font-bold flex items-center gap-1 text-slate-600">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
@@ -187,7 +192,7 @@ export default function Leads() {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleUpdateClick(lead)}
-                          className="px-3 py-1.5 bg-primary-600 text-white text-[10px] font-bold rounded-lg hover:bg-primary-700 transition-all shadow-sm flex items-center gap-1"
+                          className="px-3 py-1.5 bg-primary-600 text-black text-[10px] font-bold rounded-lg hover:bg-primary-700 transition-all shadow-sm flex items-center gap-1"
                         >
                           <Phone size={12} /> Update
                         </button>

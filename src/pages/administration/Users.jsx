@@ -1,9 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  MoreVertical, Search, Plus, Filter, SlidersHorizontal, X,
-  UserPlus, Shield, UserCheck, UserX, UserMinus, Eye, Pencil,
-  Trash2, Key, TrendingUp, Phone, Contact, Network, Loader2, CheckCircle, Clock, XCircle, Mail, Upload
+  Trash2, Key, TrendingUp, Phone, Contact, Network, Loader2, CheckCircle, UserMinus, Clock, XCircle, Mail, Upload, ArrowLeft, Pencil, Eye, Shield, MoreVertical, Search, SlidersHorizontal, Plus
 } from "lucide-react";
 import { useGetUsersData, useDeleteUser, useResetPassword } from "@/hooks/useUser";
 import { useGetAllRoles } from "@/hooks/useRoles";
@@ -30,14 +28,18 @@ export default function Users() {
   const loggedInUser = getUser();
   const userType = (loggedInUser?.userType || "").toLowerCase();
   const rawRole = (loggedInUser?.roleName || loggedInUser?.role?.roleName || loggedInUser?.role || "").toUpperCase();
-  const canManageUsers = 
-    userType.includes("admin") || 
-    rawRole.includes("ADMIN") || 
+  const canManageUsers =
+    userType.includes("admin") ||
+    rawRole.includes("ADMIN") ||
     rawRole === "PRO";
 
   // --- Search & Filters State ---
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchPhone, setSearchPhone] = useState("");
+  const [debouncedSearchPhone, setDebouncedSearchPhone] = useState("");
+  const [searchId, setSearchId] = useState("");
+  const [debouncedSearchId, setDebouncedSearchId] = useState("");
   const [filterRole, setFilterRole] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [sortField, setSortField] = useState("createdAt");
@@ -46,20 +48,28 @@ export default function Users() {
 
   // Debouncing search
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 500);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setDebouncedSearchPhone(searchPhone);
+      setDebouncedSearchId(searchId);
+    }, 500);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, searchPhone, searchId]);
 
   const clearAllFilters = () => {
     setSearch("");
     setDebouncedSearch("");
+    setSearchPhone("");
+    setDebouncedSearchPhone("");
+    setSearchId("");
+    setDebouncedSearchId("");
     setFilterRole("");
     setFilterStatus("");
     setSortOrder("desc");
     setSortField("createdAt");
   };
 
-  const activeFilterCount = [debouncedSearch, filterRole, filterStatus].filter(Boolean).length;
+  const activeFilterCount = [debouncedSearch, debouncedSearchPhone, debouncedSearchId, filterRole, filterStatus].filter(Boolean).length;
 
   // --- Data Fetching ---
   const { data: rolesResponse } = useGetAllRoles();
@@ -76,6 +86,8 @@ export default function Users() {
   } = useGetUsersData({
     pageSize: 12,
     name: debouncedSearch,
+    phone: debouncedSearchPhone,
+    userAuthId: debouncedSearchId,
     role: filterRole,
     status: filterStatus,
     sortField,
@@ -161,6 +173,23 @@ export default function Users() {
     setOpenMenuId(null);
   };
 
+  const handlePromoteClick = (user) => {
+    setSelectedUser(user);
+    setIsPromoteDialogOpen(true);
+    setOpenMenuId(null);
+  };
+
+  const handlePasswordResetRequest = async (user) => {
+    setOpenMenuId(null);
+    try {
+      await resetPassword({ id: user.id });
+      toast.success("Password reset to default (Realgo@123) successfully!");
+    } catch (error) {
+      toast.error("Failed to send password reset instructions");
+      console.error(error);
+    }
+  };
+
   const statusTabs = [
     { key: "", label: "All Team" },
     { key: "VERIFIED", label: "Verified" },
@@ -182,6 +211,7 @@ export default function Users() {
 
   return (
     <div className="p-6 min-h-screen bg-slate-50/50">
+      
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -200,7 +230,7 @@ export default function Users() {
                 <span>Add Associate</span>
               </button>
               <button
-                onClick={() => window.location.href = "/user/add-bulk-associates"}
+                onClick={() => navigate("/user/add-bulk-associates")}
                 className="inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-xl font-medium transition-all shadow-sm active:scale-95 text-sm"
               >
                 <Upload size={20} className="text-indigo-600" />
@@ -253,6 +283,26 @@ export default function Users() {
       {showFilters && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xl mb-8 animate-in slide-in-from-top-2 duration-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Search ID</label>
+              <input
+                type="text"
+                placeholder="User ID or Auth ID..."
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Search Phone</label>
+              <input
+                type="text"
+                placeholder="Phone Number..."
+                value={searchPhone}
+                onChange={(e) => setSearchPhone(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              />
+            </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Position Role</label>
               <select value={filterRole} onChange={(e) => setFilterRole(e.target.value)}
@@ -328,6 +378,12 @@ export default function Users() {
                           </button>
                           <button onClick={() => handleStatusChangeClick(user)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
                             <Shield size={16} className="text-amber-500" /> Update Status
+                          </button>
+                          <button onClick={() => handlePromoteClick(user)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                            <Network size={16} className="text-cyan-500" /> Promote User
+                          </button>
+                          <button onClick={() => handlePasswordResetRequest(user)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                            <Key size={16} className="text-emerald-500" /> Reset Password
                           </button>
                           <div className="my-1 border-t border-slate-100" />
                           <button onClick={() => handleDeleteClick(user)} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors">

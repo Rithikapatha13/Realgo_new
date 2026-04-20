@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Download, Share2, Trash2, Plus, Search, Image as ImageIcon, Send, X, Clock, ChevronRight, CheckCircle2, ChevronLeft } from "lucide-react";
+import { Download, Share2, Trash2, Plus, Search, Image as ImageIcon, Send, X, Clock, ChevronRight, CheckCircle2, ChevronLeft, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useGetGreetingsData, useAddGreetings, useDeleteGreetings } from "@/hooks/useGreetings";
 import { resolveImageUrl } from "@/utils/common";
 import { getUser, getUserType } from "@/services/auth.service";
@@ -23,6 +24,7 @@ const greetingCategories = [
 ];
 
 const Greetings = () => {
+  const navigate = useNavigate();
   const user = getUser();
   const userType = getUserType()?.toLowerCase();
   const isAdmin = userType === "admin" || userType === "superadmin";
@@ -149,6 +151,7 @@ const Greetings = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      
       <div className="w-full mx-auto space-y-2">
 
         {/* Modern Header Section */}

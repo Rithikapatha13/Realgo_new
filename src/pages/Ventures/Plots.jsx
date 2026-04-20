@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import {
-  Search, Plus, Eye, Pencil, Trash2,
-  Settings, LandPlot, CalendarDays, X,
-  CheckCircle2, BookOpen, FileCheck, PauseCircle, Filter, SlidersHorizontal, MoreVertical,
+  CheckCircle2, BookOpen, FileCheck, PauseCircle, Filter, SlidersHorizontal, MoreVertical, ArrowLeft,
+  Search, Plus, Eye, Pencil, Settings, Trash2, LandPlot, X
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useGetPlots, useGetPlotById, useDeletePlot, useUpdatePlotStatus, useGetPhases } from "../../hooks/usePlot";
 import { useGetAllProjects } from "../../hooks/useProject";
@@ -24,6 +24,7 @@ const STATUS_CONFIG = {
 const toTitleCase = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "—");
 
 export default function Plots() {
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdmin = ["admin", "accounts", "superadmin", "pro"].includes(
     user.role?.roleName?.toLowerCase() ||
@@ -111,6 +112,7 @@ export default function Plots() {
 
   return (
     <div className="p-6 space-y-6">
+      
       {/* ═══════════ HEADER ═══════════ */}
       <div className="flex items-center justify-between">
         <div>
@@ -141,7 +143,7 @@ export default function Plots() {
       </div>
 
       {/* ═══════════ STATUS TABS ═══════════ */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         {statusTabs.map((tab) => (
           <button key={tab.key} onClick={() => setStatus(tab.key)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all
@@ -167,7 +169,7 @@ export default function Plots() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div>
               <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Plot No.</label>
               <div className="relative">

@@ -1,18 +1,15 @@
 import { useState } from "react";
 import {
+  Image as ImageIcon,
+  ArrowLeft,
   Plus,
   Search,
-  Filter,
-  Newspaper,
-  Download,
-  Share2,
   Trash2,
-  Calendar,
-  ChevronRight,
-  TrendingUp,
   Clock,
-  Image as ImageIcon
+  Share2,
+  Download
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetNewsData, useDeleteNews } from "@/hooks/useNews";
 import { LoadingIndicator } from "@/components";
 import { getUser } from "@/services/auth.service";
@@ -20,6 +17,7 @@ import toast from "react-hot-toast";
 import NewsFormDialog from "@/components/media/NewsFormDialog";
 
 export default function News() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("DAILY");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -51,6 +49,7 @@ export default function News() {
 
   return (
     <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-10 font-sans">
+      
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* Simplified Header */}
@@ -85,8 +84,8 @@ export default function News() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-2 rounded-lg text-xs font-semibold transition-all ${activeTab === tab
-                    ? "bg-white text-primary-500 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                  ? "bg-white text-primary-500 shadow-sm"
+                  : "text-gray-500 hover:text-gray-900"
                   }`}
               >
                 {tab === "DAILY" ? "Daily" : tab.charAt(0) + tab.slice(1).toLowerCase()}

@@ -14,7 +14,8 @@ import {
     ShieldCheck,
     CheckCircle2,
     Play,
-    MonitorPlay
+    MonitorPlay,
+    ArrowLeft
 } from "lucide-react";
 import { useGetPortraitVideosData, useDeletePortraitVideo } from "@/hooks/usePortraitVideo";
 import { LoadingIndicator } from "@/components";
@@ -69,6 +70,7 @@ export default function PortraitVideos() {
 
     return (
         <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-10 font-sans">
+            
             <div className="max-w-7xl mx-auto space-y-12">
 
                 {/* Modern Header Section */}

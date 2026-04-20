@@ -1,13 +1,7 @@
 import apiClient from "../config/apiClient";
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return { Authorization: `Bearer ${token}` };
-};
+const API_URL = "/client-admin";
 
 export const getClientAdminDashboardStats = async () => {
-  const res = await apiClient.get("/client-admin/dashboard-stats", {
-    headers: getAuthHeader(),
-  });
+  const res = await apiClient.get(`${API_URL}/dashboard-stats`);
   return res.data;
 };

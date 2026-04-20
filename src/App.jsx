@@ -32,7 +32,7 @@ function App() {
             <Layout>
               <ConfigRoutes
                 config={routeConfig}
-                userRole={isAuthenticated ? (userRoleLower || (userType || "").toLowerCase().replace(/_/g, "")) : null}
+                userRole={isAuthenticated ? (userRoleLower?.replace(/[\s_-]/g, "") || (userType || "").toLowerCase().replace(/[\s_-]/g, "")) : null}
               />
             </Layout>
           }

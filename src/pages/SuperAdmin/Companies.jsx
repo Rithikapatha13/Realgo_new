@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Search, Eye, Trash2, Landmark } from "lucide-react";
+import { Plus, Search, Eye, Trash2, Landmark, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/Common/Button";
 import ModalWrapper from "@/components/Common/ModalWrapper";
@@ -61,6 +61,7 @@ export default function Companies() {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>

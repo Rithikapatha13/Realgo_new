@@ -111,7 +111,10 @@ export default function HistoryModal({ leadId, onClose }) {
                         <div className="flex items-center gap-3 mb-3">
                             <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700">
                                 <User size={12} className="text-primary-600" />
-                                {call.telecaller?.name}
+                                {call.dedicatedTC ? `${call.dedicatedTC.firstName} ${call.dedicatedTC.lastName || ''}` : 
+                                 call.adminTC ? `${call.adminTC.firstName} ${call.adminTC.lastName || ''}` : 
+                                 call.telecaller ? `${call.telecaller.firstName} ${call.telecaller.lastName || ''}` : 
+                                 'System'}
                             </div>
                             <span className={`px-2.5 py-1 rounded-lg font-black text-[10px] border shadow-sm uppercase tracking-widest ${
                                 call.status === 'HOT' ? 'bg-orange-50 text-orange-600 border-orange-100' :

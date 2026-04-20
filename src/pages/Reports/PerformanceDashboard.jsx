@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Users, 
   TrendingUp, 
@@ -9,7 +10,8 @@ import {
   BarChart3,
   CreditCard,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react";
 import { 
   BarChart, 
@@ -31,6 +33,7 @@ import { toast } from "react-hot-toast";
 const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 export default function PerformanceDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("accounts");
@@ -66,6 +69,7 @@ export default function PerformanceDashboard() {
 
   return (
     <div className="space-y-6 pb-12">
+      
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

@@ -91,6 +91,39 @@ export const commonMenu = {
   ],
 };
 
+export const tcGeneralMenu = {
+  label: "General",
+  icon: UserCircle,
+  module: "GENERAL",
+  children: [
+    {
+      label: "Home",
+      link: "/",
+      icon: LayoutDashboard,
+      pageTitle: "Home",
+    },
+    {
+      label: "Profile",
+      link: "/profile",
+      icon: UserCircle,
+      pageTitle: "Profile",
+    },
+    {
+      label: "My Team",
+      link: "/myteam",
+      icon: UserCheck,
+      pageTitle: "My Team",
+    },
+    {
+      label: "Reports",
+      link: "/reports",
+      icon: BarChart3,
+      pageTitle: "Reports",
+    },
+  ],
+};
+
+
 
 
 // ==================== MODULE GROUPS ====================
@@ -254,7 +287,7 @@ export const financeMenu = {
 };
 
 export const crmMenu = {
-  label: "Leadflow CRM",
+  label: "Leads",
   icon: Megaphone,
   module: "CRM",
   children: [
@@ -319,14 +352,46 @@ export const adminMenu = [
 ];
 
 export const telecallerAdminMenu = [
-  // 4. Telecaller Admin
-  commonMenu,
-  venturesMenu,
-  telecallerAdministrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  crmMenu,
+  tcGeneralMenu,
+  {
+    label: "Leadflow CRM",
+    icon: Megaphone,
+    module: "CRM",
+    children: [
+      {
+        label: "Leads",
+        link: "/leads",
+        icon: ClipboardCheck,
+        pageTitle: "Leads",
+      },
+      {
+        label: "Upload Leads",
+        link: "/leads/upload",
+        icon: Send,
+        pageTitle: "Upload Leads",
+      },
+      {
+        label: "Pending",
+        link: "/leads/pending",
+        icon: Clock,
+        pageTitle: "Pending Leads",
+      },
+      {
+        label: "Follow-ups",
+        link: "/leads/followups",
+        icon: Calendar,
+        pageTitle: "Follow-ups",
+      },
+      {
+        label: "Performance",
+        link: "/performance",
+        icon: TrendingUp,
+        pageTitle: "Performance Tracking",
+      },
+    ],
+  },
 ];
+
 
 export const financeAdminMenu = [
   // 5. Finance Admin
@@ -527,12 +592,40 @@ export const superAdminMenu = [
 ];
 
 export const telecallerMenu = [
-  // Regular Telecaller User
-  commonMenu,
-  mediaMenu,
-  crmMenu,
-  siteVisitsMenu,
+  tcGeneralMenu,
+  {
+    label: "Leadflow CRM",
+    icon: Megaphone,
+    module: "CRM",
+    children: [
+      {
+        label: "My Leads",
+        link: "/leads",
+        icon: ClipboardCheck,
+        pageTitle: "Leads",
+      },
+      {
+        label: "Pending",
+        link: "/leads/pending",
+        icon: Clock,
+        pageTitle: "Pending Leads",
+      },
+      {
+        label: "Follow-ups",
+        link: "/leads/followups",
+        icon: Calendar,
+        pageTitle: "Follow-ups",
+      },
+      {
+        label: "Performance",
+        link: "/performance",
+        icon: TrendingUp,
+        pageTitle: "Performance Tracking",
+      },
+    ],
+  },
 ];
+
 
 export const associateMenu = [
   // Regular Associate User
@@ -545,7 +638,7 @@ export const associateMenu = [
 
 // ==================== HELPER FUNCTION ====================
 export const getMenuByRole = (role, userModules = [], userType = "user") => {
-  const roleKey = (role || "").toLowerCase().replace(/_/g, "");
+  const roleKey = (role || "").toLowerCase().replace(/[\s_-]/g, "");
   const uType = (userType || "user").toLowerCase();
 
   // Base menus for each role type

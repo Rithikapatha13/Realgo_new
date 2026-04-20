@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Wallet,
-  Landmark,
-  Receipt,
-  Repeat,
-  TrendingUp,
-  BarChart3,
-  FileText,
   CreditCard,
-  Users
+  Users,
+  ArrowLeft,
+  Repeat,
+  Receipt,
+  FileText,
+  BarChart3,
+  Landmark,
+  TrendingUp,
+  Wallet
 } from "lucide-react";
 import Typewriter from "typewriter-effect";
 import { getAccounts, getLedgers, getTransactions } from "@/services/finance.service";
@@ -103,6 +104,7 @@ export default function FinanceHome() {
 
   return (
     <div className="space-y-5 min-h-screen">
+      
       {/* ================= BANNER ================= */}
       <div className="relative w-full h-[38vh] rounded-xl overflow-hidden">
         {/* Image */}

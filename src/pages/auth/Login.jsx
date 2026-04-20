@@ -268,7 +268,7 @@ export default function Login() {
           <img
             src="https://app.realgo.in/assets/images/logo1.png"
             alt="RealGo"
-            className="h-14 mb-8"
+            className="h-14 mb-8 flex-shrink-0 object-contain"
           />
 
           {/* BACK BUTTON */}
@@ -515,7 +515,7 @@ export default function Login() {
               <img
                 src="https://app.realgo.in/assets/images/brandwar.png"
                 alt="Brandwar"
-                className="h-11"
+                className="h-11 flex-shrink-0 object-contain"
               />
             </a>
           </div>

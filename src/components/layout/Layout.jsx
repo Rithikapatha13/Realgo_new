@@ -31,12 +31,12 @@ export default function Layout({ children }) {
 
       {/* Main Content (shifted right when desktop sidebar exists) */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 overflow-x-hidden
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 overflow-x-hidden min-w-0
         ${sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"}`}
       >
         <Header onMenuClick={() => setMobileSidebarOpen(true)} />
 
-        <main className="flex-1 p-2">{children}</main>
+        <main className="flex-1 px-1 sm:px-2 py-4 min-w-0">{children}</main>
       </div>
     </div>
   );

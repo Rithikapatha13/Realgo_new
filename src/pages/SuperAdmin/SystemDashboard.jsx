@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Landmark, Activity, Users, Settings, FolderTree, MapPin, Eye, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Landmark, Activity, Users, Settings, FolderTree, MapPin, Eye, Pencil, Trash2, UserCheck, UserX, ArrowLeft } from "lucide-react";
 import { getCompanyDashboard } from "../../services/company.service";
 import { resolveImageUrl } from "@/utils/common";
 import CompanyForm from "./CompanyForm";
@@ -9,6 +10,7 @@ import { useDeleteCompany } from "@/hooks/useCompany";
 import { toast } from "react-hot-toast";
 
 export default function SystemDashboard() {
+  const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -76,6 +78,7 @@ export default function SystemDashboard() {
 
   return (
     <div className="space-y-6">
+      
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h1>

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { 
-    FileText, Calendar, Filter, Loader2, 
-    Download, Printer, ChevronRight, 
-    TrendingUp, TrendingDown, Landmark,
-    Banknote, Receipt, ArrowDownLeft, ArrowUpRight
+    Banknote, Receipt, ArrowDownLeft, ArrowUpRight, ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetCashBook } from "@/hooks/useFinance";
 import dayjs from "dayjs";
 import DateRangePicker from "@/components/Common/DateRangePicker";
 
 const CashBook = () => {
+    const navigate = useNavigate();
     const [filters, setFilters] = useState({
         startDate: dayjs().startOf('month').format("YYYY-MM-DD"),
         endDate: dayjs().format("YYYY-MM-DD")
@@ -23,6 +22,7 @@ const CashBook = () => {
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
+                
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-xl font-semibold text-slate-900 tracking-tight flex items-center gap-2">

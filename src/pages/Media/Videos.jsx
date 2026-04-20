@@ -10,7 +10,8 @@ import {
   MonitorPlay,
   Clock,
   ChevronRight,
-  Smartphone
+  Smartphone,
+  ArrowLeft
 } from "lucide-react";
 import { useGetVideosData, useDeleteVideo } from "@/hooks/useVideo";
 import { LoadingIndicator } from "@/components";
@@ -55,6 +56,7 @@ export default function Videos() {
 
   return (
     <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-10 font-sans">
+      
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* Modern Header Section */}

@@ -1,10 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useReportCompanyLinkedUsers } from "../../hooks/useReports";
 import { useGetAllRoles } from "../../hooks/useRoles";
 import { exportToExcel, printHTMLTable } from "../../utils/exportExcel";
-import { Download, Printer } from "lucide-react";
+import { Download, Printer, ArrowLeft } from "lucide-react";
 
 export default function CompanyUsersReport() {
+    const navigate = useNavigate();
     const [filters, setFilters] = useState({
         active: "ALL",
         designation: "",
@@ -33,11 +35,12 @@ export default function CompanyUsersReport() {
 
     return (
         <div className="p-6">
+            
             <h1 className="text-xl font-semibold text-slate-900 mb-6">Company Linked Users Report</h1>
 
             {/* Filters */}
             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap gap-4 items-end">
-                <div className="w-48">
+                <div className="w-full sm:w-48">
                     <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Status</label>
                     <select
                         name="active"
@@ -54,7 +57,7 @@ export default function CompanyUsersReport() {
                     </select>
                 </div>
 
-                <div className="w-48">
+                <div className="w-full sm:w-48">
                     <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Designation</label>
                     <select
                         name="designation"
@@ -69,7 +72,7 @@ export default function CompanyUsersReport() {
                     </select>
                 </div>
 
-                <div className="w-40">
+                <div className="w-full sm:w-40">
                     <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Start Date</label>
                     <input
                         type="date"
@@ -80,7 +83,7 @@ export default function CompanyUsersReport() {
                     />
                 </div>
 
-                <div className="w-40">
+                <div className="w-full sm:w-40">
                     <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">End Date</label>
                     <input
                         type="date"
@@ -91,16 +94,16 @@ export default function CompanyUsersReport() {
                     />
                 </div>
 
-                <div className="flex gap-2">
-                    <button onClick={handleExport} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 flex items-center gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                    <button onClick={handleExport} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 flex items-center justify-center gap-2">
                         <Download size={16} /> Export
                     </button>
-                    <button onClick={handlePrint} className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 flex items-center gap-2">
+                    <button onClick={handlePrint} className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 flex items-center justify-center gap-2">
                         <Printer size={16} /> Print
                     </button>
                     <button
                         onClick={() => setFilters({ active: "ALL", designation: "", startDate: "", endDate: "" })}
-                        className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200"
+                        className="w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 justify-center flex"
                     >
                         Clear
                     </button>
@@ -136,8 +139,8 @@ export default function CompanyUsersReport() {
                                         <td className="px-6 py-4 text-slate-500">{user.joining_date}</td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'VERIFIED' ? 'bg-green-100 text-green-800' :
-                                                    user.status === 'PENDING' ? 'bg-amber-100 text-amber-800' :
-                                                        'bg-slate-100 text-slate-800'
+                                                user.status === 'PENDING' ? 'bg-amber-100 text-amber-800' :
+                                                    'bg-slate-100 text-slate-800'
                                                 }`}>
                                                 {user.status}
                                             </span>

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { 
-    RefreshCcw, Calendar, Loader2, Download, Printer, 
-    CheckCircle2, AlertCircle, Search, FileX,
-    Receipt, Landmark, CreditCard, Clock
+    Receipt, Landmark, CreditCard, Clock, ArrowLeft
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useGetBRS } from "@/hooks/useFinance";
 import dayjs from "dayjs";
 
 const BRS = () => {
+    const navigate = useNavigate();
     const { data, isLoading } = useGetBRS();
     const items = data?.items || [];
 
@@ -23,6 +23,7 @@ const BRS = () => {
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
+            
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>

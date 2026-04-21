@@ -48,6 +48,8 @@ import ClientAdminDashboard from "../pages/administration/ClientAdminDashboard";
 import Leads from "../pages/CRM/Leads";
 import UploadLeads from "../pages/CRM/UploadLeads";
 import CRMDashboard from "../pages/CRM/CRMDashboard";
+import AssociateDash from "../pages/CRM/AssociateDash";
+import ProjectIncentives from "../pages/CRM/Incentives";
 import AddAssociate from "../pages/administration/AddAssociate";
 import BulkAssociateForm from "../pages/administration/Form/BulkAssociateForm";
 
@@ -63,13 +65,13 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
       { path: "/users", component: Users },
-      { path: "/myteam", component: MyTeam },
-      { path: "/team-tree", component: TeamTree },
+      { path: "/my-team", component: MyTeam },
+      { path: "/tree", component: TeamTree },
       { path: "/reports", component: Reports },
       { path: "/reports/users", component: UserReport },
       { path: "/reports/company-users", component: CompanyUsersReport },
@@ -94,7 +96,7 @@ export const routeConfig = {
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -105,12 +107,12 @@ export const routeConfig = {
   },
   Site: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [{ path: "sitevisits", component: SiteVisits }],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [
       { path: "plots", component: Plots },
       { path: "Projects", component: Projects },
@@ -118,7 +120,7 @@ export const routeConfig = {
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {
@@ -158,9 +160,12 @@ export const routeConfig = {
   },
   CRM: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [
       { path: "/crm-dashboard", component: CRMDashboard },
+      { path: "/associate-dash", component: AssociateDash },
+      { path: "/project-incentives", component: ProjectIncentives },
+      { path: "/customer-sitevisits", component: SiteVisits },
       { path: "/leads", component: Leads },
       { path: "/leads/upload", component: UploadLeads },
       { path: "/leads/pending", component: Leads },

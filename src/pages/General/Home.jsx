@@ -1,7 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import AssociateDash from "../CRM/AssociateDash";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Users, Briefcase, UserCheck, ShieldCheck, Activity, Clock, Flame, ClipboardList, MessageSquare, Calendar, ArrowLeft } from "lucide-react";
-
-
 import CompactCalendar from "../../components/Calendar/CompactCalendar";
 import Typewriter from "typewriter-effect";
 import { useState, useEffect } from "react";
@@ -97,6 +96,12 @@ export default function Home() {
   // If accounts, render the FinanceHome
   if (role === "accounts") {
     return <FinanceHome />;
+  }
+
+  // If field role (associate, manager, etc.), redirect to AssociateDash
+  const fieldRoles = ["associate", "teamlead", "manager", "salesmanager", "asm", "rsm"];
+  if (fieldRoles.includes(role) || fieldRoles.includes(userRoleStr)) {
+    return <Navigate to="/associate-dash" replace />;
   }
 
   return (

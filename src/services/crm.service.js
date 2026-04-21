@@ -36,3 +36,13 @@ export const getLeadHistory = async (id) => {
     const { data } = await apiClient.get(`${API_URL}/leads/${id}/history`);
     return data;
 };
+
+export const getAssignables = async () => {
+    const { data } = await apiClient.get(`${API_URL}/assignables`);
+    return data;
+};
+
+export const getRecentLeads = async () => {
+    const { data } = await apiClient.get(`${API_URL}/leads/recent`);
+    return data;
+};

@@ -98,7 +98,7 @@ export default function MyTeam() {
 
         {!isTelecallerRole && (
           <button
-            onClick={() => navigate("/team-tree")}
+            onClick={() => navigate("/tree")}
             className="bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2"
           >
             View Team Tree

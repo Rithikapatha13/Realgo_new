@@ -9,6 +9,8 @@ import {
   FileCheck,
   Wallet,
   Bell,
+  BadgeIndianRupee,
+  Network,
   LayoutDashboard,
   Mail,
   Send,
@@ -145,7 +147,14 @@ export const venturesMenu = {
       icon: MapPin,
       pageTitle: "Plots",
       subtitle: "Manage and view all plots",
-    }
+    },
+    {
+      label: "Project Incentives",
+      link: "/project-incentives",
+      icon: BadgeIndianRupee,
+      pageTitle: "Project Incentives",
+      subtitle: "View project commission levels",
+    },
   ],
 };
 
@@ -291,36 +300,67 @@ export const crmMenu = {
   icon: Megaphone,
   module: "CRM",
   children: [
-    {
-      label: "CRM Dashboard",
-      link: "/crm-dashboard",
-      icon: LayoutDashboard,
-      pageTitle: "CRM Dashboard",
-    },
-    {
-      label: "Leads",
-      link: "/leads",
-      icon: ClipboardCheck,
-      pageTitle: "Leads",
-    },
-    {
-      label: "Upload Leads",
-      link: "/leads/upload",
-      icon: Send,
-      pageTitle: "Upload Leads",
-    },
-    {
-      label: "Pending Leads",
-      link: "/leads/pending",
-      icon: Clock,
-      pageTitle: "Pending Leads",
-    },
-    {
-      label: "Follow-ups",
-      link: "/leads/followups",
-      icon: Calendar,
-      pageTitle: "Follow-ups",
-    },
+    { label: "CRM Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
+    { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
+    { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
+    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+  ],
+};
+
+// --- Role Specific CRM Menus ---
+export const clientAdminCrmMenu = {
+  label: "Leads",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    { label: "CRM Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
+    { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
+  ],
+};
+
+export const marketingAdminCrmMenu = {
+  label: "Leads",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
+  ],
+};
+
+export const telecallerAdminCrmMenu = {
+  label: "Leads",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    { label: "CRM Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
+    { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
+    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+  ],
+};
+
+export const leadflowCrmMenu = {
+  label: "Leadflow CRM",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    { label: "CRM Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads" },
+    { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
+    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+  ],
+};
+
+export const networkMenu = {
+  label: "My Network",
+  icon: Network,
+  module: "NETWORK",
+  children: [
+    { label: "Team Tree", link: "/tree", icon: Network, pageTitle: "Organizational Tree" },
+    { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team" },
+    { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits" },
   ],
 };
 
@@ -348,48 +388,16 @@ export const adminMenu = [
   administrationMenu,
   mediaMenu,
   siteVisitsMenu,
-  crmMenu,
+  marketingAdminCrmMenu,
 ];
 
 export const telecallerAdminMenu = [
-  tcGeneralMenu,
-  {
-    label: "Leadflow CRM",
-    icon: Megaphone,
-    module: "CRM",
-    children: [
-      {
-        label: "Leads",
-        link: "/leads",
-        icon: ClipboardCheck,
-        pageTitle: "Leads",
-      },
-      {
-        label: "Upload Leads",
-        link: "/leads/upload",
-        icon: Send,
-        pageTitle: "Upload Leads",
-      },
-      {
-        label: "Pending",
-        link: "/leads/pending",
-        icon: Clock,
-        pageTitle: "Pending Leads",
-      },
-      {
-        label: "Follow-ups",
-        link: "/leads/followups",
-        icon: Calendar,
-        pageTitle: "Follow-ups",
-      },
-      {
-        label: "Performance",
-        link: "/performance",
-        icon: TrendingUp,
-        pageTitle: "Performance Tracking",
-      },
-    ],
-  },
+  commonMenu,
+  venturesMenu,
+  administrationMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  telecallerAdminCrmMenu,
 ];
 
 
@@ -397,10 +405,11 @@ export const financeAdminMenu = [
   // 5. Finance Admin
   commonMenu,
   venturesMenu,
+  administrationMenu,
   financeMenu,
   mediaMenu,
   siteVisitsMenu,
-  crmMenu,
+  // No leads menu for finance admin
 ];
 
 export const clientAdminMenu = [
@@ -411,7 +420,7 @@ export const clientAdminMenu = [
   administrationMenu,
   mediaMenu,
   siteVisitsMenu,
-  crmMenu,
+  clientAdminCrmMenu,
 ];
 
 export const systemManagementMenu = {
@@ -628,12 +637,12 @@ export const telecallerMenu = [
 
 
 export const associateMenu = [
-  // Regular Associate User
+  // Associate User — Integrated Leadflow & Realgo experience
   commonMenu,
+  leadflowCrmMenu,
+  networkMenu,
   venturesMenu,
   mediaMenu,
-  siteVisitsMenu,
-  crmMenu,
 ];
 
 // ==================== HELPER FUNCTION ====================
@@ -655,19 +664,25 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
     accounts: uType === "admin" ? financeAdminMenu : accountsMenu,
     finance: uType === "admin" ? financeAdminMenu : accountsMenu,
 
-    // Users
+    // Users / Field Roles
     associate: associateMenu,
     user: associateMenu,
-    salesmanager: adminMenu,
-    manager: adminMenu,
+    salesmanager: associateMenu,
+    manager: associateMenu,
     teamlead: associateMenu,
+    asm: associateMenu,
+    rsm: associateMenu,
+    marketingadmin: adminMenu,
+    telecalleradmin: telecallerAdminMenu,
+    financeadmin: financeAdminMenu,
   };
 
   const menu = baseMenus[roleKey] || (uType === "admin" ? adminMenu : associateMenu);
 
-  // Filter menu based on userModules
-  // If userModules is ["ALL"], skip filtering
-  if (userModules.includes("ALL")) return menu;
+  // For Field Roles (Associate, Manager, etc.), we bypass strict module filtering
+  // to ensure they see the core Leadflow and Network tools as requested.
+  const isFieldRole = ["associate", "user", "salesmanager", "manager", "teamlead", "asm", "rsm"].includes(roleKey);
+  if (isFieldRole || userModules.includes("ALL")) return menu;
 
   // Cleanup: Remove any empty strings or nulls from the module array
   const activeModules = (userModules || []).filter(m => m && m.trim() !== "");

@@ -138,7 +138,7 @@ const ProjectDetails = ({ projectId, onClose }) => {
         return (
             <div className="max-h-[85vh] overflow-y-auto p-8 space-y-12 bg-white rounded-2xl hide-scrollbar">
                 {/* 1. Header with Actions */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 pb-4 border-b">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 top-0 bg-white/80 backdrop-blur-md z-10 pb-4 border-b">
                     <div className="flex items-center gap-3">
                         <div className="p-3 bg-primary-500/10 rounded-2xl">
                             <Settings className="w-6 h-6 text-primary-600" />
@@ -158,7 +158,7 @@ const ProjectDetails = ({ projectId, onClose }) => {
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="flex items-center gap-2 bg-primary-600 text-white px-8 py-2.5 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-primary-500/20 hover:bg-primary-700 hover:shadow-primary-500/30 transition-all disabled:opacity-50"
+                            className="flex items-center gap-2 bg-primary-600 border border-slate-200 text-slate-600 px-8 py-2.5 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-primary-500/20 hover:bg-primary-700 hover:shadow-primary-500/30 transition-all disabled:opacity-50"
                         >
                             {isSaving ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -482,7 +482,7 @@ const ProjectDetails = ({ projectId, onClose }) => {
                 </div>
 
                 {/* Footer sticky bar */}
-                <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-3 z-10 rounded-b-2xl shadow-lg -mx-8 -mb-8">
+                <div className="bottom-0 bg-white border-t p-4 flex justify-end gap-3 z-10 rounded-b-2xl shadow-lg -mx-8 -mb-8">
                     <button
                         onClick={() => setIsEditing(false)}
                         className="px-6 py-2 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition-colors"

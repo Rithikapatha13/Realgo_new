@@ -84,3 +84,21 @@ export const getPhasesByProject = async (projectId) => {
     });
     return data;
 };
+
+export const getPlotsMapData = async (projectId) => {
+    const { data } = await axios.get(`${API_URL}/plots-map-data/${projectId}`, {
+        headers: getAuthHeader(),
+    });
+    return data;
+};
+export const importPlotsFromExcel = async (filePath, projectName, projectId, phases) => {
+    const { data } = await axios.post(`${API_URL}/plots-excel-import`, {
+        file_path: filePath,
+        projectName,
+        projectId,
+        phases,
+    }, {
+        headers: getAuthHeader(),
+    });
+    return data;
+};

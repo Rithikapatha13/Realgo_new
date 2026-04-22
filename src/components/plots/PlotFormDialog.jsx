@@ -99,59 +99,46 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 md:p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
 
                 {/* HEADER */}
-                <div className="flex items-center justify-between p-7 border-b border-slate-100 bg-slate-50/30">
-                    <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${action === "Create" ? "bg-blue-600 text-white shadow-blue-200" :
-                                action === "Update" ? "bg-amber-500 text-white shadow-amber-100" : "bg-indigo-600 text-white shadow-indigo-100"
-                            }`}>
-                            {action === "Create" ? <Plus size={28} /> : action === "Update" ? <Pencil size={26} /> : <Eye size={28} />}
-                        </div>
-                        <div>
-                            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{action} Plot</h2>
-                            <p className="text-sm font-medium text-slate-500">
-                                {action === "Create" ? "Register a new asset item" : `Modifying all details for Plot ${form.plotNumber}`}
-                            </p>
-                        </div>
+                <div className="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-900">{action} Plot</h2>
+                        <p className="text-sm text-slate-500">Enter plot details below</p>
                     </div>
-                    <button onClick={onClose} className="p-2.5 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-600 transition-all active:scale-90">
-                        <X size={24} />
+                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition-all">
+                        <X size={20} />
                     </button>
                 </div>
 
-                {/* FORM */}
-                <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
+                <form onSubmit={handleSubmit} className="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
                         {/* LEFT COLUMN: Physical Details */}
-                        <div className="space-y-8">
-                            <div className="space-y-5">
-                                <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2 mb-2">
-                                    <LandPlot size={14} /> Property Location & Size
-                                </h3>
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold text-slate-900 border-b pb-2">Property Details</h3>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Plot Number *</label>
                                         <input name="plotNumber" value={form.plotNumber} onChange={handleChange} disabled={isView} required
                                             placeholder="Plot No"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Area (Sq Yds) *</label>
                                         <input name="sqrYards" type="number" step="0.01" value={form.sqrYards} onChange={handleChange} disabled={isView} required
                                             placeholder="0.00"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-400 ml-1">Select Project *</label>
                                     <select name="projectId" value={form.projectId} onChange={handleChange} disabled={isView} required
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
+                                        className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
                                         <option value="">Choose a Project</option>
                                         {projects.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
                                     </select>
@@ -161,7 +148,7 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Phase</label>
                                         <select name="phaseId" value={form.phaseId} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
                                             <option value="">Select Phase</option>
                                             {phases.map((ph) => <option key={ph.id} value={ph.id}>{ph.phaseName}</option>)}
                                         </select>
@@ -169,7 +156,7 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Facing</label>
                                         <select name="facing" value={form.facing} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
                                             <option value="">Select Facing</option>
                                             <option value="east">East</option><option value="west">West</option>
                                             <option value="north">North</option><option value="south">South</option>
@@ -183,7 +170,7 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-400 ml-1">Plot Category *</label>
                                     <select name="plotCategory" value={form.plotCategory} onChange={handleChange} disabled={isView} required
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
+                                        className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all appearance-none cursor-pointer">
                                         <option value="residential">Residential</option>
                                         <option value="premium">Premium</option>
                                         <option value="executive">Executive</option>
@@ -197,99 +184,91 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                                 </div>
                             </div>
 
-                            <div className="space-y-5">
-                                <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2 mb-2">
-                                    <MapPin size={14} /> Geographic Coordinates
-                                </h3>
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold text-slate-900 border-b pb-2">Geographic Coordinates</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Latitude</label>
                                         <input name="latitude" value={form.latitude} onChange={handleChange} disabled={isView} placeholder="0.000000"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Longitude</label>
                                         <input name="longitude" value={form.longitude} onChange={handleChange} disabled={isView} placeholder="0.000000"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* RIGHT COLUMN: Financial & Customer Details */}
-                        <div className="space-y-8">
-                            <div className="space-y-5">
-                                <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2 mb-2">
-                                    <CreditCard size={14} /> Financial Summary
-                                </h3>
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold text-slate-900 border-b pb-2">Financial Details</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Total Cost (₹)</label>
                                         <input name="totalCost" type="number" value={form.totalCost} onChange={handleChange} disabled={isView}
                                             placeholder="0"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold text-emerald-600 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold text-emerald-600 focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Paid Amount (₹)</label>
                                         <input name="paidAmount" type="number" value={form.paidAmount} onChange={handleChange} disabled={isView}
                                             placeholder="0"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold text-blue-600 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold text-blue-600 focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-400 ml-1">Passbook Number (PB No)</label>
                                     <input name="pbNumber" value={form.pbNumber} onChange={handleChange} disabled={isView}
                                         placeholder="e.g. PB-123"
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                        className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                 </div>
                             </div>
 
-                            <div className="space-y-5">
-                                <h3 className="text-[10px] font-black text-rose-600 uppercase tracking-[0.2em] flex items-center gap-2 mb-2">
-                                    <User size={14} /> Customer Ownership
-                                </h3>
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold text-slate-900 border-b pb-2">Customer Details</h3>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-400 ml-1">Customer Full Name</label>
                                     <input name="customerName" value={form.customerName} onChange={handleChange} disabled={isView}
                                         placeholder="Full Name"
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                        className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Contact No</label>
                                         <input name="customerContact" value={form.customerContact} onChange={handleChange} disabled={isView}
                                             placeholder="Phone Number"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Aadhar Number</label>
                                         <input name="aadhar" value={form.aadhar} onChange={handleChange} disabled={isView}
                                             placeholder="0000 0000 0000"
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-slate-400 ml-1">Current Address</label>
                                     <textarea name="customerAddress" value={form.customerAddress} onChange={handleChange} disabled={isView} rows={2}
                                         placeholder="Full address details..."
-                                        className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all resize-none" />
+                                        className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all resize-none" />
                                 </div>
                             </div>
 
-                            <div className="space-y-5">
-                                <h3 className="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em] flex items-center gap-2 mb-2">
-                                    <Calendar size={14} /> Important Dates
-                                </h3>
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-bold text-slate-900 border-b pb-2">Dates</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Booking Date</label>
                                         <input name="bookingDate" type="date" value={form.bookingDate} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-400 ml-1">Registration Date</label>
                                         <input name="registeredDate" type="date" value={form.registeredDate} onChange={handleChange} disabled={isView}
-                                            className="w-full border border-slate-100 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                            className="w-full border border-slate-300 bg-white rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all" />
                                     </div>
                                 </div>
                             </div>
@@ -299,18 +278,17 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
 
                 {/* FOOTER */}
                 {!isView && (
-                    <div className="p-7 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-4">
+                    <div className="p-4 md:p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
                         <button type="button" onClick={onClose}
-                            className="px-8 py-3 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-200 transition-all active:scale-95">
-                            Discard Changes
+                            className="px-6 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-all">
+                            Cancel
                         </button>
                         <button type="submit" onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending}
-                            className={`px-10 py-3 rounded-2xl text-sm font-black text-white shadow-xl transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 ${action === "Create" ? "bg-blue-600 hover:bg-blue-700 shadow-blue-100" : "bg-slate-900 hover:bg-slate-800 shadow-slate-200"
-                                }`}>
+                            className="px-8 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2">
                             {createMutation.isPending || updateMutation.isPending ? (
                                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                            ) : <Save size={18} />}
-                            {action === "Create" ? "Create New Plot" : "Save All Details"}
+                            ) : null}
+                            {action === "Create" ? "Create Plot" : "Save Changes"}
                         </button>
                     </div>
                 )}

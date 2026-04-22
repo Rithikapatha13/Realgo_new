@@ -9,6 +9,10 @@ import SystemDashboard from "../SuperAdmin/SystemDashboard";
 import FinanceHome from "../Finance/FinanceHome";
 import ClientAdminDashboard from "../administration/ClientAdminDashboard";
 import { getUser, getUserType } from "@/services/auth.service";
+import { getHomeStats } from "@/services/common.service";
+import { useEffect } from "react";
+
+
 
 /* ================= QUICK ACCESS CARDS ================= */
 const cards = [
@@ -44,9 +48,44 @@ export default function Home() {
   const userType = getUserType()?.toLowerCase();
   const role = user?.role?.toLowerCase();
   
+  const [stats, setStats] = useState(null);
+  const [news, setNews] = useState([]);
+  const [pendingAssociates, setPendingAssociates] = useState([]);
+  const [followUps, setFollowUps] = useState([]);
+  const [projectList, setProjectList] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+
   const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
   const userRoleStr = role || "";
   const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin";
+
+  useEffect(() => {
+    if (!isSuperAdmin && role !== "accounts" && !isClientAdmin) {
+      fetchHomeData(selectedProjectId);
+    }
+  }, [isSuperAdmin, role, isClientAdmin, selectedProjectId]);
+
+  const fetchHomeData = async (projectId = "") => {
+    try {
+      setLoading(true);
+      const res = await getHomeStats(projectId);
+      if (res.success) {
+        setStats(res.data);
+        setNews(res.data.news || []);
+        setPendingAssociates(res.data.pendingAssociates || []);
+        setFollowUps(res.data.followUps || []);
+        setProjectList(res.data.projects || []);
+      }
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   // If superadmin, render the SystemDashboard instead of the regular Home view
   if (isSuperAdmin) {
@@ -133,18 +172,13 @@ export default function Home() {
 
             {/* Body */}
             <div className="p-5 space-y-3 max-h-[60vh] overflow-auto">
-              {[
-                "Ravi Kumar",
-                "Anjali Sharma",
-                "Suresh Reddy",
-                "Meena Patel",
-              ].map((name, i) => (
+              {pendingAssociates?.map((assoc, i) => (
                 <div
                   key={i}
                   className="flex items-center justify-between border rounded-lg px-3 py-2"
                 >
                   <div>
-                    <p className="text-sm font-medium text-slate-800">{name}</p>
+                    <p className="text-sm font-medium text-slate-800">{assoc.firstName} {assoc.lastName}</p>
                     <p className="text-xs text-slate-500">Awaiting approval</p>
                   </div>
 
@@ -153,7 +187,13 @@ export default function Home() {
                   </span>
                 </div>
               ))}
+              {pendingAssociates?.length === 0 && (
+                <div className="py-10 text-center text-slate-500 italic text-sm">
+                  No pending associates found.
+                </div>
+              )}
             </div>
+
           </div>
         </div>
       )}
@@ -220,10 +260,20 @@ export default function Home() {
         <div className="space-y-5">
            {/* ================= KPI STATS (MINIMAL) ================= */}
            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-             <MinimalKpi title="Total Admins" value="8" icon={ShieldCheck} />
+             <MinimalKpi 
+               title="Admins" 
+               value={stats?.summary?.totalAdmins || "0"} 
+               icon={ShieldCheck} 
+               onClick={() => navigate("/admin")}
+             />
+
              <div className="relative">
-               <MinimalKpi title="Total Associates" value="424" icon={Users} />
-               {/* SMALL BUTTON */}
+               <MinimalKpi 
+                 title="Associates" 
+                 value={stats?.summary?.totalUsers || "0"} 
+                 icon={Users} 
+                 onClick={() => navigate("/users")}
+               />
                <button
                  onClick={() => setOpenPending(true)}
                  className="absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shadow-sm"
@@ -232,9 +282,21 @@ export default function Home() {
                  <Plus size={12} className="text-slate-600" />
                </button>
              </div>
-             <MinimalKpi title="Total Projects" value="324" icon={Briefcase} />
-             <MinimalKpi title="Team Leads" value="56" icon={UserCheck} />
+             <MinimalKpi 
+               title="Projects" 
+               value={stats?.summary?.totalProjects || "0"} 
+               icon={Briefcase} 
+               onClick={() => navigate("/projects")}
+             />
+             <MinimalKpi 
+               title="Leads" 
+               value={stats?.summary?.totalLeads || "0"} 
+               icon={UserCheck} 
+               onClick={() => navigate("/leads")}
+             />
+
            </div>
+
 
            {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -251,7 +313,12 @@ export default function Home() {
                  <ResponsiveContainer width="99%" height="100%">
                    <PieChart>
                      <Pie
-                       data={salesData}
+                       data={[
+                         { name: "Registered", value: stats?.summary?.plots?.registered || 0 },
+                         { name: "Booked", value: stats?.summary?.plots?.booked || 0 },
+                         { name: "Available", value: stats?.summary?.plots?.available || 0 },
+                         { name: "Hold", value: stats?.summary?.plots?.hold || 0 },
+                       ].filter(d => d.value > 0)}
                        dataKey="value"
                        nameKey="name"
                        cx="50%"
@@ -260,28 +327,47 @@ export default function Home() {
                        innerRadius={45}
                        paddingAngle={3}
                      >
-                       {salesData.map((_, index) => (
-                         <Cell key={index} fill={COLORS[index]} />
+                       {[
+                         { name: "Registered", value: stats?.summary?.plots?.registered || 0 },
+                         { name: "Booked", value: stats?.summary?.plots?.booked || 0 },
+                         { name: "Available", value: stats?.summary?.plots?.available || 0 },
+                         { name: "Hold", value: stats?.summary?.plots?.hold || 0 },
+                       ].filter(d => d.value > 0).map((_, index) => (
+                         <Cell key={index} fill={COLORS[index % COLORS.length]} />
                        ))}
                      </Pie>
                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
                    </PieChart>
                  </ResponsiveContainer>
                </div>
+
              </div>
 
              {/* PROJECT STATUS */}
              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-               <h2 className="text-base font-semibold text-slate-800 mb-3">
-                 Project Status
-               </h2>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-base font-semibold text-slate-800">
+                    Project Status
+                  </h2>
+                  <select
+                    className="text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-indigo-500 font-medium text-slate-600 outline-none"
+                    value={selectedProjectId}
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                  >
+                    <option value="">All Projects</option>
+                    {projectList.map(p => (
+                      <option key={p.id} value={p.id}>{p.projectName}</option>
+                    ))}
+                  </select>
+                </div>
 
-               <div className="space-y-4 pt-2">
-                 <StatusRow label="Available" value={258} color="bg-primary-500" />
-                 <StatusRow label="Sold" value={89} color="bg-emerald-500" />
-                 <StatusRow label="Booked" value={42} color="bg-secondary-500" />
-                 <StatusRow label="Hold" value={34} color="bg-secondary-500/60" />
-               </div>
+                 <div className="space-y-4 pt-2">
+                   <StatusRow label="Available" value={stats?.summary?.plots?.available || 0} total={stats?.summary?.plots?.total || 1} color="bg-[#228b22]" />
+                   <StatusRow label="Sold / Registered" value={stats?.summary?.plots?.registered || 0} total={stats?.summary?.plots?.total || 1} color="bg-[#ff0000]" />
+                   <StatusRow label="Booked" value={stats?.summary?.plots?.booked || 0} total={stats?.summary?.plots?.total || 1} color="bg-[#ffa500]" />
+                   <StatusRow label="Hold" value={stats?.summary?.plots?.hold || 0} total={stats?.summary?.plots?.total || 1} color="bg-[#808080]" />
+                 </div>
+
              </div>
            </div>
 
@@ -293,16 +379,22 @@ export default function Home() {
                  Latest News
                </h2>
 
-               <div className="space-y-3 pt-2">
-                 {[1, 2, 3].map((i) => (
-                   <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
-                     <p className="text-sm font-medium text-slate-800">
-                       New project launch announced in sector {i * 10}
-                     </p>
-                     <p className="text-xs text-slate-500 mt-1">{i * 2} hours ago</p>
-                   </div>
-                 ))}
-               </div>
+                <div className="space-y-3 pt-2">
+                  {news?.slice(0, 3).map((item, i) => (
+                    <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
+                      <p className="text-sm font-medium text-slate-800">
+                        {item.title}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                  {news?.length === 0 && (
+                    <p className="text-xs text-slate-400 italic">No news updates yet.</p>
+                  )}
+                </div>
+
              </div>
 
              {/* RIGHT COLUMN */}
@@ -313,21 +405,25 @@ export default function Home() {
                    Pending Associates
                  </h2>
 
-                 <div className="space-y-3 pt-1">
-                   {[1, 2, 3].map((i) => (
-                     <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                       <div>
-                         <p className="text-[13px] font-bold text-slate-800">
-                           Associate #{i + 104}
-                         </p>
-                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
-                       </div>
-                       <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
-                         Pending
-                       </span>
-                     </div>
-                   ))}
-                 </div>
+                  <div className="space-y-3 pt-1">
+                    {pendingAssociates?.slice(0, 3).map((assoc, i) => (
+                      <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                        <div>
+                          <p className="text-[13px] font-bold text-slate-800">
+                            {assoc.firstName} {assoc.lastName}
+                          </p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
+                          Pending
+                        </span>
+                      </div>
+                    ))}
+                    {pendingAssociates?.length === 0 && (
+                      <p className="text-[10px] text-slate-400 italic">No pending associates.</p>
+                    )}
+                  </div>
+
                </div>
 
                {/* FOLLOW UPS */}
@@ -336,16 +432,22 @@ export default function Home() {
                    Follow Ups
                  </h2>
 
-                 <div className="space-y-3 pt-1">
-                   {[1, 2].map((i) => (
-                     <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
-                       <p className="text-[13px] font-bold text-slate-800">
-                         Client follow-up zoom call
-                       </p>
-                       <p className="text-[11px] text-indigo-500 font-medium mt-1">Today at {3 + i}:00 PM</p>
-                     </div>
-                   ))}
-                 </div>
+                  <div className="space-y-3 pt-1">
+                    {followUps?.slice(0, 2).map((follow, i) => (
+                      <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                        <p className="text-[13px] font-bold text-slate-800">
+                          {follow.leadName}
+                        </p>
+                        <p className="text-[11px] text-indigo-500 font-medium mt-1">
+                          {follow.callbackAt ? new Date(follow.callbackAt).toLocaleString() : "TBD"}
+                        </p>
+                      </div>
+                    ))}
+                    {followUps?.length === 0 && (
+                      <p className="text-[10px] text-slate-400 italic">No scheduled follow-ups.</p>
+                    )}
+                  </div>
+
                </div>
              </div>
            </div>
@@ -357,17 +459,20 @@ export default function Home() {
 
 /* ================= COMPONENTS ================= */
 
-function MinimalKpi({ title, value, icon: Icon }) {
+function MinimalKpi({ title, value, icon: Icon, onClick }) {
   return (
     <div
-      className="
+      onClick={onClick}
+      className={`
         bg-white/80
         border border-slate-200
         rounded-xl
         px-4 py-3
         flex items-center gap-3
-      "
+        ${onClick ? "cursor-pointer hover:shadow-md transition-shadow" : ""}
+      `}
     >
+
       {/* Icon */}
       <div className="h-9 w-9 rounded-lg bg-secondary-500/10 flex items-center justify-center">
         <Icon size={18} className="text-secondary-500" />
@@ -402,7 +507,7 @@ function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
   );
 }
 
-function StatusRow({ label, value, color = "bg-primary-500" }) {
+function StatusRow({ label, value, total = 1, color = "bg-primary-500" }) {
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
@@ -410,7 +515,10 @@ function StatusRow({ label, value, color = "bg-primary-500" }) {
         <span className="font-semibold text-slate-900">{value}</span>
       </div>
       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className={`h-full ${color} rounded-full`} style={{ width: `${Math.min((value/350)*100, 100)}%` }} />
+        <div 
+          className={`h-full ${color} rounded-full`} 
+          style={{ width: `${Math.min(((value || 0) / (total || 1)) * 100, 100)}%` }} 
+        />
       </div>
     </div>
   );

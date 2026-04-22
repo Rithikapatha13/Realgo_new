@@ -291,6 +291,28 @@ export const crmMenu = {
   ],
 };
 
+export const adminCrmMenu = {
+  label: "Leads",
+  icon: Megaphone,
+  module: "CRM",
+  children: [
+    {
+      label: "Leads",
+      link: "/leads",
+      icon: ClipboardCheck,
+      pageTitle: "Leads",
+    },
+    {
+      label: "Follow-ups",
+      link: "/leads/followups",
+      icon: Calendar,
+      pageTitle: "Follow-ups",
+    },
+
+  ],
+};
+
+
 // ==================== CUSTOM ADMIN MENUS ====================
 export const telecallerAdministrationMenu = {
   label: "Administration",
@@ -348,6 +370,16 @@ export const clientAdminMenu = [
   siteVisitsMenu,
   crmMenu,
 ];
+
+export const adminRoleMenu = [
+  commonMenu,
+  venturesMenu,
+  administrationMenu,
+  mediaMenu,
+  siteVisitsMenu,
+  adminCrmMenu,
+];
+
 
 export const systemManagementMenu = {
   label: "System",
@@ -551,14 +583,19 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
   // Base menus for each role type
   const baseMenus = {
     // Admins
-    admin: adminMenu, // Marketing
+    admin: adminRoleMenu, // Admin Specific
     marketingadmin: adminMenu,
+
     superadmin: superAdminMenu,
     companyadmin: clientAdminMenu,
     clientadmin: clientAdminMenu,
 
     // Specific Admins vs Users
     telecaller: uType === "admin" ? telecallerAdminMenu : telecallerMenu,
+    telecalleradmin: telecallerAdminMenu,
+    telecaller_admin: telecallerAdminMenu,
+
+
     accounts: uType === "admin" ? financeAdminMenu : accountsMenu,
     finance: uType === "admin" ? financeAdminMenu : accountsMenu,
 

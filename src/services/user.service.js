@@ -7,9 +7,10 @@ const getAuthHeader = () => {
     return { Authorization: `Bearer ${token}` };
 };
 
-export const getUsersNames = async () => {
+export const getUsersNames = async (params = {}) => {
     const { data } = await axios.get(`${API_URL}/user/names`, {
         headers: getAuthHeader(),
+        params: params
     });
     return data;
 };

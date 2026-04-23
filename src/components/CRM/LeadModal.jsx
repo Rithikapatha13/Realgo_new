@@ -125,6 +125,7 @@ export default function LeadModal({ lead, onClose, onSaved }) {
               value={form.leadSource}
               onChange={(e) => setForm({ ...form, leadSource: e.target.value })}
             >
+                <option value="SELF">Self Generated</option>
                 <option value="WEBSITE">Website</option>
                 <option value="SOCIAL_MEDIA">Social Media</option>
                 <option value="REFERRAL">Referral</option>

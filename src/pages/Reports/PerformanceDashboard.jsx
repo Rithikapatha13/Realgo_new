@@ -38,9 +38,18 @@ export default function PerformanceDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("accounts");
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.role?.toLowerCase() || "";
+  const isAdmin = ["admin", "superadmin", "clientadmin", "companyadmin", "telecalleradmin"].includes(role);
+
   useEffect(() => {
     fetchStats();
-  }, []);
+    // Default tab based on role
+    if (!isAdmin) {
+      if (role === "telecaller") setActiveTab("telecaller");
+      else if (["associate", "teamlead", "manager", "salesmanager", "asm", "rsm"].includes(role)) setActiveTab("associate");
+    }
+  }, [role, isAdmin]);
 
   const fetchStats = async () => {
     try {
@@ -80,30 +89,38 @@ export default function PerformanceDashboard() {
 
       {/* MODULE TABS */}
       <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-2xl w-fit border border-slate-200">
-        <TabButton 
-          active={activeTab === "accounts"} 
-          onClick={() => setActiveTab("accounts")} 
-          icon={Wallet} 
-          label="Accounts" 
-        />
-        <TabButton 
-          active={activeTab === "telecaller"} 
-          onClick={() => setActiveTab("telecaller")} 
-          icon={PhoneCall} 
-          label="Telecallers" 
-        />
-        <TabButton 
-          active={activeTab === "associate"} 
-          onClick={() => setActiveTab("associate")} 
-          icon={Users} 
-          label="Associates" 
-        />
-        <TabButton 
-          active={activeTab === "admin"} 
-          onClick={() => setActiveTab("admin")} 
-          icon={ShieldCheck} 
-          label="Admins" 
-        />
+        {(isAdmin || role === "accounts") && (
+          <TabButton 
+            active={activeTab === "accounts"} 
+            onClick={() => setActiveTab("accounts")} 
+            icon={Wallet} 
+            label="Accounts" 
+          />
+        )}
+        {(isAdmin || role === "telecaller") && (
+          <TabButton 
+            active={activeTab === "telecaller"} 
+            onClick={() => setActiveTab("telecaller")} 
+            icon={PhoneCall} 
+            label="Telecallers" 
+          />
+        )}
+        {(isAdmin || ["associate", "teamlead", "manager", "salesmanager", "asm", "rsm"].includes(role)) && (
+          <TabButton 
+            active={activeTab === "associate"} 
+            onClick={() => setActiveTab("associate")} 
+            icon={Users} 
+            label="Associates" 
+          />
+        )}
+        {isAdmin && (
+          <TabButton 
+            active={activeTab === "admin"} 
+            onClick={() => setActiveTab("admin")} 
+            icon={ShieldCheck} 
+            label="Admins" 
+          />
+        )}
       </div>
 
       {/* MODULE VIEW */}

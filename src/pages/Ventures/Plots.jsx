@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useGetPlots, useGetPlotById, useDeletePlot, useUpdatePlotStatus, useGetPhases } from "../../hooks/usePlot";
 import { useGetAllProjects } from "../../hooks/useProject";
+import { useGetUsersNames } from "../../hooks/useUser";
 import PlotFormDialog from "../../components/plots/PlotFormDialog";
 import PlotStatusDialog from "../../components/plots/PlotStatusDialog";
 import PlotBookingDialog from "../../components/plots/PlotBookingDialog";
@@ -41,8 +42,10 @@ export default function Plots() {
   const [sqrSize, setSqrSize] = useState("");
   const [facing, setFacing] = useState("");
   const [plotNumber, setPlotNumber] = useState("");
+  const [associate, setAssociate] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState("PROJECTS"); // "PROJECTS" or "PLOTS"
   const pageSize = 40;
 
   /* ── dialogs ── */
@@ -64,10 +67,12 @@ export default function Plots() {
     ...(category && { category }), ...(sqrSize && { sqrSize }),
     ...(facing && { facing }), ...(phase && { phases: phase }),
     ...(plotNumber && { plotNumber }),
+    ...(associate && { associateId: associate }),
   };
   const { data: plotsData, isLoading, refetch } = useGetPlots(queryParams);
   const { data: projectsData } = useGetAllProjects();
   const { data: phasesData } = useGetPhases(project);
+  const { data: usersData } = useGetUsersNames();
   const { data: plotDetail } = useGetPlotById(editId);
   const deleteMutation = useDeletePlot();
   const statusMutation = useUpdatePlotStatus();
@@ -78,15 +83,15 @@ export default function Plots() {
   const projectsList = projectsData?.items || [];
   const phasesList = phasesData?.phase || [];
 
-  useEffect(() => { setPage(0); }, [project, status, category, sqrSize, facing, phase, plotNumber]);
+  useEffect(() => { setPage(0); }, [project, status, category, sqrSize, facing, phase, plotNumber, associate]);
 
-  const hasFilters = project || phase || status || category || sqrSize || facing || plotNumber;
-  const activeFilterCount = [project, phase, status, category, sqrSize, facing, plotNumber].filter(Boolean).length;
+  const hasFilters = project || phase || status || category || sqrSize || facing || plotNumber || associate;
+  const activeFilterCount = [project, phase, status, category, sqrSize, facing, plotNumber, associate].filter(Boolean).length;
 
   /* ── handlers ── */
   const clearAll = () => {
     setProject(""); setPhase(""); setStatus(""); setCategory("");
-    setSqrSize(""); setFacing(""); setPlotNumber(""); setPage(0);
+    setSqrSize(""); setFacing(""); setPlotNumber(""); setAssociate(""); setPage(0);
   };
   const openCreate = () => { setEditId(null); setFormAction("Create"); setShowForm(true); };
   const openEdit = (id) => { setEditId(id); setFormAction("Update"); setShowForm(true); };
@@ -116,8 +121,9 @@ export default function Plots() {
       {/* ═══════════ HEADER ═══════════ */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Plots</h1>
-          <p className="text-sm text-slate-400 mt-0.5">{totalPlots} plot{totalPlots !== 1 ? "s" : ""} total</p>
+          {viewMode === "PLOTS" && (
+            <p className="text-sm font-bold text-slate-500 mt-0.5">{totalPlots} plot{totalPlots !== 1 ? "s" : ""} total</p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {/* Filter toggle */}
@@ -133,7 +139,19 @@ export default function Plots() {
             )}
           </button>
 
-          {isAdmin && (
+          {viewMode === "PROJECTS" ? (
+            <button onClick={() => setViewMode("PLOTS")}
+              className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all">
+              Show All Plots Data
+            </button>
+          ) : (
+            <button onClick={() => setViewMode("PROJECTS")}
+              className="bg-slate-100 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2">
+              <ArrowLeft size={16} /> Back to Projects
+            </button>
+          )}
+
+          {isAdmin && viewMode === "PLOTS" && (
             <button onClick={openCreate}
               className="bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:shadow-lg hover:shadow-primary-600/25 transition-all active:scale-[0.98]">
               <Plus size={16} /> Add Plot
@@ -142,7 +160,37 @@ export default function Plots() {
         </div>
       </div>
 
-      {/* ═══════════ STATUS TABS ═══════════ */}
+      {viewMode === "PROJECTS" ? (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <h2 className="text-lg font-bold text-slate-800">Select Project to View Map</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {projectsList.map((p) => (
+              <div
+                key={p.id}
+                onClick={() => {
+                  setProject(p.id);
+                  setViewMode("PLOTS");
+                }}
+                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-primary-300 transition-all cursor-pointer group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                    <LandPlot size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-800 group-hover:text-primary-600 transition-colors">
+                      {p.projectName}
+                    </h3>
+                    <p className="text-sm text-primary-500 font-medium mt-1 group-hover:underline">Click to explore</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ═══════════ STATUS TABS ═══════════ */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         {statusTabs.map((tab) => (
           <button key={tab.key} onClick={() => setStatus(tab.key)}
@@ -158,81 +206,99 @@ export default function Plots() {
         ))}
       </div>
 
-      {/* ═══════════ FILTER PANEL (collapsible) ═══════════ */}
-      {showFilters && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm animate-in slide-in-from-top-2 duration-200 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-700 flex items-center gap-2"><Filter size={14} /> Filter Plots</p>
-            {hasFilters && (
-              <button onClick={clearAll} className="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1">
-                <X size={12} /> Reset All
-              </button>
-            )}
+      {/* ═══════════ FILTER PANEL (Parity with Realgo Old) ═══════════ */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Project</label>
+            <select value={project} onChange={(e) => setProject(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Project</option>
+              {projectsList.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
+            </select>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Plot No.</label>
-              <div className="relative">
-                <input placeholder="e.g. 12A" value={plotNumber} onChange={(e) => setPlotNumber(e.target.value)}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none" />
-                <Search className="absolute right-2.5 top-2.5 text-slate-300" size={14} />
-              </div>
-            </div>
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Project</label>
-              <select value={project} onChange={(e) => setProject(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                <option value="">All</option>
-                {projectsList.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Phase</label>
-              <select value={phase} onChange={(e) => setPhase(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                <option value="">All</option>
-                {phasesList.map((ph) => <option key={ph.id} value={ph.phaseName}>{ph.phaseName}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Category</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                <option value="">All</option>
-                <option value="premium">Premium</option>
-                <option value="executive">Executive</option>
-                <option value="commercial">Commercial</option>
-                <option value="semicommercial">Semi Commercial</option>
-                <option value="vip">VIP</option>
-                <option value="villaplots">Villa Plots</option>
-                <option value="residential">Residential</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Facing</label>
-              <select value={facing} onChange={(e) => setFacing(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                <option value="">All</option>
-                <option value="east">East</option><option value="west">West</option>
-                <option value="north">North</option><option value="south">South</option>
-                <option value="corner">Corner</option><option value="northeast">NE</option>
-                <option value="northwest">NW</option><option value="southeast">SE</option>
-                <option value="southwest">SW</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 block">Size (sq yds)</label>
-              <select value={sqrSize} onChange={(e) => setSqrSize(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                <option value="">All</option>
-                <option value="0-150">0 – 150</option><option value="150-200">150 – 200</option>
-                <option value="200-300">200 – 300</option><option value="300-500">300 – 500</option>
-                <option value="500-1000">500 – 1000</option><option value="1000-">1000+</option>
-              </select>
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Phase</label>
+            <select value={phase} onChange={(e) => setPhase(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Phase</option>
+              {phasesList.map((ph) => <option key={ph.id} value={ph.phaseName}>{ph.phaseName}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Status</label>
+            <select value={status} onChange={(e) => setStatus(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Status</option>
+              {statusTabs.filter(t => t.key).map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Category</label>
+            <select value={category} onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Category</option>
+              <option value="premium">Premium</option>
+              <option value="executive">Executive</option>
+              <option value="commercial">Commercial</option>
+              <option value="semicommercial">Semi Commercial</option>
+              <option value="vip">VIP</option>
+              <option value="villaplots">Villa Plots</option>
+              <option value="residential">Residential</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Facing</label>
+            <select value={facing} onChange={(e) => setFacing(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Facing</option>
+              <option value="east">East</option><option value="west">West</option>
+              <option value="north">North</option><option value="south">South</option>
+              <option value="corner">Corner</option><option value="northeast">NE</option>
+              <option value="northwest">NW</option><option value="southeast">SE</option>
+              <option value="southwest">SW</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Plot Sizes</label>
+            <select value={sqrSize} onChange={(e) => setSqrSize(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+              <option value="">Select Size</option>
+              <option value="0-150">0 – 150</option><option value="150-200">150 – 200</option>
+              <option value="200-300">200 – 300</option><option value="300-500">300 – 500</option>
+              <option value="500-1000">500 – 1000</option><option value="1000-">1000+</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">Search</label>
+            <div className="relative">
+              <input placeholder="Search plot number" value={plotNumber} onChange={(e) => setPlotNumber(e.target.value)}
+                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50" />
+              <Search className="absolute right-3 top-3 text-slate-300" size={16} />
             </div>
           </div>
         </div>
-      )}
+
+        <div className="flex items-center gap-4 border-t border-slate-100 pt-4">
+           <div className="w-64">
+             <select value={associate} onChange={(e) => setAssociate(e.target.value)}
+               className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none bg-slate-50/50">
+               <option value="">Select Sold By Name</option>
+               {usersData?.data?.items?.map((u) => (
+                 <option key={u.id} value={u.id}>{u.username}</option>
+               ))}
+             </select>
+           </div>
+           {hasFilters && (
+             <button onClick={clearAll} className="text-sm text-red-500 hover:text-red-700 font-bold flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-red-50 transition-all">
+               <X size={16} /> Clear All
+             </button>
+           )}
+        </div>
+      </div>
 
       {/* ═══════════ LOADING ═══════════ */}
       {isLoading && (
@@ -266,82 +332,34 @@ export default function Plots() {
 
 
 
-                  <div className="p-4 space-y-3">
-                    {/* Top row: plot number + status */}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-2xl font-black text-slate-900 tracking-tight leading-none">{item.plotNumber}</p>
-                        <p className="text-xs text-slate-400 mt-1 truncate max-w-[160px]" title={item.projectName}>{item.projectName}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        {isAdmin && (
-                          <div className="relative">
-                            <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
-                              className="w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center justify-center">
-                              <MoreVertical size={20} />
-                            </button>
-                            {openMenuId === item.id && (
-                              <div className="absolute top-10 right-0 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] w-44 z-[100] py-2 px-1.5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openView(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-slate-50 text-slate-700 flex items-center gap-3 font-bold rounded-xl transition-all">
-                                  <Eye size={14} className="text-slate-400" /> View Details
-                                </button>
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openEdit(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
-                                  <Pencil size={14} /> Edit Details
-                                </button>
-                                <button onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenMenuId(null);
-                                  const action = item.status === "BOOKED" ? "plan"
-                                    : item.status === "REGISTERED" ? "status"
-                                      : item.status === "AVAILABLE" ? "book"
-                                        : "status";
-                                  if (action === "book") setBookingId(item.id);
-                                  else if (action === "plan") setBookingPlanId(item.id);
-                                  else { setStatusPlotId(item.id); setStatusDialogOpen(true); }
-                                }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-y border-slate-50 my-1">
-                                  <Settings size={14} />
-                                  {item.status === "AVAILABLE" ? "Book Plot" : item.status === "BOOKED" ? "Update Plan" : "Change Status"}
-                                </button>
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setDeleteConfirm(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-red-50 text-red-600 flex items-center gap-3 font-black rounded-xl transition-all mt-1">
-                                  <Trash2 size={14} /> Delete Asset
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                  <div className="p-0 flex flex-col h-full">
+                    <div className="p-6 text-center space-y-2 flex-grow">
+                      <p className="text-4xl font-black text-slate-800 tracking-tighter">{item.plotNumber}</p>
+                      <p className="text-sm font-bold text-slate-500">{item.projectName}</p>
+                      <p className="text-xs font-semibold text-primary-500 uppercase tracking-widest">Phase: {item.phases || 1}</p>
+                    </div>
 
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${cfg.light} ${cfg.text}`}>
-                          <Icon size={12} />
-                          {item.status}
-                        </span>
+                    {/* Card Footer Info */}
+                    <div className="grid grid-cols-3 border-t border-slate-100 bg-slate-50/30">
+                      <div className="p-3 text-center border-r border-slate-100">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Facing</p>
+                        <p className="text-[11px] font-black text-slate-700 truncate">{toTitleCase(item.facing) || "N/A"}</p>
+                      </div>
+                      <div className="p-3 text-center border-r border-slate-100">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Size</p>
+                        <p className="text-[11px] font-black text-slate-700 truncate">{item.sqrYards} sq yds</p>
+                      </div>
+                      <div className="p-3 text-center">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Type</p>
+                        <p className="text-[11px] font-black text-slate-700 truncate">{toTitleCase(item.plotCategory)}</p>
                       </div>
                     </div>
 
-                    {/* Info chips */}
-                    <div className="flex flex-wrap gap-1">
-                      {item.phases && (
-                        <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                          Phase {item.phases}
-                        </span>
-                      )}
-                      <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                        {item.sqrYards} sq yds
-                      </span>
-                      {item.facing && (
-                        <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                          {toTitleCase(item.facing)}
-                        </span>
-                      )}
-                      <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                        {toTitleCase(item.plotCategory)}
-                      </span>
+                    {/* Status Badge at bottom */}
+                    <div className={`p-2.5 text-center font-black text-[10px] uppercase tracking-[0.2em] rounded-b-xl flex items-center justify-center gap-2 ${cfg.light} ${cfg.text} border-t border-slate-100`}>
+                       <Icon size={14} />
+                       {item.status}
                     </div>
-
-
                   </div>
                 </div>
               );
@@ -377,6 +395,8 @@ export default function Plots() {
               </button>
             </div>
           )}
+        </>
+      )}
         </>
       )}
 

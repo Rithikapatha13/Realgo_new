@@ -12,6 +12,7 @@ import {
   BadgeIndianRupee,
   Network,
   LayoutDashboard,
+  NotebookPen,
   Mail,
   Send,
   CalendarDays,
@@ -71,7 +72,7 @@ export const commonMenu = {
     },
     {
       label: "My Team",
-      link: "/myteam",
+      link: "/my-team",
       icon: UserCheck,
       pageTitle: "My Team",
       subtitle: "Manage your team members",
@@ -112,7 +113,7 @@ export const tcGeneralMenu = {
     },
     {
       label: "My Team",
-      link: "/myteam",
+      link: "/my-team",
       icon: UserCheck,
       pageTitle: "My Team",
     },
@@ -300,7 +301,7 @@ export const crmMenu = {
   icon: Megaphone,
   module: "CRM",
   children: [
-    { label: "CRM Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "Dashboard" },
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
     { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
@@ -334,19 +335,20 @@ export const telecallerAdminCrmMenu = {
   icon: Megaphone,
   module: "CRM",
   children: [
-    { label: "CRM Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "Dashboard" },
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
+    { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
     { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
 export const leadflowCrmMenu = {
-  label: "Leadflow CRM",
+  label: "Leads",
   icon: Megaphone,
   module: "CRM",
   children: [
-    { label: "CRM Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "CRM Dashboard" },
+    { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard" },
     { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
     { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
@@ -603,10 +605,16 @@ export const superAdminMenu = [
 export const telecallerMenu = [
   tcGeneralMenu,
   {
-    label: "Leadflow CRM",
+    label: "Leads",
     icon: Megaphone,
     module: "CRM",
     children: [
+      {
+        label: "Dashboard",
+        link: "/tc-dash",
+        icon: LayoutDashboard,
+        pageTitle: "Dashboard",
+      },
       {
         label: "My Leads",
         link: "/leads",
@@ -643,6 +651,18 @@ export const associateMenu = [
   networkMenu,
   venturesMenu,
   mediaMenu,
+  {
+    label: "Notes",
+    link: "/notes",
+    icon: NotebookPen,
+    pageTitle: "Notes",
+  },
+  {
+    label: "Reminders",
+    link: "/reminders",
+    icon: Clock,
+    pageTitle: "Reminders",
+  },
 ];
 
 // ==================== HELPER FUNCTION ====================

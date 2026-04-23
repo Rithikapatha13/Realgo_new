@@ -57,9 +57,9 @@ export default function CallModal({ lead, onClose, onSaved }) {
                 <div className="space-y-4 mb-6">
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Lead Outcome *</label>
-                        <select 
+                        <select
                             className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                            value={status} 
+                            value={status}
                             onChange={e => setStatus(e.target.value)}
                         >
                             <option value="">Select an outcome</option>
@@ -72,39 +72,39 @@ export default function CallModal({ lead, onClose, onSaved }) {
 
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Discussion Notes</label>
-                        <textarea 
+                        <textarea
                             className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                            rows={3} 
-                            placeholder="Summarize your conversation..." 
-                            value={notes} 
-                            onChange={e => setNotes(e.target.value)} 
+                            rows={3}
+                            placeholder="Summarize your conversation..."
+                            value={notes}
+                            onChange={e => setNotes(e.target.value)}
                         />
                     </div>
 
                     {status === 'LATER' && (
                         <div className="animate-in slide-in-from-top-2 duration-200">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Scheduled Callback Time</label>
-                            <input 
-                                type="datetime-local" 
+                            <input
+                                type="datetime-local"
                                 className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                                value={cbAt} 
-                                onChange={e => setCbAt(e.target.value)} 
+                                value={cbAt}
+                                onChange={e => setCbAt(e.target.value)}
                             />
                         </div>
                     )}
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-slate-100">
-                    <button 
-                        onClick={onClose} 
+                    <button
+                        onClick={onClose}
                         className="px-6 py-2.5 rounded-lg border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
                     >
                         Cancel
                     </button>
-                    <button 
-                        onClick={save} 
-                        disabled={saving} 
-                        className="flex-1 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                    <button
+                        onClick={save}
+                        disabled={saving}
+                        className="flex-1 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-black font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         {saving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><CheckCircle size={18} /> Save Update</>}
                     </button>

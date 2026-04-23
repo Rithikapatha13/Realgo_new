@@ -7,6 +7,8 @@ import TeamTree from "../pages/General/TeamTree";
 import Users from "./../pages/administration/Users";
 import Admin from "./../pages/administration/Admin";
 import Reports from "./../pages/General/Reports";
+import Notes from "./../pages/General/Notes";
+import Reminders from "./../pages/General/Reminders";
 
 import UserReport from "./../pages/Reports/UserReport";
 import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
@@ -49,6 +51,7 @@ import Leads from "../pages/CRM/Leads";
 import UploadLeads from "../pages/CRM/UploadLeads";
 import CRMDashboard from "../pages/CRM/CRMDashboard";
 import AssociateDash from "../pages/CRM/AssociateDash";
+import TcDash from "../pages/CRM/TcDash";
 import ProjectIncentives from "../pages/CRM/Incentives";
 import AddAssociate from "../pages/administration/AddAssociate";
 import BulkAssociateForm from "../pages/administration/Form/BulkAssociateForm";
@@ -73,6 +76,8 @@ export const routeConfig = {
       { path: "/my-team", component: MyTeam },
       { path: "/tree", component: TeamTree },
       { path: "/reports", component: Reports },
+      { path: "/notes", component: Notes },
+      { path: "/reminders", component: Reminders },
       { path: "/reports/users", component: UserReport },
       { path: "/reports/company-users", component: CompanyUsersReport },
       { path: "/reports/plots", component: PlotsReport },
@@ -164,6 +169,7 @@ export const routeConfig = {
     routes: [
       { path: "/crm-dashboard", component: CRMDashboard },
       { path: "/associate-dash", component: AssociateDash },
+      { path: "/tc-dash", component: TcDash },
       { path: "/project-incentives", component: ProjectIncentives },
       { path: "/customer-sitevisits", component: SiteVisits },
       { path: "/leads", component: Leads },

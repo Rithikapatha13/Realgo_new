@@ -98,12 +98,6 @@ export default function Home() {
     return <FinanceHome />;
   }
 
-  // If field role (associate, manager, etc.), redirect to AssociateDash
-  const fieldRoles = ["associate", "teamlead", "manager", "salesmanager", "asm", "rsm"];
-  if (fieldRoles.includes(role) || fieldRoles.includes(userRoleStr)) {
-    return <Navigate to="/associate-dash" replace />;
-  }
-
   return (
     <div className="space-y-5 min-h-screen pb-10">
       {/* ================= BANNER ================= */}

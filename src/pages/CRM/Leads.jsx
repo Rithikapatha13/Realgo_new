@@ -7,7 +7,9 @@ import { getUser, getUserType } from "@/services/auth.service";
 import { getLeads, getAssignables, assignLead } from "@/services/crm.service";
 import CallModal from "@/components/CRM/CallModal";
 import LeadModal from "@/components/CRM/LeadModal";
+import { formatDistanceToNow } from "date-fns";
 import HistoryModal from "@/components/CRM/HistoryModal";
+import MeetModal from "@/components/CRM/MeetModal";
 
 export default function Leads() {
   const navigate = useNavigate();
@@ -26,8 +28,10 @@ export default function Leads() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [assignables, setAssignables] = useState({ telecallers: [], associates: [] });
   const [showCallModal, setShowCallModal] = useState(false);
+  const [showMeetModal, setShowMeetModal] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [sourceType, setSourceType] = useState("ALL"); // ALL, TC, SELF
 
   const isTelecallerAdmin = userRole === "TELECALLER_ADMIN" || userRole === "TELECALLER ADMIN";
   const isTelecaller = userRole === "TELECALLER";
@@ -102,6 +106,11 @@ export default function Leads() {
     setShowHistoryModal(true);
   };
 
+  const handleMeetClick = (lead) => {
+    setSelectedLead(lead);
+    setShowMeetModal(true);
+  };
+
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       
@@ -117,7 +126,7 @@ export default function Leads() {
         </div>
 
         <div className="flex gap-3">
-          {isAssociate && (
+          {isAssociate && !isPendingView && !isFollowupView && (
             <Button variant="primary" className="flex items-center gap-2" onClick={() => setShowLeadModal(true)}>
               <Plus size={18} />
               <span>Add Manual Lead</span>
@@ -159,6 +168,32 @@ export default function Leads() {
         </div>
       </div>
 
+      {/* SOURCE FILTER (Associate Only) */}
+      {isAssociate && (
+        <div className="mb-6 flex items-center gap-4 bg-white p-2 rounded-xl border border-slate-200 shadow-sm w-fit">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Leads Source:</span>
+          <div className="flex bg-slate-100 p-1 rounded-lg">
+            {[
+              { id: "ALL", label: "All Sources" },
+              { id: "TC", label: "Telecaller Assigned" },
+              { id: "SELF", label: "Self / Manual" }
+            ].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSourceType(s.id)}
+                className={`px-4 py-1.5 rounded-md text-[10px] font-bold transition-all ${
+                  sourceType === s.id
+                    ? "bg-white text-primary-600 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* TABLE DATA */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
@@ -175,12 +210,23 @@ export default function Leads() {
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
                   {isAdmin && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telecaller</th>}
                   {isAdmin && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Associate</th>}
-                  <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Summary</th>
+                  <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Sessions</th>
+                  <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Updated</th>
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {leads.filter(l => l.leadName.toLowerCase().includes(search.toLowerCase()) || l.leadContact.includes(search)).map((lead) => (
+                {leads
+                  .filter(l => {
+                    const matchesSearch = l.leadName.toLowerCase().includes(search.toLowerCase()) || l.leadContact.includes(search);
+                    const matchesSource = sourceType === "ALL" 
+                      ? true 
+                      : sourceType === "SELF" 
+                        ? l.leadSource === "SELF" 
+                        : l.leadSource !== "SELF";
+                    return matchesSearch && matchesSource;
+                  })
+                  .map((lead) => (
                   <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-4">
                       <div className="flex flex-col">
@@ -202,8 +248,12 @@ export default function Leads() {
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                        {lead.leadSource}
+                      <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                        lead.leadSource === 'SELF' 
+                        ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                        : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}>
+                        {lead.leadSource === 'SELF' ? 'Self' : lead.leadSource}
                       </span>
                     </td>
                     <td className="p-4">
@@ -256,19 +306,34 @@ export default function Leads() {
                       </td>
                     )}
 
-                    <td className="p-4 max-w-xs">
-                      <p className="text-xs text-slate-500 italic truncate" title={lead.notes}>
-                        {lead.notes || "--"}
+                    <td className="p-4 text-center">
+                      <span className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600">
+                        {lead.interactionCount || 0}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <p className="text-[10px] font-medium text-slate-400 whitespace-nowrap">
+                        {formatDistanceToNow(new Date(lead.updatedAt), { addSuffix: true })}
                       </p>
                     </td>
                     <td className="p-4">
                       <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleUpdateClick(lead)}
-                          className="px-3 py-1.5 bg-primary-600 text-black text-[10px] font-bold rounded-lg hover:bg-primary-700 transition-all shadow-sm flex items-center gap-1"
-                        >
-                          <Phone size={12} /> Update
-                        </button>
+                        {!isAssociate && (
+                          <button
+                            onClick={() => handleUpdateClick(lead)}
+                            className="px-3 py-1.5 bg-primary-600 text-black text-[10px] font-bold rounded-lg hover:bg-primary-700 transition-all shadow-sm flex items-center gap-1"
+                          >
+                            <Phone size={12} /> Call
+                          </button>
+                        )}
+                        {isAssociate && (
+                          <button
+                            onClick={() => handleMeetClick(lead)}
+                            className="px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-all shadow-sm flex items-center gap-1"
+                          >
+                            <Calendar size={12} /> Meet
+                          </button>
+                        )}
                         <button
                           onClick={() => handleHistoryClick(lead)}
                           className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-all shadow-sm flex items-center gap-1"
@@ -302,6 +367,13 @@ export default function Leads() {
         <CallModal
           lead={selectedLead}
           onClose={() => setShowCallModal(false)}
+          onSaved={fetchLeads}
+        />
+      )}
+      {showMeetModal && (
+        <MeetModal
+          lead={selectedLead}
+          onClose={() => setShowMeetModal(false)}
           onSaved={fetchLeads}
         />
       )}

@@ -46,3 +46,12 @@ export const getRecentLeads = async () => {
     const { data } = await apiClient.get(`${API_URL}/leads/recent`);
     return data;
 };
+
+export const logMeeting = async (id, payload) => {
+    const { data } = await apiClient.post(`${API_URL}/leads/${id}/meeting`, payload);
+    return data;
+};
+export const getRecentMeetings = async () => {
+    const { data } = await apiClient.get(`${API_URL}/meetings/recent`);
+    return data;
+};

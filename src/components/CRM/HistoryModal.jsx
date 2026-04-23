@@ -84,14 +84,17 @@ export default function HistoryModal({ leadId, onClose }) {
         <div className="flex-1 overflow-y-auto p-8 bg-white font-inter">
           <div className="relative border-l-2 border-slate-100 ml-4 pl-8 space-y-12 pb-4">
             
-            {history?.calls?.map((call, idx) => (
-               <div key={call.id} className="relative">
+            {[...(history?.calls || []).map(c => ({...c, type: 'call'})), ...(history?.meetings || []).map(m => ({...m, type: 'meeting'}))]
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((item) => (
+               <div key={item.id} className="relative">
                  {/* DOT */}
                  <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
                     <div className={`w-2.5 h-2.5 rounded-full ${
-                        call.status === 'HOT' ? 'bg-orange-500' :
-                        call.status === 'WARM' ? 'bg-amber-400' :
-                        call.status === 'COLD' ? 'bg-blue-400' :
+                        item.type === 'meeting' ? 'bg-emerald-500' :
+                        item.status === 'HOT' ? 'bg-orange-500' :
+                        item.status === 'WARM' ? 'bg-amber-400' :
+                        item.status === 'COLD' ? 'bg-blue-400' :
                         'bg-slate-400'
                     }`} />
                  </div>
@@ -99,11 +102,13 @@ export default function HistoryModal({ leadId, onClose }) {
                  <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                          <div className="flex items-center gap-2">
-                             <Phone size={14} className="text-slate-400" />
-                             <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Interaction Logged</span>
+                             {item.type === 'meeting' ? <Calendar size={14} className="text-slate-400" /> : <Phone size={14} className="text-slate-400" />}
+                             <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                {item.type === 'meeting' ? 'Meeting Logged' : 'Interaction Logged'}
+                             </span>
                          </div>
                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter bg-slate-50 px-2 py-0.5 rounded">
-                            {format(new Date(call.createdAt), "dd MMM yyyy, hh:mm a")}
+                            {format(new Date(item.createdAt), "dd MMM yyyy, hh:mm a")}
                          </span>
                     </div>
 
@@ -111,21 +116,20 @@ export default function HistoryModal({ leadId, onClose }) {
                         <div className="flex items-center gap-3 mb-3">
                             <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700">
                                 <User size={12} className="text-primary-600" />
-                                {call.dedicatedTC ? `${call.dedicatedTC.firstName} ${call.dedicatedTC.lastName || ''}` : 
-                                 call.adminTC ? `${call.adminTC.firstName} ${call.adminTC.lastName || ''}` : 
-                                 call.telecaller ? `${call.telecaller.firstName} ${call.telecaller.lastName || ''}` : 
-                                 'System'}
+                                {item.type === 'meeting' ? (item.associate?.name || 'Associate') : 
+                                 (item.dedicatedTC?.firstName || item.adminTC?.firstName || item.telecaller?.firstName || 'System')}
                             </div>
                             <span className={`px-2.5 py-1 rounded-lg font-black text-[10px] border shadow-sm uppercase tracking-widest ${
-                                call.status === 'HOT' ? 'bg-orange-50 text-orange-600 border-orange-100' :
-                                call.status === 'WARM' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                item.type === 'meeting' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                item.status === 'HOT' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                item.status === 'WARM' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                                 'bg-slate-100 text-slate-600 border-slate-200'
                             }`}>
-                                {call.status}
+                                {item.type === 'meeting' ? item.outcome : item.status}
                             </span>
                         </div>
                         <p className="text-sm text-slate-600 leading-relaxed italic">
-                            "{call.notes || "No discussion notes recorded."}"
+                            "{item.notes || (item.type === 'meeting' ? "Meeting outcome recorded." : "No discussion notes recorded.")}"
                         </p>
                     </div>
                  </div>

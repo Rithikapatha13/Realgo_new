@@ -6,9 +6,9 @@ import {
   Menu,
   LogOut
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { getMenuByRole } from "../../constants/sidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { delay, resolveImageUrl } from "../../utils/common";
 import {
   getUser,
@@ -19,17 +19,45 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const [open, setOpen] = useState({});
   const [activeLink, setActiveLink] = useState("/dashboard");
   const navigate = useNavigate();
+  const location = useLocation();
   const user = getUser();
-  const userType = getUserType()?.toLowerCase();
-  const isSuperAdmin = userType === "superadmin" || user?.role?.toLowerCase() === "superadmin" || userType === "super-admin";
-  const isClientAdmin = userType === "clientadmin" || user?.role?.toLowerCase() === "companyadmin" || user?.role?.toLowerCase() === "clientadmin";
-  const isAdmin = userType === "admin" || user?.role?.toLowerCase() === "admin" || isClientAdmin;
+  const userType = getUserType();
+  const rawRole = user?.role?.roleName || user?.role || userType || "";
+  const normalizedRole = String(rawRole).toLowerCase().replace(/[\s_]/g, "");
+
+  const isSuperAdmin = normalizedRole === "superadmin";
+  const isClientAdmin = ["clientadmin", "companyadmin"].includes(normalizedRole);
+  const isAdmin = ["admin", "marketingadmin"].includes(normalizedRole) || isClientAdmin;
+  
   const userModules = user?.roleModules || [];
-  const sidebarMenu = getMenuByRole(
-    isSuperAdmin ? "superadmin" : (user?.role || userType || "associate").toLowerCase(),
+  const sidebarMenu = useMemo(() => getMenuByRole(
+    isSuperAdmin ? "superadmin" : normalizedRole,
     isSuperAdmin || isAdmin ? ["ALL"] : userModules,
     userType
-  );
+  ), [isSuperAdmin, isAdmin, normalizedRole, userType, JSON.stringify(userModules)]);
+
+
+  useEffect(() => {
+    const path = location.pathname;
+    setActiveLink(path);
+    
+    // Auto-expand the section containing the active link
+    setOpen(prev => {
+      let changed = false;
+      const next = { ...prev };
+      sidebarMenu.forEach(item => {
+        if (item.children) {
+          const hasActiveChild = item.children.some(child => child.link === path);
+          if (hasActiveChild && !next[item.label]) {
+            next[item.label] = true;
+            changed = true;
+          }
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [location.pathname, sidebarMenu]);
+
 
   const toggleSection = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));

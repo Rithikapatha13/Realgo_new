@@ -1,7 +1,7 @@
 import apiClient from "../config/apiClient";
 
-export const getUsersNames = async () => {
-    const { data } = await apiClient.get(`/user/names`);
+export const getUsersNames = async (params = {}) => {
+    const { data } = await apiClient.get(`/user/names`, { params });
     return data;
 };
 

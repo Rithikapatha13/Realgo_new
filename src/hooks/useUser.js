@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUsersNames, getTeamTree, getPotentialParents } from "@/services/user.service";
 
-export const useGetUsersNames = () => {
+export const useGetUsersNames = (params = {}) => {
     return useQuery({
-        queryKey: ["users-names"],
-        queryFn: getUsersNames,
+        queryKey: ["users-names", params],
+        queryFn: () => getUsersNames(params),
     });
 };
 

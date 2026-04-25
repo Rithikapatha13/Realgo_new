@@ -31,6 +31,7 @@ import Login from "../pages/auth/Login";
 import Companies from "../pages/SuperAdmin/Companies";
 import SystemDashboard from "../pages/SuperAdmin/SystemDashboard";
 import CompanyDetails from "../pages/SuperAdmin/CompanyDetails";
+import PlotMapView from "../pages/Ventures/PlotMapView";
 import Accounts from "../pages/Finance/Accounts";
 import Ledgers from "../pages/Finance/Ledgers";
 import Parties from "../pages/Finance/Parties";
@@ -55,6 +56,13 @@ import TcDash from "../pages/CRM/TcDash";
 import ProjectIncentives from "../pages/CRM/Incentives";
 import AddAssociate from "../pages/administration/AddAssociate";
 import BulkAssociateForm from "../pages/administration/Form/BulkAssociateForm";
+import EmeraldHomesMap from "../pages/Ventures/plotmap/EmeraldHomes";
+import RealgoHeightsMap from "../pages/Ventures/plotmap/RealgoHeights";
+import FoxconnPlotsMap from "../pages/Ventures/plotmap/FoxconnPlotsMap";
+import GrupeSrinivasamPlotsMap from "../pages/Ventures/plotmap/GrupeSrinivasamPlotsMap";
+import GrupeLRGreenShieldsMap from "../pages/Ventures/plotmap/GrupeLRGreenShields";
+import GBApurvaHomesMap from "../pages/Ventures/plotmap/GBApurvaHomes";
+import AnvayUniversityCountyMap from "../pages/Ventures/plotmap/AnvayUniversityCounty";
 
 export const publicRoutes = {
   auth: {
@@ -94,7 +102,7 @@ export const routeConfig = {
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
       { path: "/roles", component: Roles },
-      { path: "requests", component: Requests },
+      { path: "/requests", component: Requests },
       { path: "/users/add", component: AddAssociate },
       { path: "/user/add-bulk-associates", component: BulkAssociateForm },
     ],
@@ -120,7 +128,16 @@ export const routeConfig = {
     allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
     routes: [
       { path: "plots", component: Plots },
+      { path: "plots/map/:projectId", component: PlotMapView },
+      { path: "plots/emerald-homes", component: EmeraldHomesMap },
+      { path: "plots/realgoheights", component: RealgoHeightsMap },
+      { path: "plots/foxconn-plots-map", component: FoxconnPlotsMap },
+      { path: "plots/grupe/srinivasapuram", component: GrupeSrinivasamPlotsMap },
+      { path: "plots/grupe/lrgreenshields", component: GrupeLRGreenShieldsMap },
+      { path: "plots/gb/apurvahomes", component: GBApurvaHomesMap },
+      { path: "plots/anvay/universitycounty", component: AnvayUniversityCountyMap },
       { path: "Projects", component: Projects },
+
     ],
   },
   Notifications: {

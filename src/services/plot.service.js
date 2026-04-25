@@ -56,3 +56,18 @@ export const getPhasesByProject = async (projectId) => {
     const { data } = await apiClient.get(`/phases/${projectId}`);
     return data;
 };
+
+export const getPlotsMapData = async (projectId) => {
+    const { data } = await apiClient.get(`/plots-map-data/${projectId}`);
+    return data;
+};
+
+export const importPlotsFromExcel = async (filePath, projectName, projectId, phases) => {
+    const { data } = await apiClient.post(`/plots-excel-import`, {
+        file_path: filePath,
+        projectName,
+        projectId,
+        phases,
+    });
+    return data;
+};

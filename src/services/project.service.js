@@ -1,7 +1,7 @@
 import apiClient from "../config/apiClient";
 
-export const getAllHighways = async () => {
-    const { data } = await apiClient.get(`/highways`);
+export const getAllProjectStatuses = async () => {
+    const { data } = await apiClient.get(`/project-statuses`);
     return data;
 };
 

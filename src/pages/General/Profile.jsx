@@ -213,7 +213,6 @@ export default function Profile() {
             <LogOut size={20} />
             <span className="text-sm font-medium">Logout</span>
           </div>
-          <ArrowLeft size={18} className="text-white opacity-80" />
         </button>
       </div>
 

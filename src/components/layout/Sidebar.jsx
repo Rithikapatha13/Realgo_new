@@ -25,9 +25,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const rawRole = user?.role?.roleName || user?.role || userType || "";
   const normalizedRole = String(rawRole).toLowerCase().replace(/[\s_]/g, "");
 
-  const isSuperAdmin = normalizedRole === "superadmin";
-  const isClientAdmin = ["clientadmin", "companyadmin"].includes(normalizedRole);
-  const isAdmin = ["admin", "marketingadmin"].includes(normalizedRole) || isClientAdmin;
+  const isAdmin = userType === "admin";
+  const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
   
   const userModules = user?.roleModules || [];
   const sidebarMenu = useMemo(() => getMenuByRole(
@@ -71,7 +70,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <div
-      className={`h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${collapsed ? "w-16" : "w-64"
+      className={`h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${collapsed ? "w-16" : "w-56"
         }`}
     >
       {/* Header with Logo and Collapse Button */}
@@ -103,9 +102,22 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 overflow-y-auto hide-scrollbar py-4 px-3 flex flex-col justify-between">
+      <nav className="flex-1 overflow-y-auto hide-scrollbar py-4 px-2 flex flex-col justify-between">
         <div className="space-y-1">
           {sidebarMenu.map((item) => {
+            if (item.type === 'header') {
+              return (
+                <div key={item.label} className="mt-6 mb-2 px-2">
+                  {!collapsed && (
+                    <h3 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em]">
+                      {item.label}
+                    </h3>
+                  )}
+                  {collapsed && <div className="h-px bg-slate-100 w-full my-4" />}
+                </div>
+              );
+            }
+
             const Icon = item.icon;
             const isActive = activeLink === item.link;
 

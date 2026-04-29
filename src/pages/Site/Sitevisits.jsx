@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
   Search,
@@ -8,15 +7,14 @@ import {
   Clock,
   User,
   Phone,
-  MoreVertical,
-  Eye,
   Pencil,
   Trash2,
   Filter,
-  X
+  Camera
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
+import { resolveImageUrl } from '@/utils/common';
 import { 
   getSiteVisits, 
   getTodaySiteVisits, 
@@ -24,14 +22,12 @@ import {
 } from '@/services/siteVisit.service';
 import { getUser } from '@/services/auth.service';
 import Button from '@/components/Common/Button';
-import FormInput from '@/components/Common/FormInput';
 import ModalWrapper from '@/components/Common/ModalWrapper';
 import DeleteConfirmationModal from '@/components/Common/DeleteConfirmationModal';
 import SiteVisitForm from './SiteVisitForm';
 
 export default function Sitevisits() {
   const user = getUser();
-  const navigate = useNavigate();
   const [siteVisits, setSiteVisits] = useState([]);
   const [todayVisits, setTodayVisits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,37 +76,28 @@ export default function Sitevisits() {
     setIsModalOpen(true);
   };
 
-  const openAddModal = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
-  };
-
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
-      {/* HEADER SECTION */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <MapPin className="text-primary-500" />
-            Site Visits
-          </h1>
-          <p className="text-slate-500 text-sm font-medium">Track and manage customer site visits</p>
+    <div className="space-y-6 p-2">
+      {/* SEARCH & FILTERS */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full sm:w-96">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search customer or phone..."
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <Button
-          onClick={openAddModal}
-          className="bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-200"
-          icon={<Plus size={18} />}
-        >
-          New Site Visit
-        </Button>
       </div>
 
-      {/* TODAY'S VISITS SECTION */}
+      {/* TODAY'S VISITS (Minimal Style) */}
       {todayVisits.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-slate-700 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Today's Visits
+        <section className="space-y-3">
+          <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Today's Scheduled Visits
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {todayVisits.map((visit) => (
@@ -129,36 +116,22 @@ export default function Sitevisits() {
         </section>
       )}
 
-      {/* MAIN LIST SECTION */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search customer or phone..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary-500 transition-all"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" icon={<Filter size={16} />} className="text-slate-600">Filters</Button>
-          </div>
-        </div>
-
+      {/* ALL VISITS */}
+      <section className="space-y-3">
+        <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">
+            All Site Visits
+        </h2>
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-40 bg-slate-100 rounded-3xl animate-pulse" />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {[1, 2, 3].map(i => <div key={i} className="h-40 bg-slate-100 rounded-xl animate-pulse" />)}
           </div>
         ) : siteVisits.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
-            <MapPin size={48} strokeWidth={1} />
-            <p className="font-medium text-lg">No site visits found</p>
-            <Button variant="outline" onClick={() => setSearchTerm('')}>Clear Search</Button>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-300 space-y-2">
+            <MapPin size={40} strokeWidth={1.5} />
+            <p className="text-xs font-bold uppercase tracking-widest">No site visits found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {siteVisits.map((visit) => (
               <VisitCard
                 key={visit.id}
@@ -204,41 +177,59 @@ export default function Sitevisits() {
 
 function VisitCard({ visit, onEdit, onDelete, isToday }) {
   return (
-    <div className={`group bg-white rounded-3xl p-5 border shadow-sm transition-all hover:shadow-md hover:border-primary-100 relative overflow-hidden ${isToday ? 'border-emerald-100' : 'border-slate-100'}`}>
-      {isToday && (
-        <div className="absolute top-0 right-0 w-16 h-16 -mr-8 -mt-8 bg-emerald-500/10 rounded-full" />
+    <div className={`group bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md relative overflow-hidden flex flex-col`}>
+      {/* Verification Image Preview */}
+      {visit.siteVisitPicture && (
+        <div className="h-32 w-full overflow-hidden relative">
+          <img 
+            src={resolveImageUrl(visit.siteVisitPicture)} 
+            alt="Site Visit" 
+            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-2 left-3 text-[9px] font-bold text-white uppercase tracking-widest flex items-center gap-1">
+            <Camera size={10} /> Verified Visit
+          </div>
+        </div>
       )}
 
-      <div className="flex justify-between items-start mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
-          <User size={24} />
+      <div className="p-3 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-2">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isToday ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+            <User size={16} />
+          </div>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={onEdit} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-600 transition-colors">
+              <Pencil size={14} />
+            </button>
+            <button onClick={onDelete} className="p-1.5 hover:bg-rose-50 rounded-md text-rose-600 transition-colors">
+              <Trash2 size={14} />
+            </button>
+          </div>
         </div>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={onEdit} className="p-2 hover:bg-slate-100 rounded-xl text-slate-600 transition-colors">
-            <Pencil size={16} />
-          </button>
-          <button onClick={onDelete} className="p-2 hover:bg-rose-50 rounded-xl text-rose-600 transition-colors">
-            <Trash2 size={16} />
-          </button>
-        </div>
-      </div>
 
-      <div className="space-y-1">
-        <h3 className="font-bold text-lg text-slate-800 line-clamp-1">{visit.leadName}</h3>
-        <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
-          <Phone size={14} className="text-slate-400" />
-          {visit.phone}
+        <div className="space-y-1">
+          <h3 className="font-bold text-slate-800 line-clamp-1">{visit.leadName}</h3>
+          <div className="flex items-center gap-2 text-slate-500 text-[11px] font-medium">
+            <Phone size={12} className="text-slate-400" />
+            {visit.phone}
+          </div>
+          {visit.project && (
+             <div className="flex items-center gap-2 text-primary-600 text-[10px] font-black uppercase tracking-tighter mt-1">
+               <MapPin size={10} /> {visit.project.projectName}
+             </div>
+          )}
         </div>
-      </div>
 
-      <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 text-slate-600 text-xs font-bold">
-          <Calendar size={12} className="text-primary-500" />
-          {format(new Date(visit.date), 'MMM dd, yyyy')}
-        </div>
-        <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-wider">
-          <Clock size={12} />
-          {visit.time}
+        <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between mt-3">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-bold">
+            <Calendar size={10} className="text-primary-600" />
+            {format(new Date(visit.date), 'MMM dd, yyyy')}
+          </div>
+          <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+            <Clock size={10} />
+            {visit.time}
+          </div>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import { getUser } from '@/services/auth.service';
 import { createSiteVisit, updateSiteVisit } from '@/services/siteVisit.service';
 import Button from '@/components/Common/Button';
 import FormInput from '@/components/Common/FormInput';
+import FileInput from '@/components/Common/FileUpload';
 
 export default function SiteVisitForm({ item, onSuccess, onCancel }) {
   const user = getUser();
@@ -97,6 +98,21 @@ export default function SiteVisitForm({ item, onSuccess, onCancel }) {
           onChange={handleChange}
           icon={Clock}
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+          Verification Picture
+          <span className="text-[10px] font-normal text-slate-400 italic">(Optional but recommended)</span>
+        </label>
+        <FileInput
+          name="siteVisitPicture"
+          existingFile={formData.siteVisitPicture}
+          onChange={handleChange}
+          accept="image/*"
+          maxSizeMB={2}
+          helperText="Upload a photo from the site to verify the visit."
         />
       </div>
 

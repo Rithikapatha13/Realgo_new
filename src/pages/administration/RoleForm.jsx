@@ -8,17 +8,41 @@ import { getUser } from "@/services/auth.service";
 import CustomSelect from "@/components/Common/CustomSelect";
 
 const MODULES_LIST = [
-    "VENTURES",
-    "FINANCE",
-    "ADMINISTRATION",
-    "MEDIA",
-    "SITE_VISITS",
-    "CRM",
+    "ADMIN",
+    "USER",
+    "ROLES",
+    "PROFILE",
+    "GREETINGS",
+    "PROJECT STATUS",
+    "PROJECTS",
+    "PHASES",
+    "PLOTS",
+    "FOLLOWUP",
+    "LEADS",
+    "NEWS",
+    "NOTES",
+    "REMINDERS",
+    "SITEVISITS",
+    "CUSTOMER SITEVISITS",
+    "VIDEOS",
+    "REQUESTS",
+    "ACCOUNTS",
+    "VEHICLE SITEVISITS",
+    "SHOWCASE",
+    "PROJECT INCENTIVES",
 ];
 
 const ASSOCIATE_MODULES = [
-    "MEDIA",
-    "SITE_VISITS",
+    'PROFILE',
+    'GREETINGS',
+    'PLOTS',
+    'FOLLOWUP',
+    'LEADS',
+    'NEWS',
+    'NOTES',
+    'REMINDERS',
+    'SITEVISITS',
+    'VIDEOS',
 ];
 
 const RoleForm = ({ role, action, onClose, onRefetch }) => {
@@ -55,9 +79,28 @@ const RoleForm = ({ role, action, onClose, onRefetch }) => {
         if (action === "View") return;
         setFormData((prev) => {
             const isSelected = prev.modules.includes(module);
-            const updatedModules = isSelected
-                ? prev.modules.filter((m) => m !== module)
-                : [...prev.modules, module];
+            let updatedModules = [...prev.modules];
+
+            if (isSelected) {
+                // Remove module
+                updatedModules = updatedModules.filter((m) => m !== module);
+                
+                // If it was part of a group, maybe we don't automatically remove others?
+                // Garuda doesn't seem to automatically remove others on uncheck, but it warns.
+                // Let's keep it simple: just remove the clicked one.
+            } else {
+                // Add module
+                if (["ADMIN", "USER", "ROLES"].includes(module)) {
+                    // Group 1: Admin
+                    updatedModules = [...new Set([...updatedModules, "ADMIN", "USER", "ROLES"])];
+                } else if (["PROJECTS", "PHASES", "PROJECT STATUS"].includes(module)) {
+                    // Group 2: Projects
+                    updatedModules = [...new Set([...updatedModules, "PROJECTS", "PHASES", "PROJECT STATUS", "PLOTS"])];
+                } else {
+                    updatedModules.push(module);
+                }
+            }
+            
             return { ...prev, modules: updatedModules };
         });
     };

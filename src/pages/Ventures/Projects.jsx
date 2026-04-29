@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { X, MapPin, Layout, Layers, Loader2, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { X, MapPin, Layout, Layers, Loader2, ArrowLeft, Activity } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import ModalWrapper from "../../components/Common/ModalWrapper";
 import ProjectDetails from "./ProjectDetails";
-import { getAllHighways, getProjects } from "../../services/project.service";
+import { getAllProjectStatuses, getProjects } from "../../services/project.service";
 
 
 export default function Projects() {
   const navigate = useNavigate();
-  const [highways, setHighways] = useState([]);
+  const [projectStatuses, setProjectStatuses] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedHighwayId, setSelectedHighwayId] = useState("");
+  const [selectedStatusId, setSelectedStatusId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modal State
@@ -21,7 +21,7 @@ export default function Projects() {
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
 
   useEffect(() => {
-    fetchHighways();
+    fetchProjectStatuses();
   }, []);
 
   useEffect(() => {
@@ -29,16 +29,16 @@ export default function Projects() {
       fetchProjects();
     }, 400); // Debounce search
     return () => clearTimeout(timer);
-  }, [selectedHighwayId, searchQuery]);
+  }, [selectedStatusId, searchQuery]);
 
-  const fetchHighways = async () => {
+  const fetchProjectStatuses = async () => {
     try {
-      const response = await getAllHighways();
+      const response = await getAllProjectStatuses();
       if (response.success) {
-        setHighways(response.items);
+        setProjectStatuses(response.items);
       }
     } catch (error) {
-      console.error("Error fetching highways:", error);
+      console.error("Error fetching project statuses:", error);
     }
   };
 
@@ -46,7 +46,7 @@ export default function Projects() {
     setLoading(true);
     try {
       const response = await getProjects({
-        highwayId: selectedHighwayId,
+        projectStatusId: selectedStatusId,
         name: searchQuery
       });
       if (response.success) {
@@ -70,8 +70,17 @@ export default function Projects() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Venture Projects</h1>
-          <p className="text-gray-500 font-medium">Explore premium real estate ventures across various highways.</p>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Venture Projects</h1>
+            <Link 
+              to="/project-status"
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-100 transition-all border border-indigo-100/50"
+            >
+              <Activity className="w-4 h-4" />
+              Manage Status
+            </Link>
+          </div>
+          <p className="text-gray-500 font-medium">Explore premium real estate ventures across various project stages.</p>
         </div>
 
         {/* Search Bar */}
@@ -89,35 +98,35 @@ export default function Projects() {
         </div>
       </div>
 
-      {/* Highways Filter - Horizontal Scroll */}
+      {/* Project Status Filter - Horizontal Scroll */}
       <div className="flex items-start gap-5 overflow-x-auto pb-4 hide-scrollbar w-full max-w-full min-w-0">
         <div
-          onClick={() => setSelectedHighwayId("")}
+          onClick={() => setSelectedStatusId("")}
           className="flex flex-col items-center gap-3 cursor-pointer group min-w-[90px]"
         >
           <div className={`w-15 h-15 rounded-full flex items-center justify-center border-2 transition-all duration-300 shadow-sm 
-                        ${!selectedHighwayId
+                        ${!selectedStatusId
               ? 'border-primary-600 bg-primary-500/10 shadow-primary-500/20 scale-105'
               : 'border-gray-100 bg-white group-hover:border-primary-300 group-hover:bg-gray-50'}`}>
-            <X className={`w-8 h-8 transition-colors duration-300 ${!selectedHighwayId ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`} />
+            <X className={`w-8 h-8 transition-colors duration-300 ${!selectedStatusId ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`} />
           </div>
-          <span className={`text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${!selectedHighwayId ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`}>All</span>
+          <span className={`text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${!selectedStatusId ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`}>All</span>
         </div>
 
-        {highways.map((highway) => (
+        {projectStatuses.map((status) => (
           <div
-            key={highway.id}
-            onClick={() => setSelectedHighwayId(highway.id)}
+            key={status.id}
+            onClick={() => setSelectedStatusId(status.id)}
             className="flex flex-col items-center gap-3 cursor-pointer group min-w-[90px]"
           >
             <div className={`w-15 h-15 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm flex-shrink-0
-                            ${selectedHighwayId === highway.id
+                            ${selectedStatusId === status.id
                 ? 'border-primary-600 ring-4 ring-primary-500/10 scale-105 shadow-primary-500/20'
                 : 'border-gray-100 group-hover:border-primary-300 group-hover:shadow-md'}`}>
-              {highway.highwayIcon ? (
+              {status.statusIcon ? (
                 <img
-                  src={`${IMAGE_BASE_URL}/${highway.highwayIcon}`}
-                  alt={highway.highwayName}
+                  src={`${IMAGE_BASE_URL}/${status.statusIcon}`}
+                  alt={status.statusName}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -127,8 +136,8 @@ export default function Projects() {
               )}
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider text-center truncate w-24 transition-colors duration-300
-                            ${selectedHighwayId === highway.id ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`}>
-              {highway.highwayName}
+                            ${selectedStatusId === status.id ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-400'}`}>
+              {status.statusName}
             </span>
           </div>
         ))}
@@ -168,7 +177,7 @@ export default function Projects() {
                 {/* Quick Info overlay */}
                 <div className="absolute bottom-4 left-4 right-4">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80 bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20">
-                    {project.highway?.highwayName || "Special Project"}
+                    {project.projectStatus?.statusName || "Special Project"}
                   </span>
                 </div>
               </div>
@@ -213,7 +222,7 @@ export default function Projects() {
           <h3 className="text-2xl font-black text-gray-900 mb-2">No Ventures Found</h3>
           <p className="text-gray-500 font-medium">We couldn't find any projects matching your selection.</p>
           <button
-            onClick={() => setSelectedHighwayId("")}
+            onClick={() => setSelectedStatusId("")}
             className="mt-8 text-primary-600 font-bold hover:underline"
           >
             View all projects instead

@@ -9,8 +9,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import SystemDashboard from "../SuperAdmin/SystemDashboard";
 import FinanceHome from "../Finance/FinanceHome";
 import ClientAdminDashboard from "../administration/ClientAdminDashboard";
-import { getStats, getActivities } from "@/services/crm.service";
+import { getStats, getActivities, getRecentLeads } from "@/services/crm.service";
 import { formatDistanceToNow } from 'date-fns';
+import TelecallerHome from "../CRM/TelecallerHome";
+import MarketingHome from "../Marketing/MarketingHome";
 import { getUser, getUserType } from "@/services/auth.service";
 import { getHomeStats } from "@/services/common.service";
 
@@ -49,8 +51,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [openPending, setOpenPending] = useState(false);
   const user = getUser();
-  const userType = getUserType()?.toLowerCase();
-  const role = user?.role?.toLowerCase();
   const [stats, setStats] = useState(null);
   const [news, setNews] = useState([]);
   const [pendingAssociates, setPendingAssociates] = useState([]);
@@ -58,35 +58,41 @@ export default function Home() {
   const [projectList, setProjectList] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [loading, setLoading] = useState(true);
-  const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
+  const userType = getUserType()?.toLowerCase();
+  const role = user?.role?.toLowerCase();
   const userRoleStr = (user?.role?.roleName || user?.role || "").toLowerCase().replace(/\s/g, '');
 
-  const isClientAdmin = userType === "clientadmin" || userType === "companyadmin" || userType === "admin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin" || userRoleStr.includes("admin");
+  const isSuperAdmin = userType === "superadmin" || userType === "super-admin";
+  const isClientAdmin = (userType === "clientadmin" || userType === "companyadmin" || userType === "admin" || userRoleStr === "companyadmin" || userRoleStr === "clientadmin" || userRoleStr.includes("admin")) && userRoleStr !== "telecalleradmin";
   const isTelecaller = userRoleStr === "telecaller";
   const isTelecallerAdmin = userRoleStr === "telecalleradmin";
+  const isAssociate = userType === "user" && !isTelecaller && !isTelecallerAdmin && role !== "accounts";
 
   // CRM State
   const [crmStats, setCrmStats] = useState(null);
   const [crmActivities, setCrmActivities] = useState([]);
   const [loadingCrm, setLoadingCrm] = useState(false);
+  const [leads, setLeads] = useState([]);
 
   useEffect(() => {
-    if (isTelecaller || isTelecallerAdmin) {
+    if (isTelecaller || isTelecallerAdmin || isAssociate) {
       fetchCrmData();
       const interval = setInterval(fetchCrmData, 45000); // Poll every 45s
       return () => clearInterval(interval);
     }
-  }, [isTelecaller, isTelecallerAdmin]);
+  }, [isTelecaller, isTelecallerAdmin, isAssociate]);
 
   async function fetchCrmData() {
     try {
       setLoadingCrm(true);
-      const [statsRes, actsRes] = await Promise.all([
+      const [statsRes, actsRes, recentLeadsRes] = await Promise.all([
         getStats(),
-        getActivities()
+        getActivities(),
+        getRecentLeads()
       ]);
       setCrmStats(statsRes.stats || null);
       setCrmActivities(actsRes.activities || []);
+      setLeads(recentLeadsRes.leads || []);
     } catch (error) {
       console.error("Home CRM fetch failed", error);
     } finally {
@@ -95,10 +101,10 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (!isSuperAdmin && role !== "accounts" && !isClientAdmin) {
+    if (!isSuperAdmin && role !== "accounts" && !isClientAdmin && !isAssociate) {
       fetchHomeData(selectedProjectId);
     }
-  }, [isSuperAdmin, role, isClientAdmin, selectedProjectId]);
+  }, [isSuperAdmin, role, isClientAdmin, isAssociate, selectedProjectId]);
 
   const fetchHomeData = async (projectId = "") => {
     try {
@@ -133,6 +139,14 @@ export default function Home() {
   if (role === "accounts") {
     return <FinanceHome />;
   }
+
+  // If accounts, render the FinanceHome
+  if (role === "accounts") {
+    return <FinanceHome />;
+  }
+
+  // We no longer redirect associates to a separate dashboard, 
+  // we customize the main Home body instead.
 
   return (
     <div className="space-y-5 min-h-screen pb-10">
@@ -233,7 +247,7 @@ export default function Home() {
 
       {/* ================= QUICK ACCESS ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        {isTelecaller ? (
+        {isTelecaller || isTelecallerAdmin ? (
           <>
             <QuickAccessTile
               title="Leads"
@@ -349,12 +363,32 @@ export default function Home() {
         <div className="space-y-5">
           {/* ================= KPI STATS (MINIMAL) ================= */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {isTelecaller ? (
+            {isTelecaller || isTelecallerAdmin || isAssociate ? (
               <>
-                <MinimalKpi title="Total Leads" value={crmStats?.total || '0'} icon={Users} />
-                <MinimalKpi title="Hot Leads" value={crmStats?.hot || '0'} icon={Flame} />
-                <MinimalKpi title="Pending" value={crmStats?.pending || '0'} icon={Clock} />
-                <MinimalKpi title="Follow-ups" value={crmStats?.followups || '0'} icon={Calendar} />
+                <MinimalKpi 
+                  title="Total Leads" 
+                  value={isAssociate ? (stats?.summary?.totalLeads || 0) : (crmStats?.total || '0')} 
+                  icon={Users} 
+                  onClick={() => navigate("/leads")}
+                />
+                <MinimalKpi 
+                  title="Hot Leads" 
+                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'HOT').length || 0) : (crmStats?.hot || '0')} 
+                  icon={Flame} 
+                  onClick={() => navigate("/leads?status=HOT")}
+                />
+                <MinimalKpi 
+                  title="Warm Leads" 
+                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'WARM').length || 0) : (crmStats?.warm || '0')} 
+                  icon={Activity} 
+                  onClick={() => navigate("/leads?status=WARM")}
+                />
+                <MinimalKpi 
+                  title="Site Visits" 
+                  value={isAssociate ? (stats?.summary?.sitevisits || 0) : (crmStats?.sitevisits || '0')} 
+                  icon={Clock} 
+                  onClick={() => navigate("/leads?status=SITEVISIT")}
+                />
               </>
             ) : (
               <>
@@ -398,16 +432,18 @@ export default function Home() {
           {/* ================= PLOT BOOKINGS + SALES + STATUS ================= */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Plot Bookings / CRM Pipeline */}
-            {isTelecaller ? (
+            {isTelecaller || isTelecallerAdmin || isAssociate ? (
               <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
                 <h2 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
                   <ClipboardList size={18} className="text-primary-500" /> Lead Pipeline
                 </h2>
                 <div className="space-y-4">
-                  {['NEW', 'WARM', 'HOT', 'COLD'].map(s => {
-                    const count = crmStats?.[s.toLowerCase()] || 0;
-                    const total = crmStats?.total || 1;
-                    return <StatusRow key={s} label={s} value={count} total={total} color={s === 'HOT' ? 'bg-rose-500' : s === 'NEW' ? 'bg-emerald-500' : 'bg-primary-500'} />;
+                  {['HOT', 'WARM', 'COLD'].map(s => {
+                    const count = isAssociate 
+                      ? leads?.filter(l => l.leadStatus === s).length 
+                      : (crmStats?.[s.toLowerCase()] || 0);
+                    const total = isAssociate ? (leads?.length || 1) : (crmStats?.total || 1);
+                    return <StatusRow key={s} label={s} value={count} total={total} color={s === 'HOT' ? 'bg-rose-500' : s === 'WARM' ? 'bg-amber-500' : 'bg-slate-400'} />;
                   })}
                 </div>
               </div>
@@ -415,17 +451,21 @@ export default function Home() {
               <CompactCalendar />
             )}
 
-            {/* SALES OVERVIEW / DISTRIBUTION */}
+            {/* SALES OVERVIEW / DISTRIBUTION (REPLACED WITH LEAD INSIGHTS FOR ASSOCIATES) */}
             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
               <h2 className="text-base font-semibold text-slate-800 mb-4">
-                {isTelecaller ? "Lead Distribution" : "Sales Overview"}
+                {isAssociate ? "Lead Insights" : (isTelecaller || isTelecallerAdmin ? "Lead Distribution" : "Sales Overview")}
               </h2>
 
               <div className="h-56 min-w-0" style={{ minHeight: '224px' }}>
                 <ResponsiveContainer width="99%" height="100%">
                   <PieChart>
                     <Pie
-                      data={isTelecaller ? [
+                      data={isAssociate ? [
+                        { name: 'Hot', value: leads?.filter(l => l.leadStatus === 'HOT').length || 0 },
+                        { name: 'Warm', value: leads?.filter(l => l.leadStatus === 'WARM').length || 0 },
+                        { name: 'Cold', value: leads?.filter(l => l.leadStatus === 'COLD').length || 0 },
+                      ].filter(d => d.value > 0) : (isTelecaller || isTelecallerAdmin ? [
                         { name: 'Hot', value: crmStats?.hot || 0 },
                         { name: 'Warm', value: crmStats?.warm || 0 },
                         { name: 'Cold', value: crmStats?.cold || 0 },
@@ -435,7 +475,7 @@ export default function Home() {
                         { name: "Booked", value: stats?.summary?.plots?.booked || 0 },
                         { name: "Available", value: stats?.summary?.plots?.available || 0 },
                         { name: "Hold", value: stats?.summary?.plots?.hold || 0 },
-                      ].filter(d => d.value > 0)}
+                      ].filter(d => d.value > 0))}
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
@@ -444,7 +484,7 @@ export default function Home() {
                       innerRadius={45}
                       paddingAngle={3}
                     >
-                      {(isTelecaller ? ['#f43f5e', '#f59e0b', '#94a3b8', '#10b981'] : COLORS).map((color, index) => (
+                      {(isAssociate || isTelecaller || isTelecallerAdmin ? ['#f43f5e', '#f59e0b', '#94a3b8', '#10b981'] : COLORS).map((color, index) => (
                         <Cell key={index} fill={color} />
                       ))}
                     </Pie>
@@ -454,13 +494,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PROJECT STATUS / CRM TASKS */}
+            {/* PROJECT STATUS */}
             <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-semibold text-slate-800">
-                  {isTelecaller ? "Call Status" : "Project Status"}
+                  {isTelecaller || isTelecallerAdmin ? "Call Status" : "Project Status"}
                 </h2>
-                {!isTelecaller && (
+                {!(isTelecaller || isTelecallerAdmin) && (
                   <select
                     className="text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-indigo-500 font-medium text-slate-600 outline-none"
                     value={selectedProjectId}
@@ -475,7 +515,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-4 pt-2">
-                {isTelecaller ? (
+                {isTelecaller || isTelecallerAdmin ? (
                   <>
                     <StatusRow label="Pending Calls" value={crmStats?.pending || 0} total={crmStats?.total || 1} color="bg-amber-500" />
                     <StatusRow label="Follow-ups" value={crmStats?.followups || 0} total={crmStats?.total || 1} color="bg-purple-500" />
@@ -497,13 +537,13 @@ export default function Home() {
           {/* ================= LOWER SECTION ================= */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pb-10">
             {/* LATEST NEWS / CRM ACTIVITIES */}
-            <div className="lg:col-span-2 bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div className={`${isAssociate ? 'lg:col-span-3' : 'lg:col-span-2'} bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm`}>
               <h2 className="text-base font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                {isTelecaller ? <><MessageSquare size={18} className="text-primary-500" /> Recent CRM Activities</> : "Latest News"}
+                {isTelecaller || isTelecallerAdmin ? <><MessageSquare size={18} className="text-primary-500" /> Recent CRM Activities</> : "Latest News"}
               </h2>
 
               <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {isTelecaller ? (
+                {isTelecaller || isTelecallerAdmin ? (
                   crmActivities.length > 0 ? crmActivities.map((a) => (
                     <div key={a.id} className="border-b border-slate-100 last:border-0 pb-3">
                       <p className="text-sm font-medium text-slate-800" dangerouslySetInnerHTML={{ __html: a.text }} />
@@ -519,7 +559,7 @@ export default function Home() {
                   )
                 ) : (
                   <>
-                    {news?.slice(0, 3).map((item, i) => (
+                    {news?.slice(0, 5).map((item, i) => (
                       <div key={i} className="border-b border-slate-100 last:border-0 pb-3">
                         <p className="text-sm font-medium text-slate-800">
                           {item.title}
@@ -537,93 +577,95 @@ export default function Home() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="space-y-4">
-              {/* CRM QUEUE STATUS / PENDING */}
-              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-                <h2 className="text-base font-semibold text-slate-800 mb-3">
-                  {isTelecaller ? "Lead Queue" : "Pending Associates"}
-                </h2>
+            {/* RIGHT COLUMN (HIDDEN FOR ASSOCIATES) */}
+            {!isAssociate && (
+              <div className="space-y-4">
+                {/* CRM QUEUE STATUS / PENDING */}
+                <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                  <h2 className="text-base font-semibold text-slate-800 mb-3">
+                    {isTelecaller || isTelecallerAdmin ? "Lead Queue" : "Pending Associates"}
+                  </h2>
 
-                <div className="space-y-3 pt-1">
-                  {isTelecaller ? (
-                    <>
-                      <div className="flex justify-between items-center bg-rose-50 p-2 rounded-lg border border-rose-100">
-                        <div>
-                          <p className="text-[13px] font-bold text-rose-700">Hot Leads</p>
-                          <p className="text-[10px] text-rose-500 uppercase tracking-widest mt-0.5">Urgent attention</p>
-                        </div>
-                        <span className="text-sm font-black text-rose-600 font-mono">{crmStats?.hot || 0}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100">
-                        <div>
-                          <p className="text-[13px] font-bold text-amber-700">Pending</p>
-                          <p className="text-[10px] text-amber-500 uppercase tracking-widest mt-0.5">Daily queue</p>
-                        </div>
-                        <span className="text-sm font-black text-amber-600 font-mono">{crmStats?.pending || 0}</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {pendingAssociates?.slice(0, 3).map((assoc, i) => (
-                        <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                  <div className="space-y-3 pt-1">
+                    {isTelecaller || isTelecallerAdmin ? (
+                      <>
+                        <div className="flex justify-between items-center bg-rose-50 p-2 rounded-lg border border-rose-100">
                           <div>
-                            <p className="text-[13px] font-bold text-slate-800">
-                              {assoc.firstName} {assoc.lastName}
-                            </p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
+                            <p className="text-[13px] font-bold text-rose-700">Hot Leads</p>
+                            <p className="text-[10px] text-rose-500 uppercase tracking-widest mt-0.5">Urgent attention</p>
                           </div>
-                          <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
-                            Pending
-                          </span>
+                          <span className="text-sm font-black text-rose-600 font-mono">{crmStats?.hot || 0}</span>
                         </div>
-                      ))}
-                      {pendingAssociates?.length === 0 && (
-                        <p className="text-[10px] text-slate-400 italic">No pending associates.</p>
-                      )}
-                    </>
-                  )}
+                        <div className="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100">
+                          <div>
+                            <p className="text-[13px] font-bold text-amber-700">Pending</p>
+                            <p className="text-[10px] text-amber-500 uppercase tracking-widest mt-0.5">Daily queue</p>
+                          </div>
+                          <span className="text-sm font-black text-amber-600 font-mono">{crmStats?.pending || 0}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {pendingAssociates?.slice(0, 3).map((assoc, i) => (
+                          <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                            <div>
+                              <p className="text-[13px] font-bold text-slate-800">
+                                {assoc.firstName} {assoc.lastName}
+                              </p>
+                              <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Awaiting approval</p>
+                            </div>
+                            <span className="text-[10px] uppercase tracking-widest font-bold bg-secondary-500/10 text-secondary-500 px-2 py-1 rounded">
+                              Pending
+                            </span>
+                          </div>
+                        ))}
+                        {pendingAssociates?.length === 0 && (
+                          <p className="text-[10px] text-slate-400 italic">No pending associates.</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* FOLLOW UPS */}
+                <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
+                  <h2 className="text-base font-semibold text-slate-800 mb-3">
+                    {isTelecaller || isTelecallerAdmin ? "Daily Tasks" : "Follow Ups"}
+                  </h2>
+
+                  <div className="space-y-3 pt-1">
+                    {isTelecaller || isTelecallerAdmin ? (
+                      <>
+                        <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                          <p className="text-[13px] font-bold text-slate-800">Scheduled Follow-ups</p>
+                          <p className="text-[11px] text-indigo-500 font-medium mt-1">{crmStats?.followups || 0} Task(s) remaining</p>
+                        </div>
+                        <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50">
+                          <p className="text-[13px] font-bold text-slate-800">Site Visits Planned</p>
+                          <p className="text-[11px] text-emerald-500 font-medium mt-1">{crmStats?.sitevisits || 0} Scheduled</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {followUps?.slice(0, 2).map((follow, i) => (
+                          <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                            <p className="text-[13px] font-bold text-slate-800">
+                              {follow.leadName}
+                            </p>
+                            <p className="text-[11px] text-indigo-500 font-medium mt-1">
+                              {follow.callbackAt ? new Date(follow.callbackAt).toLocaleString() : "TBD"}
+                            </p>
+                          </div>
+                        ))}
+                        {followUps?.length === 0 && (
+                          <p className="text-[10px] text-slate-400 italic">No scheduled follow-ups.</p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              {/* FOLLOW UPS */}
-              <div className="bg-white/80 rounded-xl border border-slate-200 p-4 shadow-sm">
-                <h2 className="text-base font-semibold text-slate-800 mb-3">
-                  {isTelecaller ? "Daily Tasks" : "Follow Ups"}
-                </h2>
-
-                <div className="space-y-3 pt-1">
-                  {isTelecaller ? (
-                    <>
-                      <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
-                        <p className="text-[13px] font-bold text-slate-800">Scheduled Follow-ups</p>
-                        <p className="text-[11px] text-indigo-500 font-medium mt-1">{crmStats?.followups || 0} Task(s) remaining</p>
-                      </div>
-                      <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50">
-                        <p className="text-[13px] font-bold text-slate-800">Site Visits Planned</p>
-                        <p className="text-[11px] text-emerald-500 font-medium mt-1">{crmStats?.sitevisits || 0} Scheduled</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {followUps?.slice(0, 2).map((follow, i) => (
-                        <div key={i} className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
-                          <p className="text-[13px] font-bold text-slate-800">
-                            {follow.leadName}
-                          </p>
-                          <p className="text-[11px] text-indigo-500 font-medium mt-1">
-                            {follow.callbackAt ? new Date(follow.callbackAt).toLocaleString() : "TBD"}
-                          </p>
-                        </div>
-                      ))}
-                      {followUps?.length === 0 && (
-                        <p className="text-[10px] text-slate-400 italic">No scheduled follow-ups.</p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useGetProjectById } from "@/hooks/useProject";
-import { updateProject, getAllHighways } from "../../services/project.service";
+import { updateProject, getAllProjectStatuses } from "../../services/project.service";
 import FileInput from "../../components/Common/FileUpload";
 import {
     MapPin,
@@ -32,7 +32,7 @@ const ProjectDetails = ({ projectId, onClose }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState(null);
-    const [highways, setHighways] = useState([]);
+    const [projectStatuses, setProjectStatuses] = useState([]);
 
     const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -70,16 +70,16 @@ const ProjectDetails = ({ projectId, onClose }) => {
 
     useEffect(() => {
         if (isEditing) {
-            fetchHighways();
+            fetchProjectStatuses();
         }
     }, [isEditing]);
 
-    const fetchHighways = async () => {
+    const fetchProjectStatuses = async () => {
         try {
-            const res = await getAllHighways();
-            if (res.success) setHighways(res.items);
+            const res = await getAllProjectStatuses();
+            if (res.success) setProjectStatuses(res.items);
         } catch (error) {
-            console.error("Error fetching highways:", error);
+            console.error("Error fetching project statuses:", error);
         }
     };
 
@@ -188,16 +188,16 @@ const ProjectDetails = ({ projectId, onClose }) => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 ml-1">Highway / Region</label>
+                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 ml-1">Project Status / Stage</label>
                                 <select
-                                    name="highwayId"
-                                    value={formData.highwayId || ""}
+                                    name="projectStatusId"
+                                    value={formData.projectStatusId || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-100 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all font-medium bg-white"
                                 >
-                                    <option value="">Select Highway</option>
-                                    {highways.map(h => (
-                                        <option key={h.id} value={h.id}>{h.highwayName}</option>
+                                    <option value="">Select Status</option>
+                                    {projectStatuses.map(s => (
+                                        <option key={s.id} value={s.id}>{s.statusName}</option>
                                     ))}
                                 </select>
                             </div>
@@ -533,7 +533,7 @@ const ProjectDetails = ({ projectId, onClose }) => {
                     <div>
                         <div className="flex items-center gap-2 text-white/80 text-[10px] font-bold uppercase tracking-wider mb-2">
                             <Layers className="w-4 h-4" />
-                            <span>{project.highway?.highwayName || "Venture"}</span>
+                            <span>{project.projectStatus?.statusName || "Venture"}</span>
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                             {project.projectName}

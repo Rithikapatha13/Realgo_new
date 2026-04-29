@@ -142,13 +142,15 @@ export default function Roles() {
                   <Pencil size={18} />
                 </button>
 
-                <button
-                  onClick={() => handleDelete(role)}
-                  className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Delete Role"
-                >
-                  <Trash2 size={18} />
-                </button>
+                {!['admin', 'pro', 'company', 'accounts'].includes(role.roleName?.toLowerCase()) && (
+                  <button
+                    onClick={() => handleDelete(role)}
+                    className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete Role"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
               </div>
             </div>
           </div>

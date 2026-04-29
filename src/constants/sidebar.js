@@ -28,6 +28,10 @@ import {
   Receipt,
   Clock,
   ListChecks,
+  CreditCard,
+  History,
+  Truck,
+  Car,
   Megaphone,
   UserPlus,
   BookOpenCheck,
@@ -41,13 +45,17 @@ import {
   Camera,
   Layers,
   List,
-  CreditCard,
   FileText,
   Repeat,
   TableProperties,
   CheckCircle2,
   Scale,
   LayoutList,
+  Briefcase,
+  ShieldCheck,
+  ImageIcon,
+  PlaySquare,
+  Lock,
 } from "lucide-react";
 import { GiVideoCamera } from "react-icons/gi";
 
@@ -112,12 +120,6 @@ export const tcGeneralMenu = {
       pageTitle: "Profile",
     },
     {
-      label: "My Team",
-      link: "/my-team",
-      icon: UserCheck,
-      pageTitle: "My Team",
-    },
-    {
       label: "Reports",
       link: "/reports",
       icon: BarChart3,
@@ -149,13 +151,6 @@ export const venturesMenu = {
       pageTitle: "Plots",
       subtitle: "Manage and view all plots",
     },
-    {
-      label: "Project Incentives",
-      link: "/project-incentives",
-      icon: BadgeIndianRupee,
-      pageTitle: "Project Incentives",
-      subtitle: "View project commission levels",
-    },
   ],
 };
 
@@ -163,8 +158,15 @@ export const venturesMenu = {
 export const administrationMenu = {
   label: "Administration",
   icon: User,
-  module: "ADMINISTRATION",
+  module: "ADMIN",
   children: [
+    {
+      label: "Admins",
+      link: "/administration/admins",
+      icon: ShieldCheck,
+      pageTitle: "Administrative Staff",
+      subtitle: "Manage admins and module heads",
+    },
     {
       label: "Admin",
       link: "/admin",
@@ -236,27 +238,57 @@ export const siteVisitsMenu = {
   label: "Site Visits",
   icon: MapPin,
   module: "SITE_VISITS",
-  children: [
-    {
-      label: "Site Visits",
-      link: "/Sitevisits",
-      icon: LayoutDashboard,
-      pageTitle: "Site Visits",
-      subtitle: "Manage and view all Site visits",
-    }
-  ],
+  link: "/site/dashboard",
+  pageTitle: "Site Visits",
+  subtitle: "Manage requests and logistics",
 };
 
 export const financeMenu = {
   label: "Finance",
   icon: Wallet,
+  module: "FINANCE",
   children: [
+    {
+      label: "Project Incentives",
+      link: "/project-incentives",
+      icon: BadgeIndianRupee,
+      pageTitle: "Project Incentives",
+      subtitle: "View project commission levels",
+    },
     {
       label: "Dashboard",
       link: "/finance",
       icon: LayoutDashboard,
       pageTitle: "Finance Dashboard",
       subtitle: "Overview of financial status",
+    },
+    {
+      label: "Contributions",
+      link: "/associate-contribution",
+      icon: BadgeIndianRupee,
+      pageTitle: "Associate Contributions",
+      subtitle: "Track plot-based commissions",
+    },
+    {
+      label: "Expenses",
+      link: "/associate-expense",
+      icon: Receipt,
+      pageTitle: "Associate Expenses",
+      subtitle: "Manage reimbursements",
+    },
+    {
+      label: "Payouts",
+      link: "/associate-payout",
+      icon: CreditCard,
+      pageTitle: "Associate Payouts",
+      subtitle: "Record actual payments",
+    },
+    {
+      label: "Audit Logs",
+      link: "/finance/audit-logs",
+      icon: History,
+      pageTitle: "Finance Audit Logs",
+      subtitle: "Monitor financial activities",
     },
     {
       label: "Account Tree",
@@ -404,77 +436,34 @@ export const telecallerAdministrationMenu = {
   ],
 };
 
-// ==================== ROLE-BASED MENUS ====================
-export const adminMenu = [
-  // 3. Marketing Admin
-  commonMenu,
-  venturesMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  marketingAdminCrmMenu,
-];
-
-export const telecallerAdminMenu = [
-  commonMenu,
-  venturesMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  telecallerAdminCrmMenu,
-];
-
-
-export const financeAdminMenu = [
-  // 5. Finance Admin
-  commonMenu,
-  venturesMenu,
-  administrationMenu,
-  financeMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  // No leads menu for finance admin
-];
-
-export const clientAdminMenu = [
-  // Client/Company Admin
-  commonMenu,
-  venturesMenu,
-  financeMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  clientAdminCrmMenu,
-];
-
-export const adminRoleMenu = [
-  commonMenu,
-  venturesMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
-  adminCrmMenu,
-];
-
-
-export const systemManagementMenu = {
-  label: "System",
-  icon: Settings,
-  module: "SYSTEM",
+export const financeCommonMenu = {
+  label: "Common",
+  icon: LayoutDashboard,
+  module: "GENERAL",
   children: [
     {
-      label: "Companies",
-      link: "/companies",
-      icon: Landmark,
-      pageTitle: "Companies",
-      subtitle: "Manage and view all registered companies",
+      label: "Home",
+      link: "/",
+      icon: LayoutDashboard,
+      pageTitle: "Home",
     },
     {
-      label: "System Dashboard",
-      link: "/system-dashboard",
-      icon: Activity,
-      pageTitle: "System Dashboard",
-      subtitle: "Global overview of the platform",
+      label: "Profile",
+      link: "/profile",
+      icon: Users,
+      pageTitle: "Profile",
+    },
+    {
+      label: "My Team",
+      link: "/my-team",
+      icon: UserCheck,
+      pageTitle: "My Team",
+    },
+    {
+      label: "Plots",
+      link: "/plots",
+      icon: MapPin,
+      pageTitle: "Plots Map",
     }
   ],
 };
@@ -515,6 +504,12 @@ export const financeConfigMenu = {
       pageTitle: "SubLedgers",
     },
     {
+      label: "Project Incentives",
+      link: "/project-incentives",
+      icon: BadgeIndianRupee,
+      pageTitle: "Project Incentives",
+    },
+    {
       label: "Parties",
       link: "/finance/parties",
       icon: Users,
@@ -528,6 +523,12 @@ export const financeTransactionMenu = {
   icon: Repeat,
   module: "FINANCE",
   children: [
+    {
+      label: "Transactions",
+      link: "/finance/transactions",
+      icon: Repeat,
+      pageTitle: "Transactions",
+    },
     {
       label: "General Receipt",
       link: "/finance/general-receipt",
@@ -545,12 +546,6 @@ export const financeTransactionMenu = {
       link: "/finance/journal-voucher",
       icon: FileText,
       pageTitle: "Journal Voucher",
-    },
-    {
-      label: "Transactions",
-      link: "/finance/transactions",
-      icon: Repeat,
-      pageTitle: "Transactions",
     },
     {
       label: "Cheque Detail",
@@ -617,84 +612,198 @@ export const financeReportMenu = {
   ]
 };
 
-// ==================== USER-LEVEL MENUS ====================
-export const accountsMenu = [
-  commonMenu,
-  financeConfigMenu,
-  financeTransactionMenu,
-  financeReportMenu,
+export const financeOperationMenu = {
+  label: "Accounts",
+  icon: BookMarked,
+  module: "FINANCE",
+  children: [
+    {
+      label: "Dashboard",
+      link: "/finance",
+      icon: LayoutDashboard,
+      pageTitle: "Finance Dashboard",
+    },
+    {
+      label: "Site Visits",
+      link: "/site/dashboard",
+      icon: MapPin,
+      pageTitle: "Site Visit Hub",
+    },
+    {
+      label: "Contributions",
+      link: "/associate-contribution",
+      icon: BadgeIndianRupee,
+      pageTitle: "Associate Contributions",
+    },
+    {
+      label: "Expenses",
+      link: "/associate-expense",
+      icon: Receipt,
+      pageTitle: "Associate Expenses",
+    },
+    {
+      label: "Payouts",
+      link: "/associate-payout",
+      icon: CreditCard,
+      pageTitle: "Associate Payouts",
+    },
+    {
+      label: "Audit Logs",
+      link: "/finance/audit-logs",
+      icon: History,
+      pageTitle: "Audit Logs",
+    },
+  ]
+};
+
+export const telecallerMenu = [
+  { type: "header", label: "Common" },
+  { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
+  { label: "Profile", link: "/profile", icon: User, pageTitle: "Profile", module: "GENERAL" },
+
+  { type: "header", label: "Leads" },
+  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+
+  { type: "header", label: "Analysis" },
+  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "CRM" },
+
+  { type: "header", label: "Media" },
+  { label: "News", link: "/news", icon: FileText, pageTitle: "Latest News", module: "MEDIA" },
 ];
+
+export const accountsMenu = [
+  { type: "header", label: "Common" },
+  ...financeCommonMenu.children,
+
+  { type: "header", label: "Configuration" },
+  ...financeConfigMenu.children,
+
+  { type: "header", label: "Transaction" },
+  ...financeTransactionMenu.children,
+
+  { type: "header", label: "Reports" },
+  ...financeReportMenu.children,
+
+  { type: "header", label: "Accounts" },
+  ...financeOperationMenu.children,
+];
+
+// ==================== ROLE-BASED MENUS ====================
+// ==================== MARKETING / ADMIN GROUPED MENU ====================
+export const adminMenu = [
+  { type: "header", label: "Common" },
+  { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
+  { label: "Profile", link: "/profile", icon: User, pageTitle: "Profile", module: "GENERAL" },
+  { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
+
+  { type: "header", label: "Analysis" },
+  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "GENERAL" },
+
+  { type: "header", label: "Ventures" },
+  { label: "Projects", link: "/projects", icon: Briefcase, pageTitle: "Projects", module: "VENTURES" },
+  { label: "Phases", link: "/phases", icon: Layers, pageTitle: "Phases", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
+
+  { type: "header", label: "Finance" },
+  { label: "Dashboard", link: "/finance", icon: LayoutDashboard, pageTitle: "Finance Dashboard", module: "FINANCE" },
+  { label: "Contributions", link: "/associate-contribution", icon: BadgeIndianRupee, pageTitle: "Associate Contributions", module: "FINANCE" },
+  { label: "Payouts", link: "/associate-payout", icon: CreditCard, pageTitle: "Associate Payouts", module: "FINANCE" },
+  { label: "Reports", link: "/finance/reports", icon: BarChart3, pageTitle: "Financial Reports", module: "FINANCE" },
+
+  { type: "header", label: "Administration" },
+  { label: "Users", link: "/users", icon: Users, pageTitle: "Users", module: "ADMIN" },
+  { label: "Admins", link: "/administration/admins", icon: ShieldCheck, pageTitle: "Admins", module: "ADMIN" },
+  { label: "Roles", link: "/roles", icon: Lock, pageTitle: "Roles", module: "ADMIN" },
+  { label: "Requests", link: "/all-requests", icon: MessageSquare, pageTitle: "Requests", module: "ADMIN" },
+
+  { type: "header", label: "Media" },
+  { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "MEDIA" },
+  { label: "Showcase", link: "/showcases", icon: ImageIcon, pageTitle: "Showcase", module: "MEDIA" },
+  { label: "News", link: "/news", icon: FileText, pageTitle: "News Feed", module: "MEDIA" },
+  { label: "Videos", link: "/videos", icon: PlaySquare, pageTitle: "Videos", module: "MEDIA" },
+
+  { type: "header", label: "CRM" },
+  { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+];
+
+export const telecallerAdminMenu = [
+  ...telecallerMenu,
+  { type: "header", label: "Admin Tools" },
+  { label: "Users", link: "/users", icon: Users, pageTitle: "Users" },
+  { label: "All Requests", link: "/all-requests", icon: MessageSquare, pageTitle: "Requests" },
+];
+
+export const financeAdminMenu = [
+  // 5. Finance Admin
+  ...accountsMenu,
+];
+
+export const clientAdminMenu = adminMenu;
+export const adminRoleMenu = adminMenu;
+
+
+export const systemManagementMenu = {
+  label: "System",
+  icon: Settings,
+  module: "SYSTEM",
+  children: [
+    {
+      label: "Companies",
+      link: "/companies",
+      icon: Landmark,
+      pageTitle: "Companies",
+      subtitle: "Manage and view all registered companies",
+    },
+    {
+      label: "System Dashboard",
+      link: "/system-dashboard",
+      icon: Activity,
+      pageTitle: "System Dashboard",
+      subtitle: "Global overview of the platform",
+    }
+  ],
+};
+
 
 export const superAdminMenu = [
   commonMenu,
   venturesMenu,
+  financeMenu,
   administrationMenu,
   mediaMenu,
   siteVisitsMenu,
   systemManagementMenu,
 ];
 
-export const telecallerMenu = [
-  tcGeneralMenu,
-  {
-    label: "Leads",
-    icon: Megaphone,
-    module: "CRM",
-    children: [
-      {
-        label: "Dashboard",
-        link: "/tc-dash",
-        icon: LayoutDashboard,
-        pageTitle: "Dashboard",
-      },
-      {
-        label: "My Leads",
-        link: "/leads",
-        icon: ClipboardCheck,
-        pageTitle: "Leads",
-      },
-      {
-        label: "Pending",
-        link: "/leads/pending",
-        icon: Clock,
-        pageTitle: "Pending Leads",
-      },
-      {
-        label: "Follow-ups",
-        link: "/leads/followups",
-        icon: Calendar,
-        pageTitle: "Follow-ups",
-      },
-      {
-        label: "Performance",
-        link: "/performance",
-        icon: TrendingUp,
-        pageTitle: "Performance Tracking",
-      },
-    ],
-  },
-];
-
-
 export const associateMenu = [
-  // Associate User — Integrated Leadflow & Realgo experience
-  commonMenu,
-  leadflowCrmMenu,
-  networkMenu,
-  venturesMenu,
-  mediaMenu,
-  {
-    label: "Notes",
-    link: "/notes",
-    icon: NotebookPen,
-    pageTitle: "Notes",
-  },
-  {
-    label: "Reminders",
-    link: "/reminders",
-    icon: Clock,
-    pageTitle: "Reminders",
-  },
+  { type: "header", label: "Common" },
+  { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
+  { label: "Profile", link: "/profile", icon: UserCircle, pageTitle: "Profile", module: "GENERAL" },
+  { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
+
+  { type: "header", label: "CRM" },
+  { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
+  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads", module: "CRM" },
+  { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+
+  { type: "header", label: "Ventures" },
+  { label: "Projects", link: "/projects", icon: Landmark, pageTitle: "Projects", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots", module: "VENTURES" },
+
+  { type: "header", label: "Media" },
+  { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "MEDIA" },
+  { label: "News", link: "/news", icon: Globe, pageTitle: "News", module: "MEDIA" },
+  { label: "Videos", link: "/videos", icon: Camera, pageTitle: "Videos", module: "MEDIA" },
+
+  { type: "header", label: "Tools" },
+  { label: "Notes", link: "/notes", icon: NotebookPen, pageTitle: "Notes", module: "GENERAL" },
+  { label: "Reminders", link: "/reminders", icon: Clock, pageTitle: "Reminders", module: "GENERAL" },
 ];
 
 // ==================== HELPER FUNCTION ====================
@@ -702,58 +811,47 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
   const roleKey = (role || "").toLowerCase().replace(/[\s_-]/g, "");
   const uType = (userType || "user").toLowerCase();
 
-  // Base menus for each role type
-  const baseMenus = {
-    // Admins
-    admin: adminRoleMenu, // Admin Specific
-    marketingadmin: adminMenu,
+  // 1. Identify Archetype based strictly on User Type (Table source)
+  let menu = null;
 
-    superadmin: superAdminMenu,
-    companyadmin: clientAdminMenu,
-    clientadmin: clientAdminMenu,
+  if (uType === "superadmin") {
+    menu = superAdminMenu;
+  } else if (roleKey.includes("finance") || roleKey.includes("account")) {
+    // If it's a finance/accounts role, use the specialized accountsMenu even if they are an admin
+    menu = accountsMenu;
+  } else if (roleKey.includes("telecaller")) {
+    // Specialized telecaller views
+    menu = roleKey.includes("admin") ? telecallerAdminMenu : telecallerMenu;
+  } else if (uType === "admin" || roleKey.includes("admin") || roleKey.includes("company")) {
+    // General Admins (ClientAdmin, Admin, Company Admin) or Marketing Admins get the full Admin Sidebar
+    menu = adminMenu;
+  } else {
+    // Everyone else (Director, Associate, etc.) defaults to the Associate view
+    menu = associateMenu;
+  }
 
-    // Specific Admins vs Users
-    telecaller: uType === "admin" ? telecallerAdminMenu : telecallerMenu,
-    telecalleradmin: telecallerAdminMenu,
-    telecaller_admin: telecallerAdminMenu,
+  // 2. Bypass strict filtering for core roles to ensure they always see their tools
+  const bypassFiltering = uType === "admin" || uType === "superadmin" || 
+    ["associate", "user", "accounts", "finance", "telecaller", "company", "manager", "lead", "asm", "rsm", "director", "marketing"].some(k => roleKey.includes(k));
 
-
-    accounts: uType === "admin" ? financeAdminMenu : accountsMenu,
-    finance: uType === "admin" ? financeAdminMenu : accountsMenu,
-
-    // Users / Field Roles
-    associate: associateMenu,
-    user: associateMenu,
-    salesmanager: associateMenu,
-    manager: associateMenu,
-    teamlead: associateMenu,
-    asm: associateMenu,
-    rsm: associateMenu,
-    marketingadmin: adminMenu,
-    telecalleradmin: telecallerAdminMenu,
-    financeadmin: financeAdminMenu,
-  };
-
-  const menu = baseMenus[roleKey] || (uType === "admin" ? adminMenu : associateMenu);
-
-  // For Field Roles (Associate, Manager, etc.), we bypass strict module filtering
-  // to ensure they see the core Leadflow and Network tools as requested.
-  const isFieldRole = ["associate", "user", "salesmanager", "manager", "teamlead", "asm", "rsm"].includes(roleKey);
-  if (isFieldRole || userModules.includes("ALL")) return menu;
-
-  // Cleanup: Remove any empty strings or nulls from the module array
-  const activeModules = (userModules || []).filter(m => m && m.trim() !== "");
-
-  // Migration Fallback: If NO valid modules are defined yet, show everything
-  if (activeModules.length === 0) {
+  if (bypassFiltering || userModules.includes("ALL") || userModules.length === 0) {
     return menu;
   }
 
-  return menu.filter(item => {
-    // General and System modules are always allowed
-    if (item.module === "GENERAL" || item.module === "SYSTEM") return true;
+  // 3. Module-based filtering for granular access (if defined)
+  const isActuallyAdmin = uType === "admin" || uType === "superadmin" || roleKey.includes("marketingadmin");
 
-    // Check if the specific module is enabled for this user's role
+  const activeModules = (userModules || []).filter(m => m && m.trim() !== "");
+  return menu.filter(item => {
+    // Hard security lock: Non-admins can NEVER see Administration
+    if (item.module === "ADMIN" && !isActuallyAdmin) return false;
+
+    // Hard security lock: Non-admins can ONLY see Projects and Plots in Ventures
+    if (item.module === "VENTURES" && !isActuallyAdmin) {
+      return item.label.includes("Projects") || item.label.includes("Plots");
+    }
+
+    if (item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK", "CRM"].includes(item.module)) return true;
     return activeModules.includes(item.module);
   });
 };

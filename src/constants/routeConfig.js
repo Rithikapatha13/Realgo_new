@@ -9,6 +9,7 @@ import Admin from "./../pages/administration/Admin";
 import Reports from "./../pages/General/Reports";
 import Notes from "./../pages/General/Notes";
 import Reminders from "./../pages/General/Reminders";
+import ProjectStatus from "./../pages/ProjectManagement/ProjectStatus";
 
 import UserReport from "./../pages/Reports/UserReport";
 import CompanyUsersReport from "./../pages/Reports/CompanyUsersReport";
@@ -57,12 +58,19 @@ import ProjectIncentives from "../pages/CRM/Incentives";
 import AddAssociate from "../pages/administration/AddAssociate";
 import BulkAssociateForm from "../pages/administration/Form/BulkAssociateForm";
 import EmeraldHomesMap from "../pages/Ventures/plotmap/EmeraldHomes";
+import AssociateContribution from "../pages/Finance/AssociateContribution";
+import AssociateExpense from "../pages/Finance/AssociateExpense";
+import AssociatePayout from "../pages/Finance/AssociatePayout";
+import FinanceAuditLogs from "../pages/Finance/FinanceAuditLogs";
+import SiteVisitDashboard from "../pages/Site/SiteVisitDashboard";
 import RealgoHeightsMap from "../pages/Ventures/plotmap/RealgoHeights";
 import FoxconnPlotsMap from "../pages/Ventures/plotmap/FoxconnPlotsMap";
 import GrupeSrinivasamPlotsMap from "../pages/Ventures/plotmap/GrupeSrinivasamPlotsMap";
 import GrupeLRGreenShieldsMap from "../pages/Ventures/plotmap/GrupeLRGreenShields";
 import GBApurvaHomesMap from "../pages/Ventures/plotmap/GBApurvaHomes";
 import AnvayUniversityCountyMap from "../pages/Ventures/plotmap/AnvayUniversityCounty";
+
+import Admins from "./../pages/Administration/Admins";
 
 export const publicRoutes = {
   auth: {
@@ -76,7 +84,7 @@ export const publicRoutes = {
 export const routeConfig = {
   General: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
     routes: [
       { path: "", component: Home },
       { path: "profile", component: Profile },
@@ -92,6 +100,7 @@ export const routeConfig = {
       { path: "/reports/sales", component: SalesReport },
       { path: "/reports/telecaller-performance", component: TelecallerPerformanceReport },
       { path: "/performance", component: PerformanceDashboard },
+      { path: "/administration/admins", component: Admins },
     ],
   },
   Administration: {
@@ -101,6 +110,7 @@ export const routeConfig = {
       { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
+      { path: "/administration/admins", component: Admins },
       { path: "/roles", component: Roles },
       { path: "/requests", component: Requests },
       { path: "/users/add", component: AddAssociate },
@@ -109,7 +119,7 @@ export const routeConfig = {
   },
   Media: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
     routes: [
       { path: "/greetings", component: Greetings },
       { path: "/news", component: News },
@@ -119,13 +129,15 @@ export const routeConfig = {
     ],
   },
   Site: {
-    basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
-    routes: [{ path: "sitevisits", component: SiteVisits }],
+    basePath: "/site",
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
+    routes: [
+      { path: "/dashboard", component: SiteVisitDashboard },
+    ],
   },
   Ventures: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
     routes: [
       { path: "plots", component: Plots },
       { path: "plots/map/:projectId", component: PlotMapView },
@@ -137,12 +149,13 @@ export const routeConfig = {
       { path: "plots/gb/apurvahomes", component: GBApurvaHomesMap },
       { path: "plots/anvay/universitycounty", component: AnvayUniversityCountyMap },
       { path: "Projects", component: Projects },
+      { path: "project-status", component: ProjectStatus },
 
     ],
   },
   Notifications: {
     basePath: "",
-    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
+    allowedRoles: ["admin", "associate", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
     routes: [{ path: "/notifications", component: Notifications }],
   },
   System: {
@@ -178,16 +191,21 @@ export const routeConfig = {
       { path: "/reports/trial-balance", component: FinanceReports },
       { path: "/reports/profit-loss", component: FinanceReports },
       { path: "/reports/balance-sheet", component: FinanceReports },
+      { path: "/project-incentives", component: ProjectIncentives },
+      { path: "/associate-contribution", component: AssociateContribution },
+      { path: "/associate-expense", component: AssociateExpense },
+      { path: "/associate-payout", component: AssociatePayout },
+      { path: "/audit-logs", component: FinanceAuditLogs },
     ],
   },
   CRM: {
     basePath: "/",
-    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm"],
+    allowedRoles: ["admin", "associate", "superadmin", "clientadmin", "companyadmin", "telecalleradmin", "telecaller", "salesmanager", "manager", "teamlead", "asm", "rsm", "director"],
     routes: [
       { path: "/crm-dashboard", component: CRMDashboard },
       { path: "/associate-dash", component: AssociateDash },
       { path: "/tc-dash", component: TcDash },
-      { path: "/project-incentives", component: ProjectIncentives },
+      { path: "/tc-dash", component: TcDash },
       { path: "/customer-sitevisits", component: SiteVisits },
       { path: "/leads", component: Leads },
       { path: "/leads/upload", component: UploadLeads },

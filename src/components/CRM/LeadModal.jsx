@@ -58,7 +58,7 @@ export default function LeadModal({ lead, onClose, onSaved }) {
       <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-lg shadow-xl animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-bold text-xl flex items-center gap-2 text-slate-900">
-            {lead ? "Edit Lead" : "Add Lead"}
+            {lead ? "Edit Lead" : "Add New Lead"}
           </h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-all">
             <X size={20} />
@@ -69,52 +69,52 @@ export default function LeadModal({ lead, onClose, onSaved }) {
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Name *</label>
             <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input
-                    className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                    placeholder="Enter full name"
-                    value={form.leadName}
-                    onChange={(e) => setForm({ ...form, leadName: e.target.value })}
-                />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <input
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
+                placeholder="Enter full name"
+                value={form.leadName}
+                onChange={(e) => setForm({ ...form, leadName: e.target.value })}
+              />
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone *</label>
             <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input
-                    className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                    placeholder="Enter phone number"
-                    value={form.leadContact}
-                    onChange={(e) => setForm({ ...form, leadContact: e.target.value })}
-                />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <input
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
+                placeholder="Enter phone number"
+                value={form.leadContact}
+                onChange={(e) => setForm({ ...form, leadContact: e.target.value })}
+              />
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email</label>
             <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input
-                    className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                    placeholder="example@email.com"
-                    value={form.leadEmail}
-                    onChange={(e) => setForm({ ...form, leadEmail: e.target.value })}
-                />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <input
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
+                placeholder="example@email.com"
+                value={form.leadEmail}
+                onChange={(e) => setForm({ ...form, leadEmail: e.target.value })}
+              />
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">City/Location</label>
             <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input
-                    className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
-                    placeholder="Enter city or area"
-                    value={form.leadCity}
-                    onChange={(e) => setForm({ ...form, leadCity: e.target.value })}
-                />
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <input
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
+                placeholder="Enter city or area"
+                value={form.leadCity}
+                onChange={(e) => setForm({ ...form, leadCity: e.target.value })}
+              />
             </div>
           </div>
 
@@ -125,27 +125,27 @@ export default function LeadModal({ lead, onClose, onSaved }) {
               value={form.leadSource}
               onChange={(e) => setForm({ ...form, leadSource: e.target.value })}
             >
-                <option value="SELF">Self Generated</option>
-                <option value="WEBSITE">Website</option>
-                <option value="SOCIAL_MEDIA">Social Media</option>
-                <option value="REFERRAL">Referral</option>
-                <option value="WALK_IN">Walk In</option>
-                <option value="OTHER">Other</option>
+              <option value="SELF">Self Generated</option>
+              <option value="WEBSITE">Website</option>
+              <option value="SOCIAL_MEDIA">Social Media</option>
+              <option value="REFERRAL">Referral</option>
+              <option value="WALK_IN">Walk In</option>
+              <option value="OTHER">Other</option>
             </select>
           </div>
         </div>
 
         <div className="flex gap-3 pt-4 border-t border-slate-100">
-          <button 
-            onClick={onClose} 
-            className="px-6 py-2.5 rounded-lg border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-lg border border-slate-200 text-slate-600 bg-gray-100 font-bold text-sm hover:bg-slate-200 transition-all"
           >
             Cancel
           </button>
-          <button 
-            onClick={submit} 
-            disabled={loading} 
-            className="flex-1 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2"
+          <button
+            onClick={submit}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-black font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Plus size={18} /> {lead ? "Update Lead" : "Add Lead"}</>}
           </button>

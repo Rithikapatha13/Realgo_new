@@ -7,6 +7,9 @@ import { toast } from "react-hot-toast";
 import { resolveImageUrl } from "@/utils/common";
 
 const AVAILABLE_MODULES = [
+  { id: "MARKETING", label: "MARKETING" },
+  { id: "CRM", label: "CRM" },
+  { id: "FINANCE", label: "FINANCE" },
   { id: "ADMIN", label: "ADMIN" },
   { id: "USER", label: "USER" },
   { id: "ROLES", label: "ROLES" },
@@ -145,6 +148,24 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
         });
       }
 
+      if (moduleId === "MARKETING" && !isSelected) {
+        ["PROJECTS", "PLOTS", "PHASES", "LEADS"].forEach(m => {
+          if (!newModules.includes(m)) newModules.push(m);
+        });
+      }
+      
+      if (moduleId === "CRM" && !isSelected) {
+        ["LEADS", "FOLLOWUP"].forEach(m => {
+          if (!newModules.includes(m)) newModules.push(m);
+        });
+      }
+
+      if (moduleId === "FINANCE" && !isSelected) {
+        ["ACCOUNTS", "PROJECT INCENTIVES"].forEach(m => {
+          if (!newModules.includes(m)) newModules.push(m);
+        });
+      }
+
       return { ...prev, modules: newModules };
     });
   };
@@ -246,8 +267,8 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Owner First Name<span className="text-red-500">*</span></label>
-              <input type="text" name="ownerFirstName" value={formData.ownerFirstName} onChange={handleChange} required className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Owner First Name</label>
+              <input type="text" name="ownerFirstName" value={formData.ownerFirstName} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary-500 focus:border-primary-500 bg-gray-50 uppercase font-medium" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Owner Last Name</label>
@@ -354,7 +375,7 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
 
       {/* 5. Domain */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1">Domain<span className="text-red-500">*</span></label>
+        <label className="block text-sm font-medium text-gray-800 mb-1">Domain</label>
         <input
           type="text"
           name="domain"
@@ -363,13 +384,12 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
           disabled={isView}
           placeholder="For example, www.companyname.com"
           className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 disabled:bg-gray-100 disabled:text-gray-500"
-          required
         />
       </div>
 
       {/* 6. Company Term */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1">Company Term<span className="text-red-500">*</span></label>
+        <label className="block text-sm font-medium text-gray-800 mb-1">Company Term</label>
         <p className="text-xs text-gray-500 mb-2">Please enter a term that describes your affiliation with the company (e.g., 'Appleian' for Apple, 'Teslaian' for Tesla).</p>
         <input
           type="text"
@@ -378,7 +398,6 @@ export default function CompanyForm({ company, action, onClose, onRefetch }) {
           onChange={handleChange}
           disabled={isView}
           className="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 disabled:bg-gray-100 disabled:text-gray-500"
-          required
         />
       </div>
 

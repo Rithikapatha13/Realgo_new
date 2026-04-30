@@ -14,3 +14,8 @@ export const deleteShowcase = async (id) => {
     const { data } = await apiClient.delete(`/showcases/${id}`);
     return data;
 };
+
+export const updateShowcaseStatus = async (id, status) => {
+    const { data } = await apiClient.patch(`/showcases/${id}`, { status });
+    return data;
+};

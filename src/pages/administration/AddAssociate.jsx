@@ -19,21 +19,36 @@ const STEPS = [
 export default function AddAssociate() {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
-  const { register, handleSubmit, control, formState: { errors }, watch, trigger } = useForm({
+  const loggedInUser = getUser();
+  const userType = (loggedInUser?.userType || "").toLowerCase();
+  const isAssociateUser = userType === "user";
+
+  const { register, handleSubmit, control, formState: { errors }, watch, trigger, setValue } = useForm({
     defaultValues: {
       status: "PENDING",
       gender: "MALE",
       bloodGroup: "O_POS",
+      referId: isAssociateUser ? loggedInUser.id : "",
     }
   });
 
   const { mutateAsync: addUser, isPending: isAdding } = useAddUser();
   const { data: rolesResponse } = useGetAllRoles();
   const { data: parentsResponse } = useGetPotentialParents();
-  const loggedInUser = getUser();
 
-  const rolesList = rolesResponse?.roles || [];
+  const allRoles = rolesResponse?.roles || [];
+  const rolesList = isAssociateUser 
+    ? allRoles.filter(r => r.roleName.toLowerCase() === "associate" || r.roleName.toLowerCase() === "user")
+    : allRoles;
+    
   const parentsList = parentsResponse?.data?.items || [];
+
+  // Auto-select associate role if only one is available
+  useEffect(() => {
+    if (isAssociateUser && rolesList.length > 0) {
+      setValue("roleId", rolesList[0].id);
+    }
+  }, [isAssociateUser, rolesList, setValue]);
 
     const nextStep = async () => {
         // Validate current step before moving
@@ -297,7 +312,10 @@ export default function AddAssociate() {
                         <CustomSelect
                           label="Immediate Leader / Upliner"
                           {...field}
-                          options={[
+                          disabled={isAssociateUser}
+                          options={isAssociateUser ? [
+                            { label: `${loggedInUser.firstName} ${loggedInUser.lastName} (You)`, value: loggedInUser.id }
+                          ] : [
                             { label: "Direct (No Leader)", value: "" },
                             ...parentsList.map(parent => ({
                               label: parent.label,

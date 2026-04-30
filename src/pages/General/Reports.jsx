@@ -75,6 +75,15 @@ const ALL_REPORT_CARDS = {
     bg: "bg-amber-50",
     iconColor: "text-amber-600",
   },
+  performance: {
+    title: "Performance Tracking",
+    subtitle: "Track performance of all associates",
+    icon: TrendingUp,
+    path: "/performance",
+    gradient: "from-blue-500 to-cyan-500",
+    bg: "bg-blue-50",
+    iconColor: "text-blue-600",
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -94,12 +103,12 @@ function getReportCards(roleKey, userType) {
 
   // Company admin / client admin
   if (COMPANY_ADMIN_ROLES.includes(roleKey)) {
-    return ["plots", "sales", "users", "companyUsers", "telecallerPerformance"];
+    return ["performance", "plots", "sales", "users", "companyUsers", "telecallerPerformance"];
   }
 
   // Marketing / regular admin
   if (MARKETING_ADMIN_ROLES.includes(roleKey)) {
-    return ["plots", "sales", "users", "companyUsers"];
+    return ["performance", "plots", "sales", "users", "companyUsers"];
   }
 
   // Associates / team leads

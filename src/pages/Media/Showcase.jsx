@@ -15,7 +15,8 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGetShowcasesData, useDeleteShowcase } from "@/hooks/useShowcase";
+import { resolveImageUrl } from "@/utils/common";
+import { useGetShowcasesData, useDeleteShowcase, useUpdateShowcaseStatus } from "@/hooks/useShowcase";
 import { LoadingIndicator } from "@/components";
 import { getUser } from "@/services/auth.service";
 import toast from "react-hot-toast";
@@ -33,9 +34,10 @@ export default function Showcase() {
   });
 
   const deleteMutation = useDeleteShowcase();
+  const updateStatusMutation = useUpdateShowcaseStatus();
   const items = showcaseResponse?.items || [];
 
-  const categories = ["ALL", "CERTIFICATE", "AWARD", "SITE_VISIT", "MARKETING"];
+  const categories = ["ALL", "CERTIFICATE", "AWARD", "SITE_VISIT", "MARKETING", "POPUP_PORTRAIT", "POPUP_LANDSCAPE"];
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this showcase item?")) {
@@ -46,6 +48,16 @@ export default function Showcase() {
       } catch (error) {
         toast.error("Failed to remove item");
       }
+    }
+  };
+
+  const handleToggleStatus = async (item) => {
+    const newStatus = item.status === "DISABLED" ? "VERIFIED" : "DISABLED";
+    try {
+      await updateStatusMutation.mutateAsync({ id: item.id, status: newStatus });
+      toast.success(`Showcase ${newStatus === "DISABLED" ? "disabled" : "enabled"}`);
+    } catch (error) {
+      toast.error("Failed to update status");
     }
   };
 
@@ -114,9 +126,9 @@ export default function Showcase() {
                 <div className="relative">
                   {item.fileName ? (
                     <img
-                      src={`${import.meta.env.VITE_S3_URL}${item.fileName}`}
+                      src={resolveImageUrl(item.fileName)}
                       alt={item.fileCategory}
-                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                      className={`w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105 ${item.status === 'DISABLED' ? 'grayscale opacity-50' : ''}`}
                     />
                   ) : (
                     <div className="w-full h-64 flex items-center justify-center bg-gray-50 text-gray-200">
@@ -138,8 +150,12 @@ export default function Showcase() {
                   </div>
 
                   {/* Top Status Indicators */}
-                  <div className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-secondary-500/10 backdrop-blur-md text-[9px] font-bold text-secondary-500 shadow-sm border border-secondary-500/20 flex items-center gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <CheckCircle2 size={10} className="text-secondary-500" />
+                  <div className={`absolute top-3 left-3 px-2 py-1 rounded-lg backdrop-blur-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity ${item.status === 'DISABLED' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-secondary-500/10 text-secondary-500 border-secondary-500/20'}`}>
+                    {item.status === 'DISABLED' ? (
+                      <X size={10} className="text-red-500" />
+                    ) : (
+                      <CheckCircle2 size={10} className="text-secondary-500" />
+                    )}
                     {item.status || "VERIFIED"}
                   </div>
                 </div>
@@ -156,12 +172,25 @@ export default function Showcase() {
                   </div>
 
                   {isAdmin && (
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="p-1.5 text-gray-300 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Toggle Switch */}
+                      <button
+                        onClick={() => handleToggleStatus(item)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${item.status === 'DISABLED' ? 'bg-gray-200' : 'bg-primary-500'}`}
+                        title={item.status === 'DISABLED' ? "Enable Showcase" : "Disable Showcase"}
+                      >
+                        <span
+                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${item.status === 'DISABLED' ? 'translate-x-1' : 'translate-x-5'}`}
+                        />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-1.5 text-gray-300 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

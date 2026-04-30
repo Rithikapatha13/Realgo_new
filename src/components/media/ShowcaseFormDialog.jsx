@@ -22,7 +22,8 @@ export default function ShowcaseFormDialog({ isOpen, onClose, onRefetch }) {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (fileName) => {
+    const handleFileChange = (e) => {
+        const fileName = e.target.value;
         setFormData((prev) => ({ ...prev, fileName: fileName }));
     };
 
@@ -79,7 +80,7 @@ export default function ShowcaseFormDialog({ isOpen, onClose, onRefetch }) {
                         </label>
                         <div className="p-1 bg-gray-50 rounded-2xl border border-gray-100">
                             <FileUpload
-                                onUploadSuccess={handleFileChange}
+                                onChange={handleFileChange}
                                 existingFile={formData.fileName}
                                 folder="showcase"
                             />
@@ -101,6 +102,8 @@ export default function ShowcaseFormDialog({ isOpen, onClose, onRefetch }) {
                                 <option value="AWARD">Award</option>
                                 <option value="SITE_VISIT">Site Photo</option>
                                 <option value="MARKETING">Marketing Material</option>
+                                <option value="POPUP_PORTRAIT">Popup Portrait</option>
+                                <option value="POPUP_LANDSCAPE">Popup Landscape</option>
                             </select>
                         </div>
 
@@ -116,6 +119,7 @@ export default function ShowcaseFormDialog({ isOpen, onClose, onRefetch }) {
                             >
                                 <option value="VERIFIED">Verified</option>
                                 <option value="PENDING">Review Pending</option>
+                                <option value="DISABLED">Disabled (Stop Popup)</option>
                                 <option value="NONE">No Badge</option>
                             </select>
                         </div>

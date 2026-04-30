@@ -365,44 +365,44 @@ export default function Home() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {isTelecaller || isTelecallerAdmin || isAssociate ? (
               <>
-                <MinimalKpi 
-                  title="Total Leads" 
-                  value={isAssociate ? (stats?.summary?.totalLeads || 0) : (crmStats?.total || '0')} 
-                  icon={Users} 
+                <MinimalKpi
+                  title="Total Leads"
+                  value={isAssociate ? (stats?.summary?.totalLeads || 0) : (crmStats?.total || '0')}
+                  icon={Users}
                   onClick={() => navigate("/leads")}
                 />
-                <MinimalKpi 
-                  title="Hot Leads" 
-                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'HOT').length || 0) : (crmStats?.hot || '0')} 
-                  icon={Flame} 
+                <MinimalKpi
+                  title="Hot Leads"
+                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'HOT').length || 0) : (crmStats?.hot || '0')}
+                  icon={Flame}
                   onClick={() => navigate("/leads?status=HOT")}
                 />
-                <MinimalKpi 
-                  title="Warm Leads" 
-                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'WARM').length || 0) : (crmStats?.warm || '0')} 
-                  icon={Activity} 
+                <MinimalKpi
+                  title="Warm Leads"
+                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'WARM').length || 0) : (crmStats?.warm || '0')}
+                  icon={Activity}
                   onClick={() => navigate("/leads?status=WARM")}
                 />
-                <MinimalKpi 
-                  title="Site Visits" 
-                  value={isAssociate ? (stats?.summary?.sitevisits || 0) : (crmStats?.sitevisits || '0')} 
-                  icon={Clock} 
+                <MinimalKpi
+                  title="Site Visits"
+                  value={isAssociate ? (stats?.summary?.sitevisits || 0) : (crmStats?.sitevisits || '0')}
+                  icon={Clock}
                   onClick={() => navigate("/leads?status=SITEVISIT")}
                 />
               </>
             ) : (
               <>
-                <MinimalKpi 
-                  title="Admins" 
-                  value={stats?.summary?.totalAdmins || "0"} 
-                  icon={ShieldCheck} 
+                <MinimalKpi
+                  title="Admins"
+                  value={stats?.summary?.totalAdmins || "0"}
+                  icon={ShieldCheck}
                   onClick={() => navigate("/admin")}
                 />
                 <div className="relative">
-                  <MinimalKpi 
-                    title="Associates" 
-                    value={stats?.summary?.totalUsers || "0"} 
-                    icon={Users} 
+                  <MinimalKpi
+                    title="Associates"
+                    value={stats?.summary?.totalUsers || "0"}
+                    icon={Users}
                     onClick={() => navigate("/users")}
                   />
                   <button
@@ -413,16 +413,16 @@ export default function Home() {
                     <Plus size={12} className="text-slate-600" />
                   </button>
                 </div>
-                <MinimalKpi 
-                  title="Projects" 
-                  value={stats?.summary?.totalProjects || "0"} 
-                  icon={Briefcase} 
+                <MinimalKpi
+                  title="Projects"
+                  value={stats?.summary?.totalProjects || "0"}
+                  icon={Briefcase}
                   onClick={() => navigate("/projects")}
                 />
-                <MinimalKpi 
-                  title="Leads" 
-                  value={stats?.summary?.totalLeads || "0"} 
-                  icon={UserCheck} 
+                <MinimalKpi
+                  title="Leads"
+                  value={stats?.summary?.totalLeads || "0"}
+                  icon={UserCheck}
                   onClick={() => navigate("/leads")}
                 />
               </>
@@ -439,8 +439,8 @@ export default function Home() {
                 </h2>
                 <div className="space-y-4">
                   {['HOT', 'WARM', 'COLD'].map(s => {
-                    const count = isAssociate 
-                      ? leads?.filter(l => l.leadStatus === s).length 
+                    const count = isAssociate
+                      ? leads?.filter(l => l.leadStatus === s).length
                       : (crmStats?.[s.toLowerCase()] || 0);
                     const total = isAssociate ? (leads?.length || 1) : (crmStats?.total || 1);
                     return <StatusRow key={s} label={s} value={count} total={total} color={s === 'HOT' ? 'bg-rose-500' : s === 'WARM' ? 'bg-amber-500' : 'bg-slate-400'} />;
@@ -731,9 +731,9 @@ function StatusRow({ label, value, total = 1, color = "bg-primary-500" }) {
         <span className="font-semibold text-slate-900">{value}</span>
       </div>
       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div 
-          className={`h-full ${color} rounded-full transition-all duration-500`} 
-          style={{ width: `${Math.min(((value || 0) / (total || 1)) * 100, 100)}%` }} 
+        <div
+          className={`h-full ${color} rounded-full transition-all duration-500`}
+          style={{ width: `${Math.min(((value || 0) / (total || 1)) * 100, 100)}%` }}
         />
       </div>
     </div>

@@ -25,6 +25,7 @@ import {
   Pie
 } from "recharts";
 import { getPerformanceStats } from "@/services/performance.service";
+import { getUser } from "@/services/auth.service";
 import { toast } from "react-hot-toast";
 
 const CHART_COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
@@ -62,6 +63,14 @@ export default function PerformanceDashboard() {
 
   if (!stats) return null;
 
+  const user = getUser();
+  const userModules = user?.roleModules || [];
+  const isSuperAdmin = user?.userType === "superadmin";
+
+  const showFinance = isSuperAdmin || userModules.includes("ALL") || userModules.includes("FINANCE");
+  const showCRM = isSuperAdmin || userModules.includes("ALL") || userModules.includes("CRM");
+  const showMarketing = isSuperAdmin || userModules.includes("ALL") || userModules.includes("MARKETING");
+
   const totalRevenue = stats.accounts.summary.reduce((a,c) => a+c.total, 0);
   const totalLeads = stats.telecaller.summary.reduce((a,c) => a+c.count, 0);
   const networkSize = stats.associate.totalAssociates || 0;
@@ -86,79 +95,90 @@ export default function PerformanceDashboard() {
 
       {/* TOP KPI ROW */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <NeatKPICard 
-          title="Total Revenue" 
-          value={`₹${(totalRevenue / 100000).toFixed(2)}L`}
-          trend="+12%"
-          icon={Wallet}
-        />
-        <NeatKPICard 
-          title="Leads Processed" 
-          value={totalLeads}
-          trend="+5%"
-          icon={PhoneCall}
-        />
-        <NeatKPICard 
-          title="Network Size" 
-          value={networkSize}
-          trend={`+${stats.associate.newAssociates}`}
-          icon={Users}
-        />
-        <NeatKPICard 
-          title="Conversion Rate" 
-          value={`${(Math.random() * 5 + 2).toFixed(1)}%`}
-          trend="+2%"
-          icon={TrendingUp}
-        />
+        {showFinance && (
+          <NeatKPICard 
+            title="Total Revenue" 
+            value={`₹${(totalRevenue / 100000).toFixed(2)}L`}
+            trend="+12%"
+            icon={Wallet}
+          />
+        )}
+        {showCRM && (
+          <NeatKPICard 
+            title="Leads Processed" 
+            value={totalLeads}
+            trend="+5%"
+            icon={PhoneCall}
+          />
+        )}
+        {showMarketing && (
+          <>
+            <NeatKPICard 
+              title="Network Size" 
+              value={networkSize}
+              trend={`+${stats.associate.newAssociates}`}
+              icon={Users}
+            />
+            <NeatKPICard 
+              title="Conversion Rate" 
+              value={`${(Math.random() * 5 + 2).toFixed(1)}%`}
+              trend="+2%"
+              icon={TrendingUp}
+            />
+          </>
+        )}
       </div>
 
       {/* DETAILED CONTENT */}
       <div className="space-y-12">
         
         {/* 1. FINANCIAL ANALYSIS */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 border-l-4 border-primary-500 pl-4">Financial Module Analysis</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Revenue Trend</p>
-              {stats.accounts.trend.length > 0 ? (
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stats.accounts.trend}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="date" hide />
-                      <YAxis hide />
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      />
-                      <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} fill="#eef2ff" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : <EmptyState message="No revenue recorded" />}
-            </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Ledger Breakdown</p>
-              {stats.accounts.summary.length > 0 ? (
-                <div className="space-y-3">
-                  {stats.accounts.summary.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
-                      <div>
-                        <span className="text-sm font-bold text-slate-700">{item.type}</span>
-                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">{item.count} operations</p>
+        {showFinance && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-slate-800 border-l-4 border-primary-500 pl-4">Financial Module Analysis</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Revenue Trend</p>
+                {stats.accounts.trend.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={stats.accounts.trend}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="date" hide />
+                        <YAxis hide />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        />
+                        <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} fill="#eef2ff" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : <EmptyState message="No revenue recorded" />}
+              </div>
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Ledger Breakdown</p>
+                {stats.accounts.summary.length > 0 ? (
+                  <div className="space-y-3">
+                    {stats.accounts.summary.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <div>
+                          <span className="text-sm font-bold text-slate-700">{item.type}</span>
+                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">{item.count} operations</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-base font-bold text-slate-900">₹{(item.total / 1000).toFixed(1)}k</div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-base font-bold text-slate-900">₹{(item.total / 1000).toFixed(1)}k</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : <EmptyState message="No entries found" />}
+                    ))}
+                  </div>
+                ) : <EmptyState message="No entries found" />}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 2. CRM EFFICIENCY */}
+        {showCRM && (
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-slate-800 border-l-4 border-primary-500 pl-4">CRM & Lead Interaction</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -202,8 +222,10 @@ export default function PerformanceDashboard() {
             </div>
           </div>
         </div>
+        )}
 
         {/* 3. ASSOCIATE PERFORMANCE */}
+        {showMarketing && (
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-slate-800 border-l-4 border-primary-500 pl-4">Associate & Team Growth</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -276,6 +298,7 @@ export default function PerformanceDashboard() {
             </div>
           </div>
         </div>
+        )}
 
       </div>
 

@@ -93,7 +93,7 @@ const SVGOverlayComponent = ({ projectName, plotDetails, onPlotClick, bounds }) 
                     map.removeLayer(overlayRef.current);
                 }
 
-                const svgOverlay = L.svgOverlay(svgElement, bounds || [[0, 0], [1000, 1000]]).addTo(map);
+                const svgOverlay = L.svgOverlay(svgElement, bounds || [[0, 0], [1000, 1000]], { interactive: true }).addTo(map);
                 overlayRef.current = svgOverlay;
             })
             .catch((err) => console.error("Error loading SVG:", err));

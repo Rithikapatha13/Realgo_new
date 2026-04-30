@@ -179,7 +179,7 @@ export const administrationMenu = {
       link: "/requests",
       icon: LayoutDashboard,
       pageTitle: "Requests",
-      subtitle: "Manage and view all requests",
+      subtitle: "Review and manage administrative requests",
     },
     {
       label: "Roles",
@@ -668,7 +668,7 @@ export const telecallerMenu = [
   { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
 
   { type: "header", label: "Analysis" },
-  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "CRM" },
+  { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "CRM" },
 
   { type: "header", label: "Media" },
   { label: "News", link: "/news", icon: FileText, pageTitle: "Latest News", module: "MEDIA" },
@@ -700,7 +700,7 @@ export const adminMenu = [
   { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
 
   { type: "header", label: "Analysis" },
-  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "GENERAL" },
+  { label: "Performance", link: "/reports", icon: BarChart3, pageTitle: "Performance", module: "GENERAL" },
 
   { type: "header", label: "Ventures" },
   { label: "Projects", link: "/projects", icon: Briefcase, pageTitle: "Projects", module: "VENTURES" },
@@ -717,7 +717,7 @@ export const adminMenu = [
   { label: "Users", link: "/users", icon: Users, pageTitle: "Users", module: "ADMIN" },
   { label: "Admins", link: "/administration/admins", icon: ShieldCheck, pageTitle: "Admins", module: "ADMIN" },
   { label: "Roles", link: "/roles", icon: Lock, pageTitle: "Roles", module: "ADMIN" },
-  { label: "Requests", link: "/all-requests", icon: MessageSquare, pageTitle: "Requests", module: "ADMIN" },
+  { label: "Requests", link: "/requests", icon: MessageSquare, pageTitle: "Requests", module: "ADMIN" },
 
   { type: "header", label: "Media" },
   { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "MEDIA" },
@@ -735,7 +735,6 @@ export const telecallerAdminMenu = [
   ...telecallerMenu,
   { type: "header", label: "Admin Tools" },
   { label: "Users", link: "/users", icon: Users, pageTitle: "Users" },
-  { label: "All Requests", link: "/all-requests", icon: MessageSquare, pageTitle: "Requests" },
 ];
 
 export const financeAdminMenu = [
@@ -811,49 +810,92 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
   const roleKey = (role || "").toLowerCase().replace(/[\s_-]/g, "");
   const uType = (userType || "user").toLowerCase();
 
+  // Determine if this is a Marketing Admin (not a full/client admin)
+  const isMarketingAdmin = roleKey.includes("marketingadmin") && !roleKey.includes("clientadmin");
+
   // 1. Identify Archetype based strictly on User Type (Table source)
   let menu = null;
 
   if (uType === "superadmin") {
     menu = superAdminMenu;
   } else if (roleKey.includes("finance") || roleKey.includes("account")) {
-    // If it's a finance/accounts role, use the specialized accountsMenu even if they are an admin
     menu = accountsMenu;
   } else if (roleKey.includes("telecaller")) {
-    // Specialized telecaller views
     menu = roleKey.includes("admin") ? telecallerAdminMenu : telecallerMenu;
   } else if (uType === "admin" || roleKey.includes("admin") || roleKey.includes("company")) {
-    // General Admins (ClientAdmin, Admin, Company Admin) or Marketing Admins get the full Admin Sidebar
     menu = adminMenu;
   } else {
-    // Everyone else (Director, Associate, etc.) defaults to the Associate view
     menu = associateMenu;
   }
 
-  // 2. Bypass strict filtering for core roles to ensure they always see their tools
-  const bypassFiltering = uType === "admin" || uType === "superadmin" || 
-    ["associate", "user", "accounts", "finance", "telecaller", "company", "manager", "lead", "asm", "rsm", "director", "marketing"].some(k => roleKey.includes(k));
+  // Helper to remove empty section headers
+  const removeEmptyHeaders = (arr) => arr.filter((item, index, array) => {
+    if (item.type === "header") {
+      if (index === array.length - 1) return false;
+      if (array[index + 1].type === "header") return false;
+    }
+    return true;
+  });
 
-  if (bypassFiltering || userModules.includes("ALL") || userModules.length === 0) {
-    return menu;
+  // 2. Apply hard role-level strips BEFORE any module check
+  // Sub-admins (userType === "admin", often used as Marketing Admins) NEVER see Finance
+  // Finance is strictly for Client Admin / Super Admin or dedicated Finance roles
+  const isFinanceRole = roleKey.includes("finance") || roleKey.includes("account");
+  if (uType === "admin" && !isFinanceRole) {
+    menu = menu.filter(item => item.module !== "FINANCE");
   }
 
-  // 3. Module-based filtering for granular access (if defined)
-  const isActuallyAdmin = uType === "admin" || uType === "superadmin" || roleKey.includes("marketingadmin");
+  // 3. Super Admins bypass module filtering (but still respect role strips above)
+  if (uType === "superadmin" || userModules.includes("ALL")) {
+    return removeEmptyHeaders(menu);
+  }
 
+  // 4. Module-based Gatekeeper filtering for granular access
+  const isActuallyAdmin = uType === "admin" || uType === "superadmin" || roleKey.includes("marketingadmin") || roleKey.includes("company");
   const activeModules = (userModules || []).filter(m => m && m.trim() !== "");
-  return menu.filter(item => {
-    // Hard security lock: Non-admins can NEVER see Administration
-    if (item.module === "ADMIN" && !isActuallyAdmin) return false;
 
-    // Hard security lock: Non-admins can ONLY see Projects and Plots in Ventures
-    if (item.module === "VENTURES" && !isActuallyAdmin) {
-      return item.label.includes("Projects") || item.label.includes("Plots");
+  const fallbackFiltered = menu.filter(item => item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK"].includes(item.module));
+
+  // If a company has no modules assigned yet, fallback to basics to prevent lockout
+  if (activeModules.length === 0) {
+    return removeEmptyHeaders(fallbackFiltered);
+  }
+
+  const filtered = menu.filter(item => {
+    // Basic types that are always shown
+    if (item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK"].includes(item.module)) return true;
+
+    // Hard security lock: Non-admins can NEVER see Administration
+    if (item.module === "ADMIN") {
+      if (!isActuallyAdmin) return false;
+      return activeModules.includes("ADMIN") || activeModules.includes("ROLES") || activeModules.includes("USERS");
     }
 
-    if (item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK", "CRM"].includes(item.module)) return true;
-    return activeModules.includes(item.module);
+    // Hard security lock: Non-admins can ONLY see Projects and Plots in Ventures
+    // Ventures are available globally (all modules)
+    if (item.module === "VENTURES") {
+      if (!isActuallyAdmin) {
+        return item.label.includes("Projects") || item.label.includes("Plots");
+      }
+      return true;
+    }
+
+    // Mapping sidebar groups to actual granular database modules
+    switch (item.module) {
+      case "FINANCE":
+        return activeModules.includes("FINANCE") || activeModules.includes("ACCOUNTS") || activeModules.includes("PROJECT INCENTIVES");
+      case "CRM":
+        return activeModules.includes("CRM");
+      case "MEDIA":
+        return activeModules.includes("MEDIA") || activeModules.includes("NEWS") || activeModules.includes("VIDEOS") || activeModules.includes("GREETINGS") || activeModules.includes("SHOWCASE");
+      case "SITE_VISITS":
+        return activeModules.includes("SITEVISITS") || activeModules.includes("CUSTOMER SITEVISITS") || activeModules.includes("VEHICLE SITEVISITS");
+      default:
+        return activeModules.includes(item.module);
+    }
   });
+
+  return removeEmptyHeaders(filtered);
 };
 
 export default {

@@ -31,9 +31,9 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const userModules = user?.roleModules || [];
   const sidebarMenu = useMemo(() => getMenuByRole(
     isSuperAdmin ? "superadmin" : normalizedRole,
-    isSuperAdmin || isAdmin ? ["ALL"] : userModules,
+    isSuperAdmin ? ["ALL"] : userModules,
     userType
-  ), [isSuperAdmin, isAdmin, normalizedRole, userType, JSON.stringify(userModules)]);
+  ), [isSuperAdmin, normalizedRole, userType, JSON.stringify(userModules)]);
 
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           {sidebarMenu.map((item) => {
             if (item.type === 'header') {
               return (
-                <div key={item.label} className="mt-6 mb-2 px-2">
+                <div key={item.link || item.label} className="mt-6 mb-2 px-2">
                   {!collapsed && (
                     <h3 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em]">
                       {item.label}
@@ -124,7 +124,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             if (!item.children) {
               return (
                 <button
-                  key={item.label}
+                  key={item.link}
                   onClick={() => {
                     navigate(item.link);
                     setActiveLink(item.link);
@@ -147,7 +147,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             }
 
             return (
-              <div key={item.label}>
+              <div key={item.link || item.label}>
                 <button
                   onClick={() => !collapsed && toggleSection(item.label)}
                   className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 transition-colors group"
@@ -178,7 +178,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                       const isChildActive = activeLink === child.link;
                       return (
                         <button
-                          key={child.label}
+                          key={child.link}
                           onClick={() => {
                             navigate(child.link);
                             setActiveLink(child.link);

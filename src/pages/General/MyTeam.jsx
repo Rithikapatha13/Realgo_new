@@ -26,7 +26,7 @@ export default function MyTeam() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isInactiveDialogOpen, setIsInactiveDialogOpen] = useState(false);
 
@@ -88,7 +88,7 @@ export default function MyTeam() {
 
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-h-screen">
-      
+
       {/* HEADER */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -172,7 +172,7 @@ export default function MyTeam() {
                 )}
               </div>
               <div className="absolute top-4 right-4">
-                <button 
+                <button
                   onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
                   className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                 >

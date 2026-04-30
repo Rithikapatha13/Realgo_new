@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Users, Briefcase, Map, Image as ImageIcon, 
+import {
+  Users, Briefcase, Map, Image as ImageIcon,
   BarChart3, FileText, Plus, Landmark
 } from "lucide-react";
 import Typewriter from "typewriter-effect";
@@ -101,7 +101,7 @@ function StatCard({ title, value, icon: Icon, color, bg }) {
 function ActionTile({ title, icon: Icon, path }) {
   const navigate = useNavigate();
   return (
-    <div 
+    <div
       onClick={() => navigate(path)}
       className="bg-white border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary-500 hover:text-primary-500 transition-all group"
     >

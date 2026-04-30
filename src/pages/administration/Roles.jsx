@@ -96,8 +96,8 @@ export default function Roles() {
             {/* TOP INFO */}
             <div className="p-5 flex-1">
               <div className="flex justify-between items-start mb-4">
-                <div className="h-10 w-10 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center font-bold">
-                  {role.roleNo}
+                <div className="h-10 w-10 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center font-bold text-[10px]" title="Role Number">
+                  {role.roleNo ? `#${role.roleNo}` : "N/A"}
                 </div>
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${role.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                   }`}>

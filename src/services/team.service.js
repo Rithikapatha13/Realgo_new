@@ -21,7 +21,7 @@ export const getTeamTree = async (id, status, roleId) => {
         const { data } = await apiClient.get(`/associates-tree`, { params });
 
         console.log("Tree API Response:", data);
-        return data; 
+        return data;
     } catch (error) {
         console.error('Error fetching team tree:', error);
         throw error;

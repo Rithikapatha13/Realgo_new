@@ -105,7 +105,7 @@ export const routeConfig = {
   },
   Administration: {
     basePath: "/",
-    allowedRoles: ["admin", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin"],
+    allowedRoles: ["admin", "superadmin", "accounts", "clientadmin", "companyadmin", "telecalleradmin", "associate"],
     routes: [
       { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },

@@ -8,6 +8,7 @@ import {
   BookMarked,
   FileCheck,
   Wallet,
+  FileUp,
   Bell,
   BadgeIndianRupee,
   Network,
@@ -446,24 +447,28 @@ export const financeCommonMenu = {
       link: "/",
       icon: LayoutDashboard,
       pageTitle: "Home",
+      module: "GENERAL",
     },
     {
       label: "Profile",
       link: "/profile",
       icon: Users,
       pageTitle: "Profile",
+      module: "GENERAL",
     },
     {
       label: "My Team",
       link: "/my-team",
       icon: UserCheck,
       pageTitle: "My Team",
+      module: "GENERAL",
     },
     {
       label: "Plots",
       link: "/plots",
       icon: MapPin,
       pageTitle: "Plots Map",
+      module: "GENERAL",
     }
   ],
 };
@@ -478,42 +483,56 @@ export const financeConfigMenu = {
       link: "/finance/bank",
       icon: Landmark,
       pageTitle: "Bank Configuration",
+      module: "FINANCE",
     },
     {
       label: "Cheque Series",
       link: "/finance/cheque-series",
       icon: Layers,
       pageTitle: "Cheque Series",
+      module: "FINANCE",
     },
     {
       label: "Account Tree",
       link: "/finance/accounts",
       icon: ListChecks,
       pageTitle: "Account Tree",
+      module: "FINANCE",
     },
     {
       label: "Ledgers",
       link: "/finance/ledgers",
       icon: BookOpen,
       pageTitle: "Ledgers",
+      module: "FINANCE",
     },
     {
       label: "SubLedgers",
       link: "/finance/subledgers",
       icon: List,
       pageTitle: "SubLedgers",
+      module: "FINANCE",
     },
     {
       label: "Project Incentives",
       link: "/project-incentives",
       icon: BadgeIndianRupee,
       pageTitle: "Project Incentives",
+      module: "FINANCE",
     },
     {
       label: "Parties",
       link: "/finance/parties",
       icon: Users,
       pageTitle: "Parties",
+      module: "FINANCE",
+    },
+    {
+      label: "Migration",
+      link: "/finance/migration",
+      icon: FileUp,
+      pageTitle: "Account Migration",
+      module: "FINANCE",
     },
   ]
 };
@@ -528,30 +547,35 @@ export const financeTransactionMenu = {
       link: "/finance/transactions",
       icon: Repeat,
       pageTitle: "Transactions",
+      module: "FINANCE",
     },
     {
       label: "General Receipt",
       link: "/finance/general-receipt",
       icon: Receipt,
       pageTitle: "General Receipt",
+      module: "FINANCE",
     },
     {
       label: "Payment Voucher",
       link: "/finance/payment-voucher",
       icon: CreditCard,
       pageTitle: "Payment Voucher",
+      module: "FINANCE",
     },
     {
       label: "Journal Voucher",
       link: "/finance/journal-voucher",
       icon: FileText,
       pageTitle: "Journal Voucher",
+      module: "FINANCE",
     },
     {
       label: "Cheque Detail",
       link: "/finance/cheque-details",
       icon: TableProperties,
       pageTitle: "Cheque Detailed View",
+      module: "FINANCE",
     },
   ]
 };
@@ -566,48 +590,56 @@ export const financeReportMenu = {
       link: "/finance/reports/cash-book",
       icon: Wallet,
       pageTitle: "Cash Book",
+      module: "FINANCE",
     },
     {
       label: "Bank Book",
       link: "/finance/reports/bank-book",
       icon: Landmark,
       pageTitle: "Bank Book",
+      module: "FINANCE",
     },
     {
       label: "Day Book",
       link: "/finance/reports/day-book",
       icon: Calendar,
       pageTitle: "Day Book",
+      module: "FINANCE",
     },
     {
       label: "Account Ledger",
       link: "/finance/reports/account-ledger",
       icon: BookOpen,
       pageTitle: "Account Ledger",
+      module: "FINANCE",
     },
     {
       label: "BRS",
       link: "/finance/reports/brs",
       icon: CheckCircle2,
       pageTitle: "Bank Reconciliation Statement",
+      module: "FINANCE",
     },
     {
       label: "Trail Balance",
       link: "/finance/reports/trial-balance",
       icon: Scale,
       pageTitle: "Trail Balance",
+      module: "FINANCE",
     },
     {
       label: "Profit Loss",
       link: "/finance/reports/profit-loss",
       icon: TrendingUp,
       pageTitle: "Profit & Loss",
+      module: "FINANCE",
     },
     {
       label: "Balance Sheet",
       link: "/finance/reports/balance-sheet",
       icon: LayoutList,
       pageTitle: "Balance Sheet",
+      module: "FINANCE",
     },
   ]
 };
@@ -622,36 +654,42 @@ export const financeOperationMenu = {
       link: "/finance",
       icon: LayoutDashboard,
       pageTitle: "Finance Dashboard",
+      module: "FINANCE",
     },
     {
       label: "Site Visits",
       link: "/site/dashboard",
       icon: MapPin,
       pageTitle: "Site Visit Hub",
+      module: "FINANCE",
     },
     {
       label: "Contributions",
       link: "/associate-contribution",
       icon: BadgeIndianRupee,
       pageTitle: "Associate Contributions",
+      module: "FINANCE",
     },
     {
       label: "Expenses",
       link: "/associate-expense",
       icon: Receipt,
       pageTitle: "Associate Expenses",
+      module: "FINANCE",
     },
     {
       label: "Payouts",
       link: "/associate-payout",
       icon: CreditCard,
       pageTitle: "Associate Payouts",
+      module: "FINANCE",
     },
     {
       label: "Audit Logs",
       link: "/finance/audit-logs",
       icon: History,
       pageTitle: "Audit Logs",
+      module: "FINANCE",
     },
   ]
 };
@@ -863,17 +901,18 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
 
   const filtered = menu.filter(item => {
     // Basic types that are always shown
-    if (item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK"].includes(item.module)) return true;
+    const itemModule = item.module || "GENERAL";
+    if (item.type === "header" || ["GENERAL", "SYSTEM", "NETWORK"].includes(itemModule)) return true;
 
     // Hard security lock: Non-admins can NEVER see Administration
-    if (item.module === "ADMIN") {
+    if (itemModule === "ADMIN") {
       if (!isActuallyAdmin) return false;
       return activeModules.includes("ADMIN") || activeModules.includes("ROLES") || activeModules.includes("USERS");
     }
 
     // Hard security lock: Non-admins can ONLY see Projects and Plots in Ventures
     // Ventures are available globally (all modules)
-    if (item.module === "VENTURES") {
+    if (itemModule === "VENTURES") {
       if (!isActuallyAdmin) {
         return item.label.includes("Projects") || item.label.includes("Plots");
       }
@@ -881,7 +920,7 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
     }
 
     // Mapping sidebar groups to actual granular database modules
-    switch (item.module) {
+    switch (itemModule) {
       case "FINANCE":
         return activeModules.includes("FINANCE") || activeModules.includes("ACCOUNTS") || activeModules.includes("PROJECT INCENTIVES");
       case "CRM":
@@ -891,7 +930,7 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
       case "SITE_VISITS":
         return activeModules.includes("SITEVISITS") || activeModules.includes("CUSTOMER SITEVISITS") || activeModules.includes("VEHICLE SITEVISITS");
       default:
-        return activeModules.includes(item.module);
+        return activeModules.includes(itemModule);
     }
   });
 

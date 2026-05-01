@@ -48,6 +48,7 @@ import BankBook from "../pages/Finance/BankBook";
 import DayBook from "../pages/Finance/DayBook";
 import BRS from "../pages/Finance/BRS";
 import FinanceHome from "../pages/Finance/FinanceHome";
+import Migration from "../pages/Finance/Migration";
 import ClientAdminDashboard from "../pages/administration/ClientAdminDashboard";
 import Leads from "../pages/CRM/Leads";
 import UploadLeads from "../pages/CRM/UploadLeads";
@@ -196,6 +197,7 @@ export const routeConfig = {
       { path: "/associate-expense", component: AssociateExpense },
       { path: "/associate-payout", component: AssociatePayout },
       { path: "/audit-logs", component: FinanceAuditLogs },
+      { path: "/migration", component: Migration },
     ],
   },
   CRM: {

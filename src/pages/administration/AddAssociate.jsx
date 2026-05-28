@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAddUser, useGetPotentialParents } from "@/hooks/useUser";
@@ -10,8 +10,8 @@ import FileUpload from "@/components/Common/FileUpload";
 import CustomSelect from "@/components/Common/CustomSelect";
 
 const STEPS = [
-  { id: 1, title: "Basic Info", icon: User },
-  { id: 2, title: "Nominee & Address", icon: MapPin },
+  { id: 1, title: "Basic Info & Address", icon: User },
+  { id: 2, title: "Nominee Details", icon: Heart },
   { id: 3, title: "KYC & Bank", icon: Landmark },
   { id: 4, title: "Role & Assign", icon: Briefcase },
 ];
@@ -29,6 +29,9 @@ export default function AddAssociate() {
       gender: "MALE",
       bloodGroup: "O_POS",
       referId: isAssociateUser ? loggedInUser.id : "",
+      image: "",
+      aadharCard: "",
+      panCard: "",
     }
   });
 
@@ -54,6 +57,8 @@ export default function AddAssociate() {
         // Validate current step before moving
         let fieldsToValidate = [];
         if (currentStep === 1) fieldsToValidate = ["firstName", "username", "phone", "email", "dob"];
+        if (currentStep === 2) fieldsToValidate = [];
+        if (currentStep === 3) fieldsToValidate = ["aadharCard", "panCard"];
         if (currentStep === 4) fieldsToValidate = ["roleId"];
 
         const isValid = await trigger(fieldsToValidate);
@@ -89,7 +94,7 @@ export default function AddAssociate() {
 
   return (
     <div className="min-h-screen bg-slate-50/50">
-      <div className="max-w-4xl mx-auto px-0 sm:px-4 py-4 sm:py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -131,10 +136,10 @@ export default function AddAssociate() {
         </div>
 
         {/* FORM CONTENT */}
-        <div className="bg-white border-y sm:border border-slate-200 rounded-none sm:rounded-[2.5rem] p-4 sm:p-8 md:p-12 shadow-xl shadow-slate-200/50">
+        <div className="bg-white border-y sm:border border-slate-200 rounded-none sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl shadow-slate-200/50">
           <form onSubmit={handleSubmit(onSubmit)}>
             
-            {/* STEP 1: PERSONAL INFO */}
+            {/* STEP 1: PERSONAL INFO & ADDRESS */}
             {currentStep === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -203,14 +208,13 @@ export default function AddAssociate() {
                       )}
                     />
                   </div>
-                </div>
-              </div>
-            )}
 
-            {/* STEP 2: NOMINEE & ADDRESS */}
-            {currentStep === 2 && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Address Info */}
+                  <div className="space-y-1 md:col-span-2">
+                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2 border-t border-slate-100 pt-6 mt-2">
+                        <MapPin size={14} className="text-indigo-500" /> Complete Address
+                    </h3>
+                  </div>
                   <div className="md:col-span-2 space-y-1">
                     <label className={labelClasses}>Address Line</label>
                     <input {...register("addressLine")} className={inputClasses} placeholder="House / Street" />
@@ -223,11 +227,14 @@ export default function AddAssociate() {
                     <label className={labelClasses}>State</label>
                     <input {...register("state")} className={inputClasses} placeholder="State" />
                   </div>
-                  <div className="space-y-1 border-t border-slate-100 pt-6 md:col-span-2 mt-2">
-                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Heart size={14} className="text-rose-500" /> Nominee Information
-                    </h3>
-                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: NOMINEE DETAILS */}
+            {currentStep === 2 && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <label className={labelClasses}>Nominee Name</label>
                     <input {...register("nomineeName")} className={inputClasses} placeholder="Full Name" />
@@ -256,6 +263,69 @@ export default function AddAssociate() {
                     <label className={labelClasses}>PAN Number</label>
                     <input {...register("panNo")} className={inputClasses} placeholder="ABCDE1234F" />
                   </div>
+
+                  {/* KYC File Uploads */}
+                  <div className="space-y-1 md:col-span-2">
+                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2 border-t border-slate-100 pt-6 mt-2">
+                        <Award size={14} className="text-indigo-500" /> KYC Documents & Photos
+                    </h3>
+                  </div>
+
+                  <div className="space-y-1 md:col-span-2">
+                    <label className={labelClasses}>Profile Photo</label>
+                    <Controller
+                      name="image"
+                      control={control}
+                      render={({ field }) => (
+                        <FileUpload
+                          existingFile={field.value}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          accept="image/*"
+                          folder="associates"
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className={labelClasses}>Aadhaar Card Front/Back Image *</label>
+                    <Controller
+                      name="aadharCard"
+                      control={control}
+                      rules={{ required: "Aadhaar Card image is required" }}
+                      render={({ field }) => (
+                        <FileUpload
+                          existingFile={field.value}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          error={errors.aadharCard?.message}
+                          accept="image/*"
+                          folder="kyc"
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className={labelClasses}>PAN Card Image *</label>
+                    <Controller
+                      name="panCard"
+                      control={control}
+                      rules={{ required: "PAN Card image is required" }}
+                      render={({ field }) => (
+                        <FileUpload
+                          existingFile={field.value}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          error={errors.panCard?.message}
+                          accept="image/*"
+                          folder="kyc"
+                        />
+                      )}
+                    />
+                  </div>
+
                   <div className="space-y-1 border-t border-slate-100 pt-6 md:col-span-2 mt-2">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Award size={14} className="text-amber-500" /> Bank Account Details

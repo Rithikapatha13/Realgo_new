@@ -1,4 +1,6 @@
 import Signup from "../pages/auth/Signup";
+import BulkTelecallerUpload from "../pages/telecaller/BulkTelecallerUpload";
+import AdminDashboard from "../pages/telecaller/AdminDashboard";
 import Roles from "../pages/administration/Roles";
 import Home from "../pages/General/Home";
 import Profile from "../pages/General/Profile";
@@ -111,6 +113,8 @@ export const routeConfig = {
       { path: "/client-dashboard", component: ClientAdminDashboard },
       { path: "/users", component: Users },
       { path: "/admin", component: Admin },
+      { path: "/telecaller/add", component: AdminDashboard },
+      { path: "/telecaller/bulk", component: BulkTelecallerUpload },
       { path: "/administration/admins", component: Admins },
       { path: "/roles", component: Roles },
       { path: "/requests", component: Requests },

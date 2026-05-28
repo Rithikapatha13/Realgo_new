@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAddUser, useGetPotentialParents } from "@/hooks/useUser";
@@ -37,10 +37,10 @@ export default function AddAssociate() {
   const { data: parentsResponse } = useGetPotentialParents();
 
   const allRoles = rolesResponse?.roles || [];
-  const rolesList = isAssociateUser 
+  const rolesList = isAssociateUser
     ? allRoles.filter(r => r.roleName.toLowerCase() === "associate" || r.roleName.toLowerCase() === "user")
     : allRoles;
-    
+
   const parentsList = parentsResponse?.data?.items || [];
 
   // Auto-select associate role if only one is available
@@ -50,19 +50,19 @@ export default function AddAssociate() {
     }
   }, [isAssociateUser, rolesList, setValue]);
 
-    const nextStep = async () => {
-        // Validate current step before moving
-        let fieldsToValidate = [];
-        if (currentStep === 1) fieldsToValidate = ["firstName", "username", "phone", "email", "dob"];
-        if (currentStep === 4) fieldsToValidate = ["roleId"];
+  const nextStep = async () => {
+    // Validate current step before moving
+    let fieldsToValidate = [];
+    if (currentStep === 1) fieldsToValidate = ["firstName", "username", "phone", "email", "dob"];
+    if (currentStep === 4) fieldsToValidate = ["roleId"];
 
-        const isValid = await trigger(fieldsToValidate);
-        if (isValid) {
-            setCurrentStep((prev) => Math.min(prev + 1, 4));
-        } else {
-            toast.error("Please fill all required fields correctly before proceeding");
-        }
-    };
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
+    } else {
+      toast.error("Please fill all required fields correctly before proceeding");
+    }
+  };
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
@@ -90,13 +90,13 @@ export default function AddAssociate() {
   return (
     <div className="min-h-screen bg-slate-50/50">
       <div className="max-w-4xl mx-auto px-0 sm:px-4 py-4 sm:py-8">
-        
+
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Add New Associate</h1>
             <p className="text-slate-500 text-sm mt-1">Onboard a new member to your network hierarchy</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate("/users")}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-white rounded-xl transition-all"
           >
@@ -106,34 +106,34 @@ export default function AddAssociate() {
 
         {/* STEPPER INDICATOR */}
         <div className="flex items-center justify-between mb-8 md:mb-12 relative px-2 sm:px-4">
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2" />
-            {STEPS.map((step) => {
-                const Icon = step.icon;
-                const isActive = currentStep === step.id;
-                const isCompleted = currentStep > step.id;
+          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2" />
+          {STEPS.map((step) => {
+            const Icon = step.icon;
+            const isActive = currentStep === step.id;
+            const isCompleted = currentStep > step.id;
 
-                return (
-                    <div key={step.id} className="flex flex-col items-center gap-3">
-                        <div className={`
+            return (
+              <div key={step.id} className="flex flex-col items-center gap-3">
+                <div className={`
                             w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500
                             ${isActive ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 scale-110 ring-4 ring-white" : ""}
                             ${isCompleted ? "bg-emerald-500 text-white" : ""}
                             ${!isActive && !isCompleted ? "bg-white text-slate-400 border-2 border-slate-200" : ""}
                         `}>
-                            {isCompleted ? <Check size={20} /> : <Icon size={20} />}
-                        </div>
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? "text-indigo-600" : "text-slate-400"}`}>
-                            {step.title}
-                        </span>
-                    </div>
-                )
-            })}
+                  {isCompleted ? <Check size={20} /> : <Icon size={20} />}
+                </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? "text-indigo-600" : "text-slate-400"}`}>
+                  {step.title}
+                </span>
+              </div>
+            )
+          })}
         </div>
 
         {/* FORM CONTENT */}
         <div className="bg-white border-y sm:border border-slate-200 rounded-none sm:rounded-[2.5rem] p-4 sm:p-8 md:p-12 shadow-xl shadow-slate-200/50">
           <form onSubmit={handleSubmit(onSubmit)}>
-            
+
             {/* STEP 1: PERSONAL INFO */}
             {currentStep === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -225,7 +225,7 @@ export default function AddAssociate() {
                   </div>
                   <div className="space-y-1 border-t border-slate-100 pt-6 md:col-span-2 mt-2">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Heart size={14} className="text-rose-500" /> Nominee Information
+                      <Heart size={14} className="text-rose-500" /> Nominee Information
                     </h3>
                   </div>
                   <div className="space-y-1">
@@ -258,7 +258,7 @@ export default function AddAssociate() {
                   </div>
                   <div className="space-y-1 border-t border-slate-100 pt-6 md:col-span-2 mt-2">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Award size={14} className="text-amber-500" /> Bank Account Details
+                      <Award size={14} className="text-amber-500" /> Bank Account Details
                     </h3>
                   </div>
                   <div className="space-y-1">
@@ -326,19 +326,19 @@ export default function AddAssociate() {
                       )}
                     />
                   </div>
-                  
+
                   <div className="md:col-span-2 pt-6">
                     <div className="p-6 bg-indigo-50 rounded-3xl border border-indigo-100 flex items-start gap-4">
-                        <div className="p-3 bg-white rounded-2xl shadow-sm text-indigo-600">
-                            <Fingerprint size={24} />
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-black text-indigo-900">Verification Pending</h4>
-                            <p className="text-xs text-indigo-600/70 mt-1 leading-relaxed">
-                                By default, new associates are created with a <b>PENDING</b> status. 
-                                They will need to login and verify their details, or be manually verified by an administrator.
-                            </p>
-                        </div>
+                      <div className="p-3 bg-white rounded-2xl shadow-sm text-indigo-600">
+                        <Fingerprint size={24} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-indigo-900">Verification Pending</h4>
+                        <p className="text-xs text-indigo-600/70 mt-1 leading-relaxed">
+                          By default, new associates are created with a <b>PENDING</b> status.
+                          They will need to login and verify their details, or be manually verified by an administrator.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

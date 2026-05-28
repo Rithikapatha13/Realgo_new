@@ -62,7 +62,7 @@ export default function Leads() {
 
   useEffect(() => {
     fetchLeads();
-    if (isAdmin) fetchAssignablesList();
+    if (isAdmin || isTelecallerAdmin) fetchAssignablesList();
   }, [location.pathname, statusFilter]);
 
   const fetchAssignablesList = async () => {
@@ -208,8 +208,8 @@ export default function Leads() {
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Lead Details</th>
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Source</th>
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
-                  {isAdmin && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telecaller</th>}
-                  {isAdmin && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Associate</th>}
+                  {(isAdmin || isTelecallerAdmin) && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telecaller</th>}
+                  {(isAdmin || isTelecallerAdmin) && <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Associate</th>}
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Sessions</th>
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Updated</th>
                   <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Actions</th>
@@ -275,7 +275,7 @@ export default function Leads() {
                     </td>
 
                     {/* TELECALLER ASSIGNMENT */}
-                    {isAdmin && (
+                    {(isAdmin || isTelecallerAdmin) && (
                       <td className="p-4">
                         <select
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:ring-1 focus:ring-primary-500 outline-none"
@@ -291,7 +291,7 @@ export default function Leads() {
                     )}
 
                     {/* ASSOCIATE ASSIGNMENT */}
-                    {isAdmin && (
+                    {(isAdmin || isTelecallerAdmin) && (
                       <td className="p-4">
                         <select
                           className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:ring-1 focus:ring-primary-500 outline-none"

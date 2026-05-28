@@ -770,9 +770,42 @@ export const adminMenu = [
 ];
 
 export const telecallerAdminMenu = [
-  ...telecallerMenu,
-  { type: "header", label: "Admin Tools" },
-  { label: "Users", link: "/users", icon: Users, pageTitle: "Users" },
+  { type: "header", label: "Common" },
+  { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
+  { label: "Profile", link: "/profile", icon: User, pageTitle: "Profile", module: "GENERAL" },
+  { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
+
+  { type: "header", label: "Analysis" },
+  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "GENERAL" },
+  { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "CRM" },
+
+  { type: "header", label: "Ventures" },
+  { label: "Projects", link: "/projects", icon: Landmark, pageTitle: "Projects", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
+
+  { type: "header", label: "Administration" },
+  { label: "Users", link: "/users", icon: Users, pageTitle: "Users", module: "GENERAL" },
+
+  { type: "header", label: "Media" },
+  { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "GENERAL" },
+  { label: "Showcase", link: "/showcases", icon: ImageIcon, pageTitle: "Showcase", module: "GENERAL" },
+  { label: "News Feed", link: "/news", icon: FileText, pageTitle: "News Feed", module: "GENERAL" },
+  { label: "Videos", link: "/videos", icon: PlaySquare, pageTitle: "Videos", module: "GENERAL" },
+
+  { type: "header", label: "CRM" },
+  { label: "Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
+  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads", module: "CRM" },
+  { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "GENERAL" },
+  { label: "Site Visits Hub", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Dashboard", module: "GENERAL" },
+
+  { type: "header", label: "Finance" },
+  { label: "Dashboard", link: "/finance", icon: LayoutDashboard, pageTitle: "Finance Dashboard", module: "FINANCE" },
+  { label: "Contributions", link: "/associate-contribution", icon: BadgeIndianRupee, pageTitle: "Associate Contributions", module: "FINANCE" },
+  { label: "Payouts", link: "/associate-payout", icon: CreditCard, pageTitle: "Associate Payouts", module: "FINANCE" },
+  { label: "Reports", link: "/finance/reports", icon: BarChart3, pageTitle: "Financial Reports", module: "FINANCE" },
 ];
 
 export const financeAdminMenu = [
@@ -809,11 +842,11 @@ export const systemManagementMenu = {
 
 export const superAdminMenu = [
   commonMenu,
-  venturesMenu,
-  financeMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
+  // venturesMenu,
+  // financeMenu,
+  // administrationMenu,
+  // mediaMenu,
+  // siteVisitsMenu,
   systemManagementMenu,
 ];
 

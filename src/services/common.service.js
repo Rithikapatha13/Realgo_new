@@ -52,3 +52,19 @@ export const uploadExcelFile = async (file) => {
 
   return res.data;
 };
+
+/**
+ * Get notifications for the current user
+ */
+export const getNotifications = async () => {
+  const res = await apiClient.get("/common/notifications");
+  return res.data;
+};
+
+/**
+ * Mark all notifications as read
+ */
+export const markNotificationsRead = async () => {
+  const res = await apiClient.patch("/common/notifications/read");
+  return res.data;
+};

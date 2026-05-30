@@ -15,7 +15,7 @@ export default function Leads() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
-  const userRole = (user?.role?.roleName || "").toUpperCase();
+  const userRole = (user?.role?.roleName || user?.role || "").toUpperCase();
   const userType = (getUserType() || "").toLowerCase();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -126,7 +126,7 @@ export default function Leads() {
         </div>
 
         <div className="flex gap-3">
-          {isAssociate && !isPendingView && !isFollowupView && (
+          {(isAssociate || isTelecaller) && !isPendingView && !isFollowupView && (
             <Button variant="primary" className="flex items-center gap-2" onClick={() => setShowLeadModal(true)}>
               <Plus size={18} />
               <span>Add Manual Lead</span>
@@ -245,6 +245,11 @@ export default function Leads() {
                             <MessageSquare size={14} />
                           </a>
                         </div>
+                        {lead.addedByName && (
+                          <span className="text-[10px] text-slate-400 font-semibold mt-1">
+                            Added by: <span className="text-slate-500">{lead.addedByName}</span> ({lead.addedByRole})
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="p-4">

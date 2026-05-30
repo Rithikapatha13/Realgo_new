@@ -367,25 +367,25 @@ export default function Home() {
               <>
                 <MinimalKpi
                   title="Total Leads"
-                  value={isAssociate ? (stats?.summary?.totalLeads || 0) : (crmStats?.total || '0')}
+                  value={crmStats?.total || 0}
                   icon={Users}
                   onClick={() => navigate("/leads")}
                 />
                 <MinimalKpi
                   title="Hot Leads"
-                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'HOT').length || 0) : (crmStats?.hot || '0')}
+                  value={crmStats?.hot || 0}
                   icon={Flame}
                   onClick={() => navigate("/leads?status=HOT")}
                 />
                 <MinimalKpi
                   title="Warm Leads"
-                  value={isAssociate ? (leads?.filter(l => l.leadStatus === 'WARM').length || 0) : (crmStats?.warm || '0')}
+                  value={crmStats?.warm || 0}
                   icon={Activity}
                   onClick={() => navigate("/leads?status=WARM")}
                 />
                 <MinimalKpi
                   title="Site Visits"
-                  value={isAssociate ? (stats?.summary?.sitevisits || 0) : (crmStats?.sitevisits || '0')}
+                  value={crmStats?.sitevisits || 0}
                   icon={Clock}
                   onClick={() => navigate("/leads?status=SITEVISIT")}
                 />
@@ -439,10 +439,8 @@ export default function Home() {
                 </h2>
                 <div className="space-y-4">
                   {['HOT', 'WARM', 'COLD'].map(s => {
-                    const count = isAssociate
-                      ? leads?.filter(l => l.leadStatus === s).length
-                      : (crmStats?.[s.toLowerCase()] || 0);
-                    const total = isAssociate ? (leads?.length || 1) : (crmStats?.total || 1);
+                    const count = crmStats?.[s.toLowerCase()] || 0;
+                    const total = crmStats?.total || 1;
                     return <StatusRow key={s} label={s} value={count} total={total} color={s === 'HOT' ? 'bg-rose-500' : s === 'WARM' ? 'bg-amber-500' : 'bg-slate-400'} />;
                   })}
                 </div>

@@ -851,27 +851,28 @@ export const superAdminMenu = [
 ];
 
 export const associateMenu = [
-  { type: "header", label: "Common" },
+  { type: "header", label: "General" },
   { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
   { label: "Profile", link: "/profile", icon: UserCircle, pageTitle: "Profile", module: "GENERAL" },
+  { label: "Team Tree", link: "/tree", icon: Network, pageTitle: "Team Tree", module: "GENERAL" },
   { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
-
-  { type: "header", label: "CRM" },
-  { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
-  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads", module: "CRM" },
-  { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "GENERAL" },
 
   { type: "header", label: "Ventures" },
-  { label: "Projects", link: "/projects", icon: Landmark, pageTitle: "Projects", module: "VENTURES" },
-  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
 
   { type: "header", label: "Media" },
   { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "MEDIA" },
-  { label: "News", link: "/news", icon: Globe, pageTitle: "News", module: "MEDIA" },
+  { label: "News", link: "/news", icon: Globe, pageTitle: "News Feed", module: "MEDIA" },
   { label: "Videos", link: "/videos", icon: Camera, pageTitle: "Videos", module: "MEDIA" },
 
-  { type: "header", label: "Tools" },
+  { type: "header", label: "Leads" },
+  { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
+  { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Followup", link: "/leads/followups", icon: Calendar, pageTitle: "Followups", module: "CRM" },
+
+  { type: "header", label: "Notes" },
   { label: "Notes", link: "/notes", icon: NotebookPen, pageTitle: "Notes", module: "GENERAL" },
   { label: "Reminders", link: "/reminders", icon: Clock, pageTitle: "Reminders", module: "GENERAL" },
 ];
@@ -907,6 +908,11 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
     }
     return true;
   });
+
+  // 1.5. Bypass module filtering for associates so they always see their full workspace
+  if (menu === associateMenu) {
+    return removeEmptyHeaders(menu);
+  }
 
   // 2. Apply hard role-level strips BEFORE any module check
   // Sub-admins (userType === "admin", often used as Marketing Admins) NEVER see Finance

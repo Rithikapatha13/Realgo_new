@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getMenuByRole } from "../../constants/sidebar";
 import { getUser } from "../../services/auth.service";
 import { resolveImageUrl } from "../../utils/common";
+import { getNotifications, markNotificationsRead } from "../../services/common.service";
 
 export default function Header({
   onMenuClick,
@@ -13,6 +14,38 @@ export default function Header({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const user = getUser();
   const userRole = user?.role || "associate";
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await getNotifications();
+      if (res.success) {
+        setNotifications(res.notifications);
+        setUnreadCount(res.notifications.filter(n => !n.isRead).length);
+      }
+    } catch (err) {
+      console.error("Error fetching notifications", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 15000); // poll every 15s
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markNotificationsRead();
+      fetchNotifications();
+    } catch (err) {
+      console.error("Error marking notifications as read", err);
+    }
+  };
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -118,7 +151,9 @@ export default function Header({
             className="relative p-2 hover:bg-slate-50 rounded-lg transition-colors group"
           >
             <Bell size={20} className="text-slate-600 group-hover:text-primary-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+            )}
           </button>
 
           {showNotifications && (
@@ -128,16 +163,39 @@ export default function Header({
                 onClick={() => setShowNotifications(false)}
               />
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-20 overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-right">
-                <div className="px-4 py-3 border-b bg-slate-50/50">
+                <div className="px-4 py-3 border-b bg-slate-50/50 flex justify-between items-center">
                   <h3 className="font-bold text-sm text-slate-800">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={handleMarkAllAsRead}
+                      className="text-[10px] text-primary-600 font-bold hover:underline"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
                 </div>
-                <div className="max-h-[300px] overflow-y-auto">
-                  <div className="px-4 py-8 text-center">
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Bell size={20} className="text-slate-400" />
+                <div className="max-h-[300px] overflow-y-auto divide-y divide-slate-100">
+                  {notifications.length > 0 ? (
+                    notifications.map((n) => (
+                      <div 
+                        key={n.id} 
+                        className={`px-4 py-3 hover:bg-slate-50 transition-colors text-left ${!n.isRead ? 'bg-primary-50/30' : ''}`}
+                      >
+                        <p className="text-xs font-semibold text-slate-800">{n.title}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.body}</p>
+                        <p className="text-[9px] text-slate-400 mt-1">
+                          {new Date(n.createdAt).toLocaleDateString()} {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-8 text-center">
+                      <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Bell size={20} className="text-slate-400" />
+                      </div>
+                      <p className="text-xs text-slate-500 font-medium">No notifications yet</p>
                     </div>
-                    <p className="text-sm text-slate-500">No new notifications</p>
-                  </div>
+                  )}
                 </div>
               </div>
             </>

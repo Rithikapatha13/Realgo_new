@@ -61,9 +61,9 @@ export default function AssociateDash() {
 
   // Data for Pie Chart
   const pieData = [
-    { name: 'HOT', value: leads.filter(l => l.leadStatus === 'HOT').length, color: '#f43f5e' },
-    { name: 'WARM', value: leads.filter(l => l.leadStatus === 'WARM').length, color: '#f59e0b' },
-    { name: 'COLD', value: leads.filter(l => l.leadStatus === 'COLD').length, color: '#94a3b8' },
+    { name: 'HOT', value: stats?.hot || 0, color: '#f43f5e' },
+    { name: 'WARM', value: stats?.warm || 0, color: '#f59e0b' },
+    { name: 'COLD', value: stats?.cold || 0, color: '#94a3b8' },
   ].filter(d => d.value > 0);
 
   return (
@@ -85,21 +85,21 @@ export default function AssociateDash() {
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard 
           label="Hot Leads" 
-          value={leads.filter(l => l.leadStatus === "HOT").length} 
+          value={stats?.hot || 0} 
           gradient="linear-gradient(135deg,#f43f5e,#fb923c)" 
           icon={<Flame />} 
           filterType="HOT"
         />
         <StatCard 
           label="Warm Leads" 
-          value={leads.filter(l => l.leadStatus === "WARM").length} 
+          value={stats?.warm || 0} 
           gradient="linear-gradient(135deg,#f59e0b,#fbbf24)" 
           icon={<Activity />} 
           filterType="WARM"
         />
         <StatCard 
           label="Cold Leads" 
-          value={leads.filter(l => l.leadStatus === "COLD").length} 
+          value={stats?.cold || 0} 
           gradient="linear-gradient(135deg,#64748b,#94a3b8)" 
           icon={<Clock />} 
           filterType="COLD"
@@ -136,7 +136,7 @@ export default function AssociateDash() {
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {['HOT', 'WARM', 'COLD'].map(s => {
-                const ls = leads.filter(l => l.leadStatus === s);
+                const ls = leads.filter(l => l.leadStatus === s && !['BOOKED', 'PAYMENT_PENDING'].includes(l.assocStatus));
                 const colors = { HOT: "text-rose-600", WARM: "text-amber-600", COLD: "text-slate-400" };
                 const bgs = { HOT: "bg-rose-50", WARM: "bg-amber-50", COLD: "bg-slate-50" };
                 return (
@@ -157,6 +157,11 @@ export default function AssociateDash() {
                             <span>{l.leadContact}</span>
                             {l.assocStatus && <span className="text-emerald-600 font-black text-[8px] uppercase">{l.assocStatus}</span>}
                           </div>
+                          {l.addedByName && (
+                            <div className="text-[9px] text-slate-400 font-semibold mt-0.5">
+                              Added by: {l.addedByName} ({l.addedByRole})
+                            </div>
+                          )}
                         </div>
                       ))}
                       {ls.length > 5 && (

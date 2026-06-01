@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Download, Filter, MessageSquare, Phone } from 'lucide-react';
 import { getLeads } from "@/services/crm.service";
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
 export default function StatCard({ label, value, gradient, icon, filterType, onClick }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [leads, setLeads] = useState([]);
   const [from, setFrom] = useState('');
@@ -118,7 +120,7 @@ export default function StatCard({ label, value, gradient, icon, filterType, onC
               <div className="flex gap-2">
                 <button 
                   onClick={() => fetchLeads(from, to)}
-                  className="px-6 py-2 bg-primary-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-700 transition-all flex items-center gap-2 shadow-sm"
+                  className="px-6 py-2 bg-primary-600 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-700 transition-all flex items-center gap-2 shadow-sm"
                 >
                   <Filter size={14} /> Filter
                 </button>
@@ -156,13 +158,23 @@ export default function StatCard({ label, value, gradient, icon, filterType, onC
                       <th className="px-6 py-4 text-slate-600">Source</th>
                       <th className="px-6 py-4 text-slate-600">Status</th>
                       <th className="px-6 py-4 text-slate-600">Created</th>
-                      <th className="px-6 py-4 text-center text-slate-600">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {leads.map((l) => (
                       <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-700">{l.leadName}</td>
+                        <td className="px-6 py-4 font-bold text-slate-700">
+                          <button 
+                            onClick={() => {
+                              setOpen(false);
+                              navigate(`/leads?status=ALL&search=${l.leadContact}`);
+                            }}
+                            className="hover:text-primary-500 hover:underline text-left font-bold transition-colors cursor-pointer"
+                            title="Click to view details in CRM"
+                          >
+                            {l.leadName}
+                          </button>
+                        </td>
                         <td className="px-6 py-4 font-mono text-slate-500 text-xs">{l.leadContact}</td>
                         <td className="px-6 py-4">
                           <span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-bold text-slate-600 uppercase tracking-tight">
@@ -179,24 +191,6 @@ export default function StatCard({ label, value, gradient, icon, filterType, onC
                           </span>
                         </td>
                         <td className="px-6 py-4 text-xs text-slate-400">{l.createdAt ? format(new Date(l.createdAt), 'dd/MM/yyyy') : '--'}</td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex justify-center gap-2">
-                             <a 
-                               href={`https://wa.me/91${l.leadContact.replace(/\D/g, '')}`} 
-                               target="_blank" 
-                               rel="noreferrer"
-                               className="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg hover:bg-emerald-500 hover:text-white transition-all"
-                             >
-                               <MessageSquare size={14} />
-                             </a>
-                             <a 
-                               href={`tel:${l.leadContact}`}
-                               className="p-2 bg-primary-500/10 text-primary-500 rounded-lg hover:bg-primary-500 hover:text-white transition-all"
-                             >
-                               <Phone size={14} />
-                             </a>
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>

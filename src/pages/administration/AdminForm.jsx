@@ -83,7 +83,7 @@ export default function AdminForm({ item, action, onClose, onRefetch }) {
             <Section title="Basic Information" icon={User}>
                 <InputField label="Full Name" name="username" register={register} errors={errors} required disabled={isView} />
                 {action === "Create" && (
-                    <InputField label="Password" name="password" type="password" register={register} errors={errors} required />
+                    <InputField label="Password (Default: Realgo@123)" name="password" type="password" register={register} errors={errors} required={false} />
                 )}
                 <InputField label="Phone Number" name="phone" register={register} errors={errors} required disabled={isView} />
                 <InputField label="Email Address" name="email" type="email" register={register} errors={errors} required disabled={isView} />

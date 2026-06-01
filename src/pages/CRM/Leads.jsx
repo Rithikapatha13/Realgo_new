@@ -23,7 +23,7 @@ export default function Leads() {
 
   const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [statusFilter, setStatusFilter] = useState(initialStatus);
   const [selectedLead, setSelectedLead] = useState(null);
   const [assignables, setAssignables] = useState({ telecallers: [], associates: [] });
@@ -77,6 +77,8 @@ export default function Leads() {
   useEffect(() => {
     const status = searchParams.get("status");
     if (status) setStatusFilter(status);
+    const searchQuery = searchParams.get("search");
+    if (searchQuery !== null) setSearch(searchQuery);
   }, [searchParams]);
 
   const fetchLeads = async () => {

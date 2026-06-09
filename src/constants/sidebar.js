@@ -338,7 +338,7 @@ export const crmMenu = {
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
     { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -372,7 +372,7 @@ export const telecallerAdminCrmMenu = {
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
     { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -384,7 +384,7 @@ export const leadflowCrmMenu = {
     { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard" },
     { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -412,7 +412,7 @@ export const adminCrmMenu = {
     },
     {
       label: "Follow-ups",
-      link: "/leads/followups",
+      link: "/followup",
       icon: Calendar,
       pageTitle: "Follow-ups",
     },
@@ -702,8 +702,8 @@ export const telecallerMenu = [
   { type: "header", label: "Leads" },
   { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
   { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
-  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
 
   { type: "header", label: "Analysis" },
   { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "CRM" },
@@ -742,7 +742,6 @@ export const adminMenu = [
 
   { type: "header", label: "Ventures" },
   { label: "Projects", link: "/projects", icon: Briefcase, pageTitle: "Projects", module: "VENTURES" },
-  { label: "Phases", link: "/phases", icon: Layers, pageTitle: "Phases", module: "VENTURES" },
   { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
 
   { type: "header", label: "Finance" },
@@ -765,8 +764,8 @@ export const adminMenu = [
 
   { type: "header", label: "CRM" },
   { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
-  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Hub", module: "SITE_VISITS" },
 ];
 
 export const telecallerAdminMenu = [
@@ -797,9 +796,9 @@ export const telecallerAdminMenu = [
   { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
   { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads", module: "CRM" },
   { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
-  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "GENERAL" },
-  { label: "Site Visits Hub", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Dashboard", module: "GENERAL" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Hub", module: "SITE_VISITS" },
+
 
   { type: "header", label: "Finance" },
   { label: "Dashboard", link: "/finance", icon: LayoutDashboard, pageTitle: "Finance Dashboard", module: "FINANCE" },
@@ -870,7 +869,8 @@ export const associateMenu = [
   { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
   { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
   { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Followup", link: "/leads/followups", icon: Calendar, pageTitle: "Followups", module: "CRM" },
+  { label: "Followup", link: "/followup", icon: Calendar, pageTitle: "Followups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits", module: "CRM" },
 
   { type: "header", label: "Notes" },
   { label: "Notes", link: "/notes", icon: NotebookPen, pageTitle: "Notes", module: "GENERAL" },

@@ -68,3 +68,19 @@ export const markNotificationsRead = async () => {
   const res = await apiClient.patch("/common/notifications/read");
   return res.data;
 };
+
+/**
+ * Register FCM push token
+ */
+export const registerPushToken = async (fcmToken) => {
+  const res = await apiClient.post("/common/push-tokens", { fcmToken });
+  return res.data;
+};
+
+/**
+ * Deregister FCM push token
+ */
+export const deregisterPushToken = async (fcmToken) => {
+  const res = await apiClient.delete("/common/push-tokens", { data: { fcmToken } });
+  return res.data;
+};

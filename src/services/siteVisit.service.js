@@ -25,6 +25,11 @@ export const updateSiteVisit = async (id, data) => {
   return response.data;
 };
 
+export const updateSiteVisitStatus = async (id, status) => {
+  const response = await API.patch(`/site-visits/${id}/status`, { status });
+  return response.data;
+};
+
 export const deleteSiteVisit = async (id) => {
   const response = await API.delete(`/site-visits/${id}`);
   return response.data;

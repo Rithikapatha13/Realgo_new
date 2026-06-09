@@ -31,3 +31,11 @@ export const deleteRequest = async (id) => {
   });
   return data;
 };
+
+export const createRequest = async (requestData) => {
+  const { data } = await axios.post(`${API_URL}/requests`, requestData, {
+    headers: getAuthHeader(),
+  });
+  return data;
+};
+

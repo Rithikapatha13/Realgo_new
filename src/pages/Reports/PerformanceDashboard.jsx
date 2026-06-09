@@ -70,10 +70,13 @@ export default function PerformanceDashboard() {
   const showFinance = isSuperAdmin || userModules.includes("ALL") || userModules.includes("FINANCE");
   const showCRM = isSuperAdmin || userModules.includes("ALL") || userModules.includes("CRM");
   const showMarketing = isSuperAdmin || userModules.includes("ALL") || userModules.includes("MARKETING");
+  const showAdmin = isSuperAdmin || userModules.includes("ALL") || userModules.includes("ADMIN");
+  const hasNoModules = !showFinance && !showCRM && !showMarketing && !showAdmin;
 
-  const totalRevenue = stats.accounts.summary.reduce((a,c) => a+c.total, 0);
-  const totalLeads = stats.telecaller.summary.reduce((a,c) => a+c.count, 0);
-  const networkSize = stats.associate.totalAssociates || 0;
+  const totalRevenue = stats.accounts?.summary?.reduce((a,c) => a+c.total, 0) || 0;
+  const totalLeads = stats.telecaller?.summary?.reduce((a,c) => a+c.count, 0) || 0;
+  const networkSize = stats.associate?.totalAssociates || 0;
+  const totalRequests = stats.admin?.summary?.reduce((a,c) => a+c.count, 0) || 0;
 
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-h-screen space-y-10">
@@ -94,40 +97,50 @@ export default function PerformanceDashboard() {
       </div>
 
       {/* TOP KPI ROW */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {showFinance && (
-          <NeatKPICard 
-            title="Total Revenue" 
-            value={`₹${(totalRevenue / 100000).toFixed(2)}L`}
-            trend="+12%"
-            icon={Wallet}
-          />
-        )}
-        {showCRM && (
-          <NeatKPICard 
-            title="Leads Processed" 
-            value={totalLeads}
-            trend="+5%"
-            icon={PhoneCall}
-          />
-        )}
-        {showMarketing && (
-          <>
+      {!hasNoModules && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {showFinance && (
             <NeatKPICard 
-              title="Network Size" 
-              value={networkSize}
-              trend={`+${stats.associate.newAssociates}`}
-              icon={Users}
+              title="Total Revenue" 
+              value={`₹${(totalRevenue / 100000).toFixed(2)}L`}
+              trend="+12%"
+              icon={Wallet}
             />
+          )}
+          {showCRM && (
             <NeatKPICard 
-              title="Conversion Rate" 
-              value={`${(Math.random() * 5 + 2).toFixed(1)}%`}
-              trend="+2%"
-              icon={TrendingUp}
+              title="Leads Processed" 
+              value={totalLeads}
+              trend="+5%"
+              icon={PhoneCall}
             />
-          </>
-        )}
-      </div>
+          )}
+          {showMarketing && (
+            <>
+              <NeatKPICard 
+                title="Network Size" 
+                value={networkSize}
+                trend={`+${stats.associate?.newAssociates || 0}`}
+                icon={Users}
+              />
+              <NeatKPICard 
+                title="Conversion Rate" 
+                value={`${(Math.random() * 5 + 2).toFixed(1)}%`}
+                trend="+2%"
+                icon={TrendingUp}
+              />
+            </>
+          )}
+          {showAdmin && (
+            <NeatKPICard 
+              title="Total Requests" 
+              value={totalRequests}
+              trend="Pending Review"
+              icon={Inbox}
+            />
+          )}
+        </div>
+      )}
 
       {/* DETAILED CONTENT */}
       <div className="space-y-12">

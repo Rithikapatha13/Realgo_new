@@ -1,22 +1,24 @@
-import { Menu, Search, User, X, Bell, ArrowLeft } from "lucide-react";
+import { Menu, Search, User, X, Bell } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMenuByRole } from "../../constants/sidebar";
 import { getUser } from "../../services/auth.service";
 import { resolveImageUrl } from "../../utils/common";
-import { getNotifications, markNotificationsRead } from "../../services/common.service";
+import { getNotifications } from "../../services/common.service";
+import { cleanupPushNotifications } from "../../services/push.service";
 
 export default function Header({
   onMenuClick,
 }) {
   const [searchValue, setSearchValue] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const user = getUser();
   const userRole = user?.role || "associate";
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const [prevUnreadCount, setPrevUnreadCount] = useState(0);
 
   const fetchNotifications = async () => {
     try {
@@ -33,26 +35,29 @@ export default function Header({
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000); // poll every 15s
+      const interval = setInterval(fetchNotifications, 40000); // poll every 40s
       return () => clearInterval(interval);
     }
-  }, [user]);
+  }, [user?.id]);
 
-  const handleMarkAllAsRead = async () => {
-    try {
-      await markNotificationsRead();
-      fetchNotifications();
-    } catch (err) {
-      console.error("Error marking notifications as read", err);
+  useEffect(() => {
+    if (unreadCount > prevUnreadCount) {
+      setShowNotificationPopup(true);
+      const timer = setTimeout(() => {
+        setShowNotificationPopup(false);
+      }, 8000);
+      setPrevUnreadCount(unreadCount);
+      return () => clearTimeout(timer);
+    } else {
+      setPrevUnreadCount(unreadCount);
     }
-  };
+  }, [unreadCount]);
 
   const location = useLocation();
   const navigate = useNavigate();
 
   // Close menus on route change
   useEffect(() => {
-    setShowNotifications(false);
     setShowProfileMenu(false);
   }, [location.pathname]);
 
@@ -147,58 +152,46 @@ export default function Header({
         {/* Notifications */}
         <div className="relative">
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
+            onClick={() => {
+              navigate("/notifications");
+              setShowNotificationPopup(false);
+            }}
             className="relative p-2 hover:bg-slate-50 rounded-lg transition-colors group"
           >
             <Bell size={20} className="text-slate-600 group-hover:text-primary-600" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
             )}
           </button>
 
-          {showNotifications && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setShowNotifications(false)}
-              />
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-20 overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-right">
-                <div className="px-4 py-3 border-b bg-slate-50/50 flex justify-between items-center">
-                  <h3 className="font-bold text-sm text-slate-800">Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button 
-                      onClick={handleMarkAllAsRead}
-                      className="text-[10px] text-primary-600 font-bold hover:underline"
-                    >
-                      Mark all as read
-                    </button>
-                  )}
+          {/* New Notification Popup/Tooltip */}
+          {showNotificationPopup && unreadCount > 0 && (
+            <div 
+              onClick={() => {
+                navigate("/notifications");
+                setShowNotificationPopup(false);
+              }}
+              className="absolute right-0 top-12 w-64 bg-slate-900 text-white p-3.5 rounded-2xl shadow-2xl border border-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-300 cursor-pointer hover:bg-slate-950 transition-all"
+            >
+              <div className="flex justify-between items-start gap-3">
+                <div className="flex-1 text-left">
+                  <p className="text-[10px] font-black tracking-wider text-rose-400 uppercase">Alert</p>
+                  <p className="text-[11px] text-slate-100 mt-1 leading-normal font-bold">
+                    You have {unreadCount} new notification{unreadCount > 1 ? 's' : ''}. Go and check them!
+                  </p>
                 </div>
-                <div className="max-h-[300px] overflow-y-auto divide-y divide-slate-100">
-                  {notifications.length > 0 ? (
-                    notifications.map((n) => (
-                      <div 
-                        key={n.id} 
-                        className={`px-4 py-3 hover:bg-slate-50 transition-colors text-left ${!n.isRead ? 'bg-primary-50/30' : ''}`}
-                      >
-                        <p className="text-xs font-semibold text-slate-800">{n.title}</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.body}</p>
-                        <p className="text-[9px] text-slate-400 mt-1">
-                          {new Date(n.createdAt).toLocaleDateString()} {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="px-4 py-8 text-center">
-                      <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Bell size={20} className="text-slate-400" />
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium">No notifications yet</p>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowNotificationPopup(false);
+                  }}
+                  className="text-slate-400 hover:text-slate-200 p-0.5 rounded-lg hover:bg-slate-800 transition-colors flex-shrink-0"
+                >
+                  <X size={12} />
+                </button>
               </div>
-            </>
+              <div className="absolute -top-1.5 right-3.5 w-3 h-3 bg-slate-900 rotate-45 border-l border-t border-slate-800" />
+            </div>
           )}
         </div>
 
@@ -259,7 +252,8 @@ export default function Header({
 
                 <button
                   className="w-full px-4 py-2.5 text-sm text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
-                  onClick={() => {
+                  onClick={async () => {
+                    await cleanupPushNotifications().catch(err => console.error(err));
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     navigate("/auth/login");

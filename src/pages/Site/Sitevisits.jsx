@@ -18,9 +18,10 @@ import { resolveImageUrl } from '@/utils/common';
 import { 
   getSiteVisits, 
   getTodaySiteVisits, 
-  deleteSiteVisit 
+  deleteSiteVisit,
+  updateSiteVisitStatus
 } from '@/services/siteVisit.service';
-import { getUser } from '@/services/auth.service';
+import { getUser, getUserType } from '@/services/auth.service';
 import Button from '@/components/Common/Button';
 import ModalWrapper from '@/components/Common/ModalWrapper';
 import DeleteConfirmationModal from '@/components/Common/DeleteConfirmationModal';
@@ -28,6 +29,16 @@ import SiteVisitForm from './SiteVisitForm';
 
 export default function Sitevisits() {
   const user = getUser();
+  const userType = (getUserType() || "").toLowerCase();
+  const role = (user?.role_name || "").toLowerCase();
+
+  const isOpsRole = 
+    userType === "admin" || 
+    userType === "superadmin" || 
+    role.includes("admin") || 
+    role.includes("account") || 
+    role.includes("finance");
+
   const [siteVisits, setSiteVisits] = useState([]);
   const [todayVisits, setTodayVisits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +51,11 @@ export default function Sitevisits() {
   const fetchAllData = async () => {
     setLoading(true);
     try {
+      // Associates only see their own site visits
+      const isAssociate = role === 'associate';
       const [allRes, todayRes] = await Promise.all([
-        getSiteVisits({ search: searchTerm, userId: user?.role_name === 'associate' ? user.id : undefined }),
-        getTodaySiteVisits(user?.role_name === 'associate' ? user.id : undefined)
+        getSiteVisits({ search: searchTerm, userId: isAssociate ? user.id : undefined }),
+        getTodaySiteVisits(isAssociate ? user.id : undefined)
       ]);
       setSiteVisits(allRes.items || []);
       setTodayVisits(todayRes.items || []);
@@ -71,6 +84,16 @@ export default function Sitevisits() {
     }
   };
 
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateSiteVisitStatus(id, status);
+      toast.success(`Site visit status updated to ${status.toLowerCase()}`);
+      fetchAllData();
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
   const openEditModal = (item) => {
     setEditingItem(item);
     setIsModalOpen(true);
@@ -90,6 +113,13 @@ export default function Sitevisits() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <Button
+          onClick={() => { setEditingItem(null); setIsModalOpen(true); }}
+          className="flex items-center gap-2 whitespace-nowrap"
+        >
+          <Plus size={16} />
+          Add Site Visit
+        </Button>
       </div>
 
       {/* TODAY'S VISITS (Minimal Style) */}
@@ -109,6 +139,8 @@ export default function Sitevisits() {
                   setItemToDelete(visit);
                   setIsDeleteModalOpen(true);
                 }}
+                onStatusChange={handleStatusChange}
+                isOpsRole={isOpsRole}
                 isToday
               />
             ))}
@@ -141,6 +173,8 @@ export default function Sitevisits() {
                   setItemToDelete(visit);
                   setIsDeleteModalOpen(true);
                 }}
+                onStatusChange={handleStatusChange}
+                isOpsRole={isOpsRole}
               />
             ))}
           </div>
@@ -175,7 +209,18 @@ export default function Sitevisits() {
   );
 }
 
-function VisitCard({ visit, onEdit, onDelete, isToday }) {
+const STATUS_STYLES = {
+  PENDING: { bg: 'bg-amber-50 border-amber-200 text-amber-700', label: 'Pending Approval' },
+  APPROVED: { bg: 'bg-blue-50 border-blue-200 text-blue-700', label: 'Approved' },
+  REJECTED: { bg: 'bg-rose-50 border-rose-200 text-rose-700', label: 'Rejected' },
+  VISITED: { bg: 'bg-purple-50 border-purple-200 text-purple-700', label: 'Visited - Review' },
+  COMPLETED: { bg: 'bg-emerald-50 border-emerald-200 text-emerald-700', label: 'Completed' },
+};
+
+function VisitCard({ visit, onEdit, onDelete, onStatusChange, isOpsRole, isToday }) {
+  const canEdit = isOpsRole || (visit.status === 'PENDING' || (visit.status === 'APPROVED' && !visit.siteVisitPicture));
+  const canDelete = isOpsRole || visit.status === 'PENDING';
+
   return (
     <div className={`group bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md relative overflow-hidden flex flex-col`}>
       {/* Verification Image Preview */}
@@ -198,26 +243,43 @@ function VisitCard({ visit, onEdit, onDelete, isToday }) {
           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isToday ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
             <User size={16} />
           </div>
+          
+          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold border ${STATUS_STYLES[visit.status]?.bg || 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+            {STATUS_STYLES[visit.status]?.label || visit.status}
+          </span>
+
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={onEdit} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-600 transition-colors">
-              <Pencil size={14} />
-            </button>
-            <button onClick={onDelete} className="p-1.5 hover:bg-rose-50 rounded-md text-rose-600 transition-colors">
-              <Trash2 size={14} />
-            </button>
+            {canEdit && (
+              <button onClick={onEdit} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-600 transition-colors">
+                <Pencil size={14} />
+              </button>
+            )}
+            {canDelete && (
+              <button onClick={onDelete} className="p-1.5 hover:bg-rose-50 rounded-md text-rose-600 transition-colors">
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         </div>
 
         <div className="space-y-1">
           <h3 className="font-bold text-slate-800 line-clamp-1">{visit.leadName}</h3>
+          
           <div className="flex items-center gap-2 text-slate-500 text-[11px] font-medium">
             <Phone size={12} className="text-slate-400" />
             {visit.phone}
           </div>
+          
           {visit.project && (
              <div className="flex items-center gap-2 text-primary-600 text-[10px] font-black uppercase tracking-tighter mt-1">
                <MapPin size={10} /> {visit.project.projectName}
              </div>
+          )}
+
+          {visit.creator && (
+            <div className="text-[10px] text-slate-400 font-semibold mt-1">
+              By: {visit.creator.firstName} {visit.creator.lastName}
+            </div>
           )}
         </div>
 
@@ -231,6 +293,52 @@ function VisitCard({ visit, onEdit, onDelete, isToday }) {
             {visit.time}
           </div>
         </div>
+
+        {/* Actions Row */}
+        {isOpsRole ? (
+          // Admin/Ops Actions
+          (visit.status === 'PENDING' || visit.status === 'VISITED') && (
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
+              {visit.status === 'PENDING' && (
+                <>
+                  <button
+                    onClick={() => onStatusChange(visit.id, 'APPROVED')}
+                    className="flex-1 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => onStatusChange(visit.id, 'REJECTED')}
+                    className="flex-1 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              {visit.status === 'VISITED' && (
+                <button
+                  onClick={() => onStatusChange(visit.id, 'COMPLETED')}
+                  className="w-full py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all"
+                >
+                  Verify & Complete
+                </button>
+              )}
+            </div>
+          )
+        ) : (
+          // Associate Actions
+          visit.status === 'APPROVED' && (
+            <div className="mt-3 pt-3 border-t border-slate-100">
+              <button
+                onClick={onEdit}
+                className="w-full py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+              >
+                <Camera size={12} />
+                Complete & Upload Photo
+              </button>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

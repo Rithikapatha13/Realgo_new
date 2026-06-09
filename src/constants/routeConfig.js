@@ -55,6 +55,7 @@ import ClientAdminDashboard from "../pages/administration/ClientAdminDashboard";
 import Leads from "../pages/CRM/Leads";
 import UploadLeads from "../pages/CRM/UploadLeads";
 import CRMDashboard from "../pages/CRM/CRMDashboard";
+import Followup from "../pages/CRM/Followup";
 import AssociateDash from "../pages/CRM/AssociateDash";
 import TcDash from "../pages/CRM/TcDash";
 import ProjectIncentives from "../pages/CRM/Incentives";
@@ -217,6 +218,7 @@ export const routeConfig = {
       { path: "/leads/upload", component: UploadLeads },
       { path: "/leads/pending", component: Leads },
       { path: "/leads/followups", component: Leads },
+      { path: "/followup", component: Followup },
     ]
   }
 };

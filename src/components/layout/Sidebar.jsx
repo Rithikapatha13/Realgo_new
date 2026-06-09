@@ -14,6 +14,7 @@ import {
   getUser,
   getUserType,
 } from "../../services/auth.service";
+import { cleanupPushNotifications } from "../../services/push.service";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const [open, setOpen] = useState({});
@@ -62,7 +63,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await cleanupPushNotifications().catch(err => console.error(err));
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/auth/login");

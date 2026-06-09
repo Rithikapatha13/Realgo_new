@@ -3,10 +3,20 @@ import { X, LandPlot, MapPin, Ruler, Box, Compass, Save, Eye, Plus, Pencil, Slid
 import toast from "react-hot-toast";
 import CustomSelect from "../Common/CustomSelect";
 import { useCreatePlot, useUpdatePlot, useGetPhases } from "../../hooks/usePlot";
+import PlotBookingRequestDialog from "./PlotBookingRequestDialog";
 
 export default function PlotFormDialog({ isOpen, onClose, action, plotData, projects }) {
     const createMutation = useCreatePlot();
     const updateMutation = useUpdatePlot();
+    const [bookingRequestOpen, setBookingRequestOpen] = useState(false);
+
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const isUserAdmin = ["admin", "accounts", "superadmin", "pro"].includes(
+        loggedInUser.role?.roleName?.toLowerCase() ||
+        loggedInUser.roleName?.toLowerCase() ||
+        loggedInUser.role?.toLowerCase() ||
+        loggedInUser.userType?.toLowerCase()
+    );
 
     const [form, setForm] = useState({
         plotNumber: "",
@@ -333,7 +343,31 @@ export default function PlotFormDialog({ isOpen, onClose, action, plotData, proj
                         </button>
                     </div>
                 )}
+
+                {isView && !isUserAdmin && plotData?.status === "AVAILABLE" && (
+                    <div className="p-5 sm:p-7 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-3 sm:gap-4">
+                        <button type="button" onClick={onClose}
+                            className="px-8 py-3 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-200 transition-all active:scale-95">
+                            Close
+                        </button>
+                        <button type="button" onClick={() => setBookingRequestOpen(true)}
+                            className="px-10 py-3 rounded-2xl text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95 flex items-center gap-2">
+                            Request Booking
+                        </button>
+                    </div>
+                )}
             </div>
+
+            {bookingRequestOpen && plotData && (
+                <PlotBookingRequestDialog
+                    isOpen={bookingRequestOpen}
+                    onClose={() => {
+                        setBookingRequestOpen(false);
+                        onClose();
+                    }}
+                    plot={plotData}
+                />
+            )}
         </div>
     );
 }

@@ -32,6 +32,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("usertype");
+      localStorage.removeItem("fcm_token");
       
       // Prevent infinite redirect loops
       if (!window.location.pathname.includes("/auth/login")) {

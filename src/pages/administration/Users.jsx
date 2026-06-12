@@ -219,7 +219,7 @@ export default function Users() {
           <p className="text-slate-500 text-sm mt-1">Manage network hierarchy and profile verification</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {canManageUsers && (
             <>
               <button
@@ -235,6 +235,25 @@ export default function Users() {
               >
                 <Upload size={20} className="text-indigo-600" />
                 <span>Bulk Upload</span>
+              </button>
+            </>
+          )}
+          {/* Telecaller buttons — only for telecalleradmin */}
+          {(rawRole.replace(/\s+/g, "").includes("TELECALLERADMIN") || userType.replace(/\s+/g, "").includes("telecalleradmin")) && (
+            <>
+              <button
+                onClick={() => navigate("/telecaller/add")}
+                className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-md shadow-emerald-200 active:scale-95 text-sm"
+              >
+                <Plus size={20} />
+                <span>Add Telecaller</span>
+              </button>
+              <button
+                onClick={() => navigate("/telecaller/bulk")}
+                className="inline-flex items-center justify-center gap-2 bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-700 px-5 py-2.5 rounded-xl font-medium transition-all shadow-sm active:scale-95 text-sm"
+              >
+                <Upload size={20} className="text-emerald-600" />
+                <span>Bulk Telecallers</span>
               </button>
             </>
           )}

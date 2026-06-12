@@ -28,6 +28,7 @@ export default function VehicleSiteVisits() {
   
   const [logs, setLogs] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [availableProjects, setAvailableProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,12 +53,14 @@ export default function VehicleSiteVisits() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [logsRes, vehiclesRes] = await Promise.all([
+      const [logsRes, vehiclesRes, projectsRes] = await Promise.all([
         apiClient.get("/site-visits/vehicle-site-visits"),
-        apiClient.get("/site-visits/vehicles")
+        apiClient.get("/site-visits/vehicles"),
+        apiClient.get("/projects")
       ]);
       setLogs(logsRes.data.items || []);
       setVehicles(vehiclesRes.data.items || []);
+      setAvailableProjects(projectsRes.data.items || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -99,7 +102,8 @@ export default function VehicleSiteVisits() {
         startKms: "",
         endKms: "",
         totalKms: "",
-        paymentReceipt: ""
+        paymentReceipt: "",
+        projects: []
       });
     } catch (err) {
       toast.error(err.response?.data?.message || "Error saving log");
@@ -118,13 +122,35 @@ export default function VehicleSiteVisits() {
     }
   };
 
+  const handleProjectToggle = (project) => {
+    const isSelected = formData.projects.some(p => p.id === project.id);
+    let newProjects = [];
+    if (isSelected) {
+      newProjects = formData.projects.filter(p => p.id !== project.id);
+    } else {
+      newProjects = [...formData.projects, { id: project.id, projectName: project.projectName }];
+    }
+    setFormData(prev => ({ ...prev, projects: newProjects }));
+  };
+
   return (
     <div className="p-6 space-y-6 animate-in fade-in duration-500">
       {/* Action Header */}
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recent Trips & Logistics</h2>
         <Button 
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setFormData({
+              ...formData,
+              totalAmountSpent: 0,
+              startKms: "",
+              endKms: "",
+              totalKms: "",
+              paymentReceipt: "",
+              projects: []
+            });
+            setShowModal(true);
+          }}
           className="flex items-center gap-2"
           variant="primary"
           size="sm"
@@ -249,6 +275,15 @@ export default function VehicleSiteVisits() {
                                   </a>
                                 )}
                             </div>
+                            {log.projects && Array.isArray(log.projects) && log.projects.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2.5">
+                                    {log.projects.map((proj, i) => (
+                                        <span key={i} className="text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                            <MapPin size={8} /> {proj.projectName || proj.name || proj}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -350,6 +385,30 @@ export default function VehicleSiteVisits() {
                 </div>
               </div>
 
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Projects Visited</label>
+                <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg max-h-40 overflow-y-auto custom-scrollbar">
+                  {availableProjects.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic col-span-2">No projects found</p>
+                  ) : (
+                    availableProjects.map((p) => {
+                      const isChecked = formData.projects.some(proj => proj.id === p.id);
+                      return (
+                        <label key={p.id} className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer select-none">
+                          <input 
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => handleProjectToggle(p)}
+                            className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 w-4 h-4"
+                          />
+                          <span className="truncate">{p.projectName}</span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+ 
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Payment Receipt / Bill</label>
                 <FileInput 

@@ -338,7 +338,7 @@ export const crmMenu = {
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
     { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -372,7 +372,7 @@ export const telecallerAdminCrmMenu = {
     { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads" },
     { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -384,7 +384,7 @@ export const leadflowCrmMenu = {
     { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard" },
     { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads" },
     { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads" },
-    { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups" },
+    { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups" },
   ],
 };
 
@@ -412,7 +412,7 @@ export const adminCrmMenu = {
     },
     {
       label: "Follow-ups",
-      link: "/leads/followups",
+      link: "/followup",
       icon: Calendar,
       pageTitle: "Follow-ups",
     },
@@ -702,8 +702,8 @@ export const telecallerMenu = [
   { type: "header", label: "Leads" },
   { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
   { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
-  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
 
   { type: "header", label: "Analysis" },
   { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "CRM" },
@@ -742,7 +742,6 @@ export const adminMenu = [
 
   { type: "header", label: "Ventures" },
   { label: "Projects", link: "/projects", icon: Briefcase, pageTitle: "Projects", module: "VENTURES" },
-  { label: "Phases", link: "/phases", icon: Layers, pageTitle: "Phases", module: "VENTURES" },
   { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
 
   { type: "header", label: "Finance" },
@@ -765,14 +764,47 @@ export const adminMenu = [
 
   { type: "header", label: "CRM" },
   { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
-  { label: "Site Visits", link: "/customer-sitevisits", icon: MapPin, pageTitle: "Site Visits", module: "SITE_VISITS" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Hub", module: "SITE_VISITS" },
 ];
 
 export const telecallerAdminMenu = [
-  ...telecallerMenu,
-  { type: "header", label: "Admin Tools" },
-  { label: "Users", link: "/users", icon: Users, pageTitle: "Users" },
+  { type: "header", label: "Common" },
+  { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
+  { label: "Profile", link: "/profile", icon: User, pageTitle: "Profile", module: "GENERAL" },
+  { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
+
+  { type: "header", label: "Analysis" },
+  { label: "Performance", link: "/performance", icon: TrendingUp, pageTitle: "Performance Tracking", module: "GENERAL" },
+  { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "CRM" },
+
+  { type: "header", label: "Ventures" },
+  { label: "Projects", link: "/projects", icon: Landmark, pageTitle: "Projects", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
+
+  { type: "header", label: "Administration" },
+  { label: "Users", link: "/users", icon: Users, pageTitle: "Users", module: "GENERAL" },
+
+  { type: "header", label: "Media" },
+  { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "GENERAL" },
+  { label: "Showcase", link: "/showcases", icon: ImageIcon, pageTitle: "Showcase", module: "GENERAL" },
+  { label: "News Feed", link: "/news", icon: FileText, pageTitle: "News Feed", module: "GENERAL" },
+  { label: "Videos", link: "/videos", icon: PlaySquare, pageTitle: "Videos", module: "GENERAL" },
+
+  { type: "header", label: "CRM" },
+  { label: "Dashboard", link: "/crm-dashboard", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
+  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Upload Leads", link: "/leads/upload", icon: Send, pageTitle: "Upload Leads", module: "CRM" },
+  { label: "Pending", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Follow-ups", link: "/followup", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits Hub", module: "SITE_VISITS" },
+
+
+  { type: "header", label: "Finance" },
+  { label: "Dashboard", link: "/finance", icon: LayoutDashboard, pageTitle: "Finance Dashboard", module: "FINANCE" },
+  { label: "Contributions", link: "/associate-contribution", icon: BadgeIndianRupee, pageTitle: "Associate Contributions", module: "FINANCE" },
+  { label: "Payouts", link: "/associate-payout", icon: CreditCard, pageTitle: "Associate Payouts", module: "FINANCE" },
+  { label: "Reports", link: "/finance/reports", icon: BarChart3, pageTitle: "Financial Reports", module: "FINANCE" },
 ];
 
 export const financeAdminMenu = [
@@ -809,36 +841,38 @@ export const systemManagementMenu = {
 
 export const superAdminMenu = [
   commonMenu,
-  venturesMenu,
-  financeMenu,
-  administrationMenu,
-  mediaMenu,
-  siteVisitsMenu,
+  // venturesMenu,
+  // financeMenu,
+  // administrationMenu,
+  // mediaMenu,
+  // siteVisitsMenu,
   systemManagementMenu,
 ];
 
 export const associateMenu = [
-  { type: "header", label: "Common" },
+  { type: "header", label: "General" },
   { label: "Home", link: "/", icon: LayoutDashboard, pageTitle: "Home", module: "GENERAL" },
   { label: "Profile", link: "/profile", icon: UserCircle, pageTitle: "Profile", module: "GENERAL" },
+  { label: "Team Tree", link: "/tree", icon: Network, pageTitle: "Team Tree", module: "GENERAL" },
   { label: "My Team", link: "/my-team", icon: Users, pageTitle: "My Team", module: "GENERAL" },
-
-  { type: "header", label: "CRM" },
-  { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
-  { label: "My Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "My Leads", module: "CRM" },
-  { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
-  { label: "Follow-ups", link: "/leads/followups", icon: Calendar, pageTitle: "Follow-ups", module: "CRM" },
+  { label: "Reports", link: "/reports", icon: BarChart3, pageTitle: "Reports", module: "GENERAL" },
 
   { type: "header", label: "Ventures" },
-  { label: "Projects", link: "/projects", icon: Landmark, pageTitle: "Projects", module: "VENTURES" },
-  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots", module: "VENTURES" },
+  { label: "Plots", link: "/plots", icon: MapPin, pageTitle: "Plots Map", module: "VENTURES" },
 
   { type: "header", label: "Media" },
   { label: "Greetings", link: "/greetings", icon: ImageIcon, pageTitle: "Greetings", module: "MEDIA" },
-  { label: "News", link: "/news", icon: Globe, pageTitle: "News", module: "MEDIA" },
+  { label: "News", link: "/news", icon: Globe, pageTitle: "News Feed", module: "MEDIA" },
   { label: "Videos", link: "/videos", icon: Camera, pageTitle: "Videos", module: "MEDIA" },
 
-  { type: "header", label: "Tools" },
+  { type: "header", label: "Leads" },
+  { label: "Dashboard", link: "/associate-dash", icon: LayoutDashboard, pageTitle: "Dashboard", module: "CRM" },
+  { label: "Leads", link: "/leads", icon: ClipboardCheck, pageTitle: "Leads", module: "CRM" },
+  { label: "Pending Leads", link: "/leads/pending", icon: Clock, pageTitle: "Pending Leads", module: "CRM" },
+  { label: "Followup", link: "/followup", icon: Calendar, pageTitle: "Followups", module: "CRM" },
+  { label: "Site Visits", link: "/site/dashboard", icon: MapPin, pageTitle: "Site Visits", module: "CRM" },
+
+  { type: "header", label: "Notes" },
   { label: "Notes", link: "/notes", icon: NotebookPen, pageTitle: "Notes", module: "GENERAL" },
   { label: "Reminders", link: "/reminders", icon: Clock, pageTitle: "Reminders", module: "GENERAL" },
 ];
@@ -874,6 +908,11 @@ export const getMenuByRole = (role, userModules = [], userType = "user") => {
     }
     return true;
   });
+
+  // 1.5. Bypass module filtering for associates so they always see their full workspace
+  if (menu === associateMenu) {
+    return removeEmptyHeaders(menu);
+  }
 
   // 2. Apply hard role-level strips BEFORE any module check
   // Sub-admins (userType === "admin", often used as Marketing Admins) NEVER see Finance

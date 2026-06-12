@@ -2,6 +2,8 @@
 
 @theme {
   --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
   --color-secondary-500: var(--secondary-500);
 }
 
@@ -9,6 +11,7 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

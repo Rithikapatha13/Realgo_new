@@ -32,11 +32,11 @@ export default function UploadLeads() {
 
         setUploading(true);
         setProg(20);
-        
+
         try {
             const formData = new FormData();
             formData.append('file', file);
-            
+
             const API_URL = import.meta.env.VITE_API_URL + "/crm/leads/bulk";
             const response = await axios.post(API_URL, formData, {
                 headers: {
@@ -62,22 +62,54 @@ export default function UploadLeads() {
     }
 
     async function addManual() {
+        // Validate required fields
         if (!form.leadName || !form.leadContact) {
             toast.error('Name and phone are required');
             return;
         }
+
         try {
-            const API_URL = import.meta.env.VITE_API_URL + "/crm/leads";
-            await axios.post(API_URL, form, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            // Pull logged‑in user info (companyId and userId)
+            const user = getUser(); // assumes a helper that returns { companyId, userId }
+            const companyId = user?.companyId;
+            const creatorUserId = user?.userId;
+
+            // OPTIONAL: try to auto‑assign a telecaller via a helper endpoint
+            let dedicatedTCId = null;
+            let adminTCId = null;
+            try {
+                const assignRes = await axios.get(import.meta.env.VITE_API_URL + '/crm/assign-telecaller', {
+                    params: { companyId },
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                if (assignRes.data && assignRes.data.id) {
+                    if (assignRes.data.isDedicatedTC) dedicatedTCId = assignRes.data.id;
+                    else adminTCId = assignRes.data.id;
+                }
+            } catch (e) {
+                // If the helper endpoint is missing, we simply proceed without pre‑assignment
+            }
+
+            const payload = {
+                ...form,
+                companyId,
+                userId: creatorUserId,
+                dedicatedTCId,
+                adminTCId,
+                assignedById: creatorUserId,
+                date: new Date(),
+            };
+
+            const API_URL = import.meta.env.VITE_API_URL + '/crm/leads';
+            await axios.post(API_URL, payload, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             toast.success(`Lead added: ${form.leadName}`);
             setForm({ leadName: '', leadContact: '', leadEmail: '', leadCity: '', leadSource: 'WEBSITE', description: 'Company Website' });
         } catch (error) {
-            toast.error('Failed to add lead');
+            toast.error(error?.response?.data?.message || 'Failed to add lead');
         }
     }
-
     function dlSample() {
         const csv = `leadName,leadContact,leadEmail,leadSource,description,leadCity\nAmit Sharma,9876543210,amit@gmail.com,SOCIAL_MEDIA,Facebook,Hyderabad\nSunita Reddy,9876543211,sunita@gmail.com,WEBSITE,99Acres,Secunderabad`;
         const a = document.createElement('a');
@@ -88,7 +120,7 @@ export default function UploadLeads() {
 
     return (
         <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-            
+
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
                     <Upload size={24} className="text-primary-600" />
@@ -168,40 +200,40 @@ export default function UploadLeads() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Name *</label>
-                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 placeholder="Lead Name" value={form.leadName} onChange={e => setForm(p => ({ ...p, leadName: e.target.value }))} />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone Number *</label>
-                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 placeholder="98XXXXXXXX" value={form.leadContact} onChange={e => setForm(p => ({ ...p, leadContact: e.target.value }))} />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address</label>
-                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 type="email" placeholder="example@mail.com" value={form.leadEmail} onChange={e => setForm(p => ({ ...p, leadEmail: e.target.value }))} />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">City/Location</label>
-                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <input className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 placeholder="Area, City" value={form.leadCity} onChange={e => setForm(p => ({ ...p, leadCity: e.target.value }))} />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Traffic Source</label>
-                            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 value={form.leadSource} onChange={e => setForm(p => ({ ...p, leadSource: e.target.value, description: (SRC_OPTS[e.target.value] || [''])[0] }))}>
                                 {Object.keys(SRC_OPTS).map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
                             </select>
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Specific Detail</label>
-                            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block" 
+                            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 block"
                                 value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}>
                                 {(SRC_OPTS[form.leadSource] || []).map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                         </div>
                     </div>
-                    <button onClick={addManual} className="w-full py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all focus:ring-4 focus:ring-primary-300 flex items-center justify-center gap-2">
+                    <button onClick={addManual} className="w-full py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-black font-bold text-sm transition-all focus:ring-4 focus:ring-primary-300 flex items-center justify-center gap-2">
                         <Plus size={18} /> Add New Lead
                     </button>
                 </div>

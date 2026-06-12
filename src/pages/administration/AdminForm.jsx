@@ -82,9 +82,6 @@ export default function AdminForm({ item, action, onClose, onRefetch }) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <Section title="Basic Information" icon={User}>
                 <InputField label="Full Name" name="username" register={register} errors={errors} required disabled={isView} />
-                {action === "Create" && (
-                    <InputField label="Password" name="password" type="password" register={register} errors={errors} required />
-                )}
                 <InputField label="Phone Number" name="phone" register={register} errors={errors} required disabled={isView} />
                 <InputField label="Email Address" name="email" type="email" register={register} errors={errors} required disabled={isView} />
                 <InputField label="Alternative Phone" name="alternativePhone" register={register} errors={errors} disabled={isView} />

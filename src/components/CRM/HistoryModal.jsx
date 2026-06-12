@@ -117,7 +117,7 @@ export default function HistoryModal({ leadId, onClose }) {
                             <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700">
                                 <User size={12} className="text-primary-600" />
                                 {item.type === 'meeting' ? (item.associate?.name || 'Associate') : 
-                                 (item.dedicatedTC?.firstName || item.adminTC?.firstName || item.telecaller?.firstName || 'System')}
+                                 (item.telecaller?.name || 'System')}
                             </div>
                             <span className={`px-2.5 py-1 rounded-lg font-black text-[10px] border shadow-sm uppercase tracking-widest ${
                                 item.type === 'meeting' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :

@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import { ConfigRoutes } from "./components/routing/RoutesConfig";
 import { publicRoutes, routeConfig } from "./constants/routeConfig";
 import { Toaster } from "react-hot-toast";
 import { getUser, getUserType } from "./services/auth.service";
+import { initializePushNotifications } from "./services/push.service";
 // import { getUser } from "./services/auth.service";
 // import Snowfall from "react-snowfall";
 
@@ -13,6 +15,12 @@ function App() {
   // Combined auth logic from both branches
   const isAuthenticated = !!user;
   const userRoleLower = user?.role?.toLowerCase() || null;
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      initializePushNotifications();
+    }
+  }, [isAuthenticated]);
 
   return (
     <BrowserRouter>

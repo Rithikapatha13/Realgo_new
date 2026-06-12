@@ -17,6 +17,7 @@ import PlotBookingDialog from "../../components/plots/PlotBookingDialog";
 import PlotRegistrationDialog from "../../components/plots/PlotRegistrationDialog";
 import PlotBookingPlanDialog from "../../components/plots/PlotBookingPlanDialog";
 import PlotBulkDialog from "../../components/plots/PlotBulkDialog";
+import PlotBookingRequestDialog from "../../components/plots/PlotBookingRequestDialog";
 
 /* ── Colour map ── */
 const STATUS_CONFIG = {
@@ -71,6 +72,7 @@ export default function Plots() {
   const [bookingPlanId, setBookingPlanId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [bookingRequestPlot, setBookingRequestPlot] = useState(null);
 
   /* ── data ── */
   const queryParams = {
@@ -135,13 +137,15 @@ export default function Plots() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 md:space-y-10 bg-[#fdfdfd] min-h-screen overflow-x-hidden">
+    <div className="p-4 sm:p-6 lg:p-8 bg-[#fdfdfd] min-h-screen overflow-x-hidden">
       {/* ═══════════ HEADER ═══════════ */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-[#0f172a] tracking-tight mb-2">Plots</h1>
-          <p className="text-slate-500 font-bold text-sm md:text-lg">
-            {viewMode === "projects" ? "Select Project to View Map"
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-6 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            Venture <span className="text-[#1e1e62]">Plots</span>
+          </h1>
+          <p className="text-slate-500 text-sm font-medium">
+            {viewMode === "projects" ? "Select a project to view its interactive layout map."
               : `Browsing ${totalPlots} Plots Data`}
           </p>
         </div>
@@ -150,7 +154,7 @@ export default function Plots() {
           {viewMode === "projects" ? (
             <button
               onClick={() => { setViewMode("grid"); setProject(""); }}
-              className="bg-[#1e1e62] text-white px-5 md:px-8 py-3 rounded-xl text-sm font-black transition-all hover:bg-[#2e2e8a] shadow-lg active:scale-95 flex items-center gap-2"
+              className="bg-[#1e1e62] hover:bg-[#2e2e8a] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95 flex items-center gap-2"
             >
               <LayoutGrid size={18} />
               Show Plots Data
@@ -161,14 +165,14 @@ export default function Plots() {
                 <>
                   <button
                     onClick={() => { setFormAction("Create"); setEditId(null); setShowForm(true); }}
-                    className="px-4 md:px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs md:text-sm shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
+                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-xs md:text-sm shadow-sm transition-all active:scale-95 flex items-center gap-2"
                   >
                     <Plus size={18} />
                     Add Plot
                   </button>
                   <button
                     onClick={() => setShowBulkForm(true)}
-                    className="px-4 md:px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xs md:text-sm shadow-xl shadow-slate-200 transition-all active:scale-95 flex items-center gap-2"
+                    className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs md:text-sm shadow-sm transition-all active:scale-95 flex items-center gap-2"
                   >
                     <Layers size={18} />
                     Bulk Plots
@@ -177,14 +181,38 @@ export default function Plots() {
               )}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 md:px-6 py-3 rounded-xl font-black text-xs md:text-sm transition-all active:scale-95 flex items-center gap-2 border-2 ${showFilters ? "bg-slate-900 border-slate-900 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-xs md:text-sm transition-all active:scale-95 flex items-center gap-2 border ${showFilters ? "bg-slate-900 border-slate-900 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
               >
                 <SlidersHorizontal size={18} />
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </button>
+
+              <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white shrink-0">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3.5 py-2 text-xs font-bold transition-all ${
+                    viewMode === "grid"
+                      ? "bg-[#1e1e62] text-white shadow-inner"
+                      : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  Cards
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3.5 py-2 text-xs font-bold transition-all ${
+                    viewMode === "table"
+                      ? "bg-[#1e1e62] text-white shadow-inner"
+                      : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  Table
+                </button>
+              </div>
+
               <button
                 onClick={() => setViewMode("projects")}
-                className="bg-white border-2 border-[#1e1e62] text-[#1e1e62] px-5 md:px-8 py-3 rounded-xl text-sm font-black transition-all hover:bg-slate-50 active:scale-95 flex items-center gap-2"
+                className="bg-white border border-[#1e1e62] text-[#1e1e62] px-6 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-slate-50 active:scale-95 flex items-center gap-2"
               >
                 <Building2 size={18} />
                 Select Project
@@ -198,34 +226,83 @@ export default function Plots() {
 
       {/* 1. PROJECT SELECTION VIEW */}
       {viewMode === "projects" && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
           {projectsLoading ? (
             <div className="flex justify-center py-32">
               <div className="w-12 h-12 border-4 border-slate-100 border-t-[#1e1e62] rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
-              {projectsList.map((p) => (
-                <div key={p.id} onClick={() => handleProjectClick(p.id)}
-                  className="group bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-2xl transition-all duration-300 cursor-pointer flex items-center gap-4 md:gap-6"
-                >
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-[#f8f9ff] flex items-center justify-center text-[#1e1e62] group-hover:bg-[#1e1e62] group-hover:text-white transition-all duration-500">
-                    <Building2 size={24} className="md:w-[28px] md:h-[28px]" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+              {projectsList.map((p) => {
+                const hasImage = p.projectImage && p.projectImage.trim() !== "";
+                const imageUrl = hasImage 
+                  ? (p.projectImage.startsWith("http") ? p.projectImage : `${IMAGE_BASE_URL}/${p.projectImage}`)
+                  : null;
+
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => handleProjectClick(p.id)}
+                    className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full"
+                  >
+                    {/* Top banner / Image */}
+                    <div className="h-40 w-full bg-gradient-to-tr from-[#1e1e62] to-[#2e2e8a] relative overflow-hidden shrink-0">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={p.projectName}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center opacity-10">
+                          <Building2 size={80} className="text-white" />
+                        </div>
+                      )}
+                      
+                      {/* Floating status tag */}
+                      {p.projectStatus?.statusName && (
+                        <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#1e1e62] px-3 py-1 rounded-lg text-[9px] font-bold tracking-wider uppercase shadow-sm">
+                          {p.projectStatus.statusName}
+                        </span>
+                      )}
+
+                      {/* Available plots tag */}
+                      <span className="absolute bottom-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-lg text-[9px] font-bold tracking-wider uppercase shadow-sm flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        {p.availablePlots} Plots Available
+                      </span>
+                    </div>
+
+                    {/* Content area */}
+                    <div className="p-5 flex-1 flex flex-col justify-between gap-4 bg-white">
+                      <div className="space-y-2">
+                        <h3 className="text-base font-bold text-slate-800 tracking-tight transition-colors line-clamp-1">
+                          {p.projectName}
+                        </h3>
+                        {p.projectAddress && (
+                          <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5 line-clamp-1 leading-relaxed">
+                            <MapPin size={12} className="shrink-0 text-slate-400" />
+                            {p.projectAddress}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Action text */}
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#1e1e62] uppercase tracking-wider">
+                        <span>Explore Venture Map</span>
+                        <ChevronRight size={14} className="transform group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg md:text-xl font-bold text-[#1e1e62] transition-colors truncate">{p.projectName}</h3>
-                    <p className="text-[10px] md:text-xs font-black text-primary-500 uppercase tracking-widest opacity-60">Click to explore</p>
-                  </div>
-                  <ChevronRight size={20} className="text-slate-200 group-hover:text-slate-400 transform group-hover:translate-x-1 transition-all" />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       )}
 
       {/* 2. MASTER GRID VIEW */}
-      {viewMode === "grid" && (
+      {(viewMode === "grid" || viewMode === "table") && (
         <>
           {/* Permanent Search Bar */}
           <div className="mb-4">
@@ -235,19 +312,19 @@ export default function Plots() {
                   placeholder="Quick search by plot number..." 
                   value={plotNumber} 
                   onChange={(e) => setPlotNumber(e.target.value)}
-                  className="w-full bg-white border-2 border-slate-200 rounded-[1.25rem] pl-12 pr-4 py-3 text-sm md:text-base font-bold focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all shadow-sm group-hover:border-slate-300" 
+                  className="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all shadow-sm group-hover:border-slate-300" 
                 />
              </div>
           </div>
 
           {/* Collapsible Filters Grid */}
           {showFilters && (
-            <div className="mb-8 p-4 md:p-6 bg-white border border-slate-100 rounded-[2rem] shadow-xl animate-in slide-in-from-top-4 fade-in duration-300">
+            <div className="mb-8 p-4 md:p-6 bg-white border border-slate-200 rounded-2xl shadow-md animate-in slide-in-from-top-4 fade-in duration-300">
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Project</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Project</label>
                     <select value={project} onChange={(e) => setProject(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Projects</option>
                       {projectsList.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
                     </select>
@@ -255,9 +332,9 @@ export default function Plots() {
                   </div>
 
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Phase</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Phase</label>
                     <select value={phase} onChange={(e) => setPhase(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Phases</option>
                       {phasesList.map((ph) => <option key={ph.id} value={ph.phaseName}>{ph.phaseName}</option>)}
                     </select>
@@ -265,9 +342,9 @@ export default function Plots() {
                   </div>
 
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Status</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Status</label>
                     <select value={status} onChange={(e) => setStatus(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Status</option>
                       <option value="AVAILABLE">Available</option>
                       <option value="BOOKED">Booked</option>
@@ -278,9 +355,9 @@ export default function Plots() {
                   </div>
 
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Category</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Category</label>
                     <select value={category} onChange={(e) => setCategory(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Categories</option>
                       <option value="premium">Premium</option><option value="executive">Executive</option>
                       <option value="commercial">Commercial</option><option value="semicommercial">Semi Commercial</option>
@@ -291,9 +368,9 @@ export default function Plots() {
                   </div>
 
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Facing</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Facing</label>
                     <select value={facing} onChange={(e) => setFacing(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Facing</option>
                       <option value="east">East</option><option value="west">West</option>
                       <option value="north">North</option><option value="south">South</option>
@@ -303,9 +380,9 @@ export default function Plots() {
                   </div>
 
                   <div className="relative">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Plot Size</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Plot Size</label>
                     <select value={sqrSize} onChange={(e) => setSqrSize(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold appearance-none">
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium appearance-none">
                       <option value="">All Sizes</option>
                       <option value="0-150">0 – 150</option><option value="150-200">150 – 200</option>
                       <option value="200-300">200 – 300</option><option value="1000-">1000+</option>
@@ -314,12 +391,12 @@ export default function Plots() {
                   </div>
                </div>
 
-               <div className="mt-6 pt-6 border-t border-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+               <div className="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                    <div className="relative flex-1 w-full max-w-sm">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Sold By (Associate)</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Sold By (Associate)</label>
                       <div 
                         onClick={() => setSoldByDropdownOpen(!soldByDropdownOpen)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-bold flex items-center justify-between cursor-pointer text-slate-700"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs md:text-sm font-medium flex items-center justify-between cursor-pointer text-slate-700"
                       >
                         <span className="truncate">
                           {soldBy ? (associatesList.find(a => a.id === soldBy)?.username || soldBy) : (
@@ -334,7 +411,7 @@ export default function Plots() {
                             <Search className="absolute left-6 top-2.5 text-slate-400" size={12} />
                             <input type="text" placeholder="Search associate..." value={soldBySearch}
                               onChange={(e) => setSoldBySearch(e.target.value)}
-                              className="w-full bg-slate-50 border-none rounded-lg pl-8 pr-4 py-2 text-[11px] font-bold outline-none"
+                              className="w-full bg-slate-50 border-none rounded-lg pl-8 pr-4 py-2 text-[11px] font-medium outline-none"
                               onClick={(e) => e.stopPropagation()}
                             />
                           </div>
@@ -355,7 +432,7 @@ export default function Plots() {
                       )}
                    </div>
                    {hasFilters && (
-                     <button onClick={clearAll} className="px-6 py-2.5 bg-rose-50 text-rose-500 hover:bg-rose-100 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+                     <button onClick={clearAll} className="px-6 py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all">
                        <X size={16} /> Clear All Filters
                      </button>
                    )}
@@ -363,110 +440,265 @@ export default function Plots() {
             </div>
           )}
 
-          {/* Grid Content */}
+          {/* Content area */}
           {isLoading ? (
             <div className="flex justify-center py-32">
-              <div className="w-12 h-12 border-4 border-primary-50 border-t-primary-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-slate-100 border-t-[#1e1e62] rounded-full animate-spin" />
             </div>
           ) : plots.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/30 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/30 rounded-2xl border-2 border-dashed border-slate-200">
               <LandPlot size={48} className="text-slate-200 mb-4" />
               <p className="font-bold text-slate-900">No plots found</p>
             </div>
+          ) : viewMode === "table" ? (
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-in fade-in duration-300">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200">
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Plot No</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Project</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Phase</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Size</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Facing</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {plots.map((item) => {
+                      const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG.HOLD;
+                      const Icon = cfg.icon;
+
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-900 text-sm">
+                            {item.plotNumber}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-600 font-medium">
+                            {item.projectName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 font-medium">
+                            {item.phases ? `Phase ${item.phases}` : "—"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 font-medium">
+                            {item.sqrYards} sq yds
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 font-semibold">
+                            {toTitleCase(item.facing)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 font-medium">
+                            {toTitleCase(item.plotCategory)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${cfg.light} ${cfg.text}`}>
+                              <Icon size={12} />
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {!isAdmin && item.status === "AVAILABLE" && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setBookingRequestPlot(item);
+                                  }}
+                                  className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all"
+                                >
+                                  Request
+                                </button>
+                              )}
+
+                              {isAdmin && (
+                                <div className="relative inline-block text-left">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpenMenuId(openMenuId === item.id ? null : item.id);
+                                    }}
+                                    className="w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center"
+                                  >
+                                    <MoreVertical size={16} />
+                                  </button>
+                                  {openMenuId === item.id && (
+                                    <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] w-44 z-[100] py-2 px-1.5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                                      <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openView(item.id); }}
+                                        className="w-full text-left px-3 py-2 text-[11px] hover:bg-slate-50 text-slate-700 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                        <Eye size={14} className="text-slate-400" /> View Details
+                                      </button>
+                                      <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openEdit(item.id); }}
+                                        className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                        <Pencil size={14} /> Edit Details
+                                      </button>
+                                      
+                                      {item.status === "AVAILABLE" && (
+                                        <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setBookingId(item.id); }}
+                                          className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                          <Settings size={14} /> Book Plot
+                                        </button>
+                                      )}
+
+                                      {item.status === "BOOKED" && (
+                                        <>
+                                          <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setBookingPlanId(item.id); }}
+                                            className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                            <Settings size={14} /> Update Plan
+                                          </button>
+                                          <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setRegistrationId(item.id); }}
+                                            className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                            <Settings size={14} /> Register Plot
+                                          </button>
+                                        </>
+                                      )}
+
+                                      {item.status !== "AVAILABLE" && (
+                                        <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setStatusPlotId(item.id); setStatusDialogOpen(true); }}
+                                          className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                          <Settings size={14} /> Change Status
+                                        </button>
+                                      )}
+
+                                      <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setDeleteConfirm(item.id); }}
+                                        className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-red-50 text-red-600 flex items-center gap-3 font-bold rounded-xl transition-all mt-1 border-t border-slate-100 pt-2">
+                                        <Trash2 size={14} /> Delete Asset
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           ) : (
-            <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {plots.map((item) => {
-              const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG.HOLD;
-              const Icon = cfg.icon;
-              return (
-                <div key={item.id}
-                  className="group bg-white rounded-xl border border-slate-200 hover:shadow-xl hover:shadow-slate-200/50 hover:border-primary-200/50 transition-all duration-300 cursor-pointer relative"
-                  onClick={() => openView(item.id)}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {plots.map((item) => {
+                const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG.HOLD;
+                const Icon = cfg.icon;
+                return (
+                  <div key={item.id}
+                    className="group bg-white rounded-xl border border-slate-200 hover:shadow-xl hover:shadow-slate-200/50 hover:border-primary-200/50 transition-all duration-300 cursor-pointer relative flex flex-col justify-between h-full"
+                    onClick={() => openView(item.id)}>
 
+                    <div className="p-4 flex flex-col justify-between flex-1 h-full min-h-[170px]">
+                      <div className="space-y-3 flex-1">
+                        {/* Top row: plot number + status */}
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-2xl font-bold text-slate-900 tracking-tight leading-none">{item.plotNumber}</p>
+                            <p className="text-xs text-slate-400 mt-1 truncate max-w-[160px]" title={item.projectName}>{item.projectName}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            {isAdmin && (
+                              <div className="relative">
+                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
+                                  className="w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center justify-center">
+                                  <MoreVertical size={20} />
+                                </button>
+                                {openMenuId === item.id && (
+                                  <div className="absolute top-10 right-0 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] w-44 z-[100] py-2 px-1.5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                                    <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openView(item.id); }}
+                                      className="w-full text-left px-3 py-2 text-[11px] hover:bg-slate-50 text-slate-700 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                      <Eye size={14} className="text-slate-400" /> View Details
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openEdit(item.id); }}
+                                      className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                      <Pencil size={14} /> Edit Details
+                                    </button>
+                                    
+                                    {item.status === "AVAILABLE" && (
+                                      <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setBookingId(item.id); }}
+                                        className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                        <Settings size={14} /> Book Plot
+                                      </button>
+                                    )}
 
+                                    {item.status === "BOOKED" && (
+                                      <>
+                                        <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setBookingPlanId(item.id); }}
+                                          className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                          <Settings size={14} /> Update Plan
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setRegistrationId(item.id); }}
+                                          className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
+                                          <Settings size={14} /> Register Plot
+                                        </button>
+                                      </>
+                                    )}
 
-                  <div className="p-4 space-y-3">
-                    {/* Top row: plot number + status */}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-2xl font-black text-slate-900 tracking-tight leading-none">{item.plotNumber}</p>
-                        <p className="text-xs text-slate-400 mt-1 truncate max-w-[160px]" title={item.projectName}>{item.projectName}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        {isAdmin && (
-                          <div className="relative">
-                            <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
-                              className="w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center justify-center">
-                              <MoreVertical size={20} />
-                            </button>
-                            {openMenuId === item.id && (
-                              <div className="absolute top-10 right-0 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] w-44 z-[100] py-2 px-1.5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openView(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-slate-50 text-slate-700 flex items-center gap-3 font-bold rounded-xl transition-all">
-                                  <Eye size={14} className="text-slate-400" /> View Details
-                                </button>
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); openEdit(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all">
-                                  <Pencil size={14} /> Edit Details
-                                </button>
-                                <button onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenMenuId(null);
-                                  const action = item.status === "BOOKED" ? "plan"
-                                    : item.status === "REGISTERED" ? "status"
-                                      : item.status === "AVAILABLE" ? "book"
-                                        : "status";
-                                  if (action === "book") setBookingId(item.id);
-                                  else if (action === "plan") setBookingPlanId(item.id);
-                                  else { setStatusPlotId(item.id); setStatusDialogOpen(true); }
-                                }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-y border-slate-50 my-1">
-                                  <Settings size={14} />
-                                  {item.status === "AVAILABLE" ? "Book Plot" : item.status === "BOOKED" ? "Update Plan" : "Change Status"}
-                                </button>
-                                <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setDeleteConfirm(item.id); }}
-                                  className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-red-50 text-red-600 flex items-center gap-3 font-black rounded-xl transition-all mt-1">
-                                  <Trash2 size={14} /> Delete Asset
-                                </button>
+                                    {item.status !== "AVAILABLE" && (
+                                      <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setStatusPlotId(item.id); setStatusDialogOpen(true); }}
+                                        className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-primary-500/10 text-primary-600 flex items-center gap-3 font-bold rounded-xl transition-all border-t border-slate-100 pt-2">
+                                        <Settings size={14} /> Change Status
+                                      </button>
+                                    )}
+
+                                    <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setDeleteConfirm(item.id); }}
+                                      className="w-full text-left px-3 py-2.5 text-[11px] hover:bg-red-50 text-red-600 flex items-center gap-3 font-bold rounded-xl transition-all mt-1 border-t border-slate-100 pt-2">
+                                      <Trash2 size={14} /> Delete Asset
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                        )}
 
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${cfg.light} ${cfg.text}`}>
-                          <Icon size={12} />
-                          {item.status}
-                        </span>
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${cfg.light} ${cfg.text}`}>
+                              <Icon size={12} />
+                              {item.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Info chips */}
+                        <div className="flex flex-wrap gap-1">
+                          {item.phases && (
+                            <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                              Phase {item.phases}
+                            </span>
+                          )}
+                          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                            {item.sqrYards} sq yds
+                          </span>
+                          {item.facing && (
+                            <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                              {toTitleCase(item.facing)}
+                            </span>
+                          )}
+                          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                            {toTitleCase(item.plotCategory)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Request Booking Button or spacer */}
+                      <div className="mt-3 shrink-0 flex items-center justify-center min-h-[32px]">
+                        {!isAdmin && item.status === "AVAILABLE" ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // prevent opening the view modal
+                              setBookingRequestPlot(item);
+                            }}
+                            className="w-fit mx-auto px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+                          >
+                            Request Booking
+                          </button>
+                        ) : (
+                          <div className="h-[28px]" />
+                        )}
                       </div>
                     </div>
-
-                    {/* Info chips */}
-                    <div className="flex flex-wrap gap-1">
-                      {item.phases && (
-                        <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                          Phase {item.phases}
-                        </span>
-                      )}
-                      <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                        {item.sqrYards} sq yds
-                      </span>
-                      {item.facing && (
-                        <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                          {toTitleCase(item.facing)}
-                        </span>
-                      )}
-                      <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                        {toTitleCase(item.plotCategory)}
-                      </span>
-                    </div>
-
-
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* ════ PAGINATION ════ */}
           {totalPages > 1 && (
@@ -499,8 +731,6 @@ export default function Plots() {
           )}
         </>
       )}
-        </>
-      )}
 
       {/* DIALOGS */}
       {showForm && (
@@ -512,18 +742,18 @@ export default function Plots() {
           onStatusChange={handleStatusChange} />
       )}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[2000] animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-sm shadow-2xl space-y-6 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-rose-50 flex items-center justify-center mx-auto">
-               <Trash2 size={32} className="text-rose-500" />
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[2000] animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl space-y-6 text-center border border-slate-100">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto">
+               <Trash2 size={28} className="text-rose-500" />
             </div>
             <div>
-              <h3 className="text-2xl font-black text-slate-900">Delete Record?</h3>
-              <p className="text-slate-500 font-medium mt-2 leading-relaxed">This plot will be permanently removed from the database.</p>
+              <h3 className="text-xl font-bold text-slate-900">Delete Record?</h3>
+              <p className="text-slate-500 text-xs mt-2 leading-relaxed">This plot will be permanently removed from the database.</p>
             </div>
-            <div className="flex gap-4">
-              <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-6 py-3.5 border border-slate-100 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-              <button onClick={handleDelete} className="flex-1 px-6 py-3.5 bg-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 shadow-xl shadow-rose-200 transition-all">Delete</button>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 text-slate-600 transition-all">Cancel</button>
+              <button onClick={handleDelete} className="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Delete</button>
             </div>
           </div>
         </div>
@@ -532,6 +762,13 @@ export default function Plots() {
       {registrationId && (<PlotRegistrationDialog isOpen={!!registrationId} onClose={() => { setRegistrationId(null); refetch(); }} id={registrationId} />)}
       {showBulkForm && (<PlotBulkDialog isOpen={showBulkForm} onClose={() => setShowBulkForm(false)} projects={projectsList} />)}
       {bookingPlanId && (<PlotBookingPlanDialog isOpen={!!bookingPlanId} onClose={() => { setBookingPlanId(null); refetch(); }} plotId={bookingPlanId} />)}
+      {bookingRequestPlot && (
+        <PlotBookingRequestDialog
+          isOpen={!!bookingRequestPlot}
+          onClose={() => { setBookingRequestPlot(null); refetch(); }}
+          plot={bookingRequestPlot}
+        />
+      )}
     </div>
   );
 }

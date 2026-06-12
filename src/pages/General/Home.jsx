@@ -170,7 +170,8 @@ export default function Home() {
             <div className="text-2xl sm:text-3xl font-semibold text-slate-900 leading-tight">
               <Typewriter
                 onInit={(typewriter) => {
-                  typewriter.typeString(`Welcome to grupe, ${user?.firstName || 'Admin'}`).start();
+                  const nameStr = user?.firstName && user?.firstName !== "Company" ? `, ${user.firstName}` : "";
+                  typewriter.typeString(`Welcome to ${user?.companyName || 'Real Go'}${nameStr}`).start();
                 }}
                 options={{
                   delay: 70,
@@ -184,7 +185,7 @@ export default function Home() {
                 onInit={(typewriter) => {
                   typewriter
                     .pauseFor(1200)
-                    .typeString("Created by Brandwar")
+                    .typeString("Manage your organization and ventures")
                     .start();
                 }}
                 options={{

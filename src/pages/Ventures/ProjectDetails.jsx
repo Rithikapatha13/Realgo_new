@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useGetProjectById } from "@/hooks/useProject";
 import { updateProject, getAllProjectStatuses } from "../../services/project.service";
 import FileInput from "../../components/Common/FileUpload";
+import { useGetPhasesByProject, useCreatePhase, useUpdatePhase, useDeletePhase } from "../../hooks/usePhase";
+import { getUser, getUserType } from "../../services/auth.service";
 import {
     MapPin,
     CheckCircle2,
@@ -23,16 +25,34 @@ import {
     Video,
     Smartphone,
     Globe,
-    Settings
+    Settings,
+    GitBranch,
+    Check,
+    AlertCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ProjectDetails = ({ projectId, onClose }) => {
+    const _user = getUser();
+    const _userType = getUserType();
+    const userRole = (_user?.role?.toLowerCase() || _userType?.toLowerCase() || "").replace(/[\s_-]/g, "");
+    const isAdmin = ["admin", "companyadmin", "superadmin", "clientadmin"].includes(userRole);
     const { data: response, isLoading, refetch } = useGetProjectById(projectId);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState(null);
     const [projectStatuses, setProjectStatuses] = useState([]);
+
+    // Phase management state
+    const { data: phasesData, refetch: refetchPhases } = useGetPhasesByProject(projectId);
+    const createPhaseMutation = useCreatePhase();
+    const updatePhaseMutation = useUpdatePhase();
+    const deletePhaseMutation = useDeletePhase();
+    const [phaseInput, setPhaseInput] = useState("");
+    const [editingPhase, setEditingPhase] = useState(null); // { id, phaseName }
+    const [editPhaseInput, setEditPhaseInput] = useState("");
+    const [showPhaseInput, setShowPhaseInput] = useState(false);
+    const phaseInputRef = useRef(null);
 
     const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -738,6 +758,157 @@ const ProjectDetails = ({ projectId, onClose }) => {
                         {/* Subtle background decoration */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/10 rounded-full -translate-y-16 translate-x-16"></div>
                     </div>
+
+                    {/* ===== PHASE MANAGEMENT SECTION ===== */}
+                    <div className="mt-6 space-y-3">
+                        <div className="flex items-center justify-between px-1">
+                            <div className="flex items-center gap-2">
+                                <GitBranch className="w-4 h-4 text-indigo-500" />
+                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Project Phases</h4>
+                            </div>
+                            {isAdmin && (
+                                <button
+                                    onClick={() => { setShowPhaseInput(true); setTimeout(() => phaseInputRef.current?.focus(), 100); }}
+                                    className="flex items-center gap-1 text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-700 transition-colors"
+                                >
+                                    <Plus className="w-3 h-3" />
+                                    Add Phase
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Inline add phase input */}
+                        {showPhaseInput && isAdmin && (
+                            <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-200 rounded-xl animate-in fade-in duration-200">
+                                <input
+                                    ref={phaseInputRef}
+                                    value={phaseInput}
+                                    onChange={(e) => setPhaseInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && phaseInput.trim()) {
+                                            createPhaseMutation.mutate({ phaseName: phaseInput.trim(), projectId }, {
+                                                onSuccess: () => { setPhaseInput(""); setShowPhaseInput(false); refetchPhases(); }
+                                            });
+                                        }
+                                        if (e.key === "Escape") { setPhaseInput(""); setShowPhaseInput(false); }
+                                    }}
+                                    placeholder="Phase name (press Enter)"
+                                    className="flex-1 text-sm px-3 py-1.5 border border-indigo-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-300 bg-white font-medium"
+                                />
+                                <button
+                                    disabled={!phaseInput.trim() || createPhaseMutation.isPending}
+                                    onClick={() => {
+                                        if (!phaseInput.trim()) return;
+                                        createPhaseMutation.mutate({ phaseName: phaseInput.trim(), projectId }, {
+                                            onSuccess: () => { setPhaseInput(""); setShowPhaseInput(false); refetchPhases(); }
+                                        });
+                                    }}
+                                    className="p-1.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 disabled:opacity-40 transition-colors"
+                                >
+                                    <Check className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => { setPhaseInput(""); setShowPhaseInput(false); }}
+                                    className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Phase list */}
+                        <div className="space-y-2">
+                            {(phasesData?.items || []).length === 0 ? (
+                                <div className="flex items-center gap-2 p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-400">
+                                    <AlertCircle className="w-4 h-4" />
+                                    <span className="text-xs font-medium">No phases defined yet</span>
+                                </div>
+                            ) : (
+                                (phasesData?.items || []).map((phase) => (
+                                    <div
+                                        key={phase.id}
+                                        className="group flex items-center gap-2 p-3 bg-white border border-slate-100 rounded-xl hover:border-indigo-200 hover:bg-indigo-50/30 transition-all duration-200"
+                                    >
+                                        {editingPhase?.id === phase.id ? (
+                                            // Edit mode row
+                                            <>
+                                                <input
+                                                    value={editPhaseInput}
+                                                    onChange={(e) => setEditPhaseInput(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter" && editPhaseInput.trim()) {
+                                                            updatePhaseMutation.mutate({ id: phase.id, data: { phaseName: editPhaseInput.trim() } }, {
+                                                                onSuccess: () => { setEditingPhase(null); refetchPhases(); }
+                                                            });
+                                                        }
+                                                        if (e.key === "Escape") setEditingPhase(null);
+                                                    }}
+                                                    className="flex-1 text-sm px-2 py-1 border border-indigo-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-200 font-medium"
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    disabled={!editPhaseInput.trim() || updatePhaseMutation.isPending}
+                                                    onClick={() => {
+                                                        if (!editPhaseInput.trim()) return;
+                                                        updatePhaseMutation.mutate({ id: phase.id, data: { phaseName: editPhaseInput.trim() } }, {
+                                                            onSuccess: () => { setEditingPhase(null); refetchPhases(); }
+                                                        });
+                                                    }}
+                                                    className="p-1 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 disabled:opacity-40 transition-colors"
+                                                >
+                                                    <Check className="w-3 h-3" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingPhase(null)}
+                                                    className="p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            // View mode row
+                                            <>
+                                                <div className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0"></div>
+                                                <span className="flex-1 text-sm font-semibold text-slate-700">{phase.phaseName}</span>
+                                                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                                                    {phase._count?.plots ?? 0} plots
+                                                </span>
+                                                {isAdmin && (
+                                                    <div className="flex items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                        <button
+                                                            onClick={() => { setEditingPhase(phase); setEditPhaseInput(phase.phaseName || ""); }}
+                                                            className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                                        >
+                                                            <Pencil className="w-3 h-3" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (phase._count?.plots > 0) return;
+                                                                if (window.confirm(`Delete "${phase.phaseName}"? This cannot be undone.`)) {
+                                                                    deletePhaseMutation.mutate(phase.id, {
+                                                                        onSuccess: () => refetchPhases()
+                                                                    });
+                                                                }
+                                                            }}
+                                                            className={`p-1 rounded-md transition-colors ${
+                                                                phase._count?.plots > 0
+                                                                    ? "text-slate-200 cursor-not-allowed"
+                                                                    : "text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                                            }`}
+                                                            title={phase._count?.plots > 0 ? "Cannot delete — has plots assigned" : "Delete phase"}
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                    {/* ===== END PHASE MANAGEMENT ===== */}
 
                     {/* 4. Brochure Cabinet */}
                     <div className="space-y-3">

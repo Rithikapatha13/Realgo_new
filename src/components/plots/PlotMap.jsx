@@ -4,6 +4,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getPlotsMapData } from "../../services/plot.service";
 import { Loader2, X, Info, User, Maximize2, Minimize2, Map as MapIcon, Layers } from "lucide-react";
+import PlotBookingRequestDialog from "./PlotBookingRequestDialog";
+import PlotBookingDialog from "./PlotBookingDialog";
 
 // Normalize names for consistent matching
 const normalizeName = (name) => (name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -115,6 +117,16 @@ const PlotMap = ({ projectId, onBack, bounds, center = [500, 500], zoom = 0, min
     const [projectName, setProjectName] = useState("");
     const [selectedPlot, setSelectedPlot] = useState(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [bookingRequestOpen, setBookingRequestOpen] = useState(false);
+    const [bookingId, setBookingId] = useState(null);
+
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const isUserAdmin = ["admin", "accounts", "superadmin", "pro"].includes(
+        loggedInUser.role?.roleName?.toLowerCase() ||
+        loggedInUser.roleName?.toLowerCase() ||
+        loggedInUser.role?.toLowerCase() ||
+        loggedInUser.userType?.toLowerCase()
+    );
 
     useEffect(() => {
         fetchData();
@@ -262,12 +274,23 @@ const PlotMap = ({ projectId, onBack, bounds, center = [500, 500], zoom = 0, min
                                 )}
                             </div>
 
-                            {/* <button
-                                className="w-full mt-6 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98]"
-                               
-                            >
-                                View Full Record
-                            </button> */}
+                            {selectedPlot.status === "AVAILABLE" && (
+                                isUserAdmin ? (
+                                    <button
+                                        onClick={() => setBookingId(selectedPlot.id)}
+                                        className="w-full mt-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
+                                    >
+                                        Book Plot
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setBookingRequestOpen(true)}
+                                        className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
+                                    >
+                                        Request Booking
+                                    </button>
+                                )
+                            )}
                         </div>
                     </div>
                 </div>
@@ -289,6 +312,30 @@ const PlotMap = ({ projectId, onBack, bounds, center = [500, 500], zoom = 0, min
                     bounds={bounds}
                 />
             </MapContainer>
+
+            {bookingRequestOpen && selectedPlot && (
+                <PlotBookingRequestDialog
+                    isOpen={bookingRequestOpen}
+                    onClose={() => {
+                        setBookingRequestOpen(false);
+                        setSelectedPlot(null);
+                        fetchData();
+                    }}
+                    plot={{ ...selectedPlot, projectName }}
+                />
+            )}
+
+            {bookingId && (
+                <PlotBookingDialog
+                    isOpen={!!bookingId}
+                    onClose={() => {
+                        setBookingId(null);
+                        setSelectedPlot(null);
+                        fetchData();
+                    }}
+                    plotId={bookingId}
+                />
+            )}
         </div>
     );
 };

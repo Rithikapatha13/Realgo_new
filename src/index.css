@@ -2,8 +2,8 @@
 
 @theme {
   --color-primary-500: var(--primary-500);
-  --color-primary-600: var(--primary-600);
-  --color-primary-700: var(--primary-700);
+  --color-primary-600: color-mix(in srgb, var(--primary-500) 90%, black);
+  --color-primary-700: color-mix(in srgb, var(--primary-500) 80%, black);
   --color-secondary-500: var(--secondary-500);
 }
 

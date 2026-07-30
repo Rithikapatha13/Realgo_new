@@ -154,20 +154,17 @@ export default function Home() {
     <ErrorBoundary>
       <div className="space-y-5 min-h-screen pb-10">
         {/* ================= BANNER ================= */}
-        <div className="relative w-full h-[38vh] rounded-xl overflow-hidden shadow-sm">
-          {/* Image */}
-          <img
-            src="/assets/Banner/banner.jpg"
-            alt="Grupe Banner"
-            className="w-full h-full object-cover object-bottom"
-          />
-
-          {/* Very soft overlay */}
-          <div className="absolute inset-0 bg-white/20" />
-
-          {/* Text */}
-          <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14">
-            <div className="text-2xl sm:text-3xl font-semibold text-slate-900 leading-tight">
+        <div className="relative w-full h-[32vh] rounded-2xl overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 shadow-lg flex flex-col justify-center px-8 sm:px-14 group">
+          {/* Ambient glowing circles */}
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+          <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+          
+          <div className="relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 mb-4 uppercase">
+              Welcome Back
+            </span>
+            
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               <Typewriter
                 onInit={(typewriter) => {
                   const nameStr = user?.firstName && user?.firstName !== "Company" ? `, ${user.firstName}` : "";
@@ -178,22 +175,22 @@ export default function Home() {
                   cursor: "",
                 }}
               />
-            </div>
+            </h1>
 
-            <div className="mt-1 text-sm sm:text-base text-slate-800">
+            <p className="mt-2 text-sm sm:text-base text-slate-300 font-medium">
               <Typewriter
                 onInit={(typewriter) => {
                   typewriter
                     .pauseFor(1200)
-                    .typeString("Manage your organization and ventures")
+                    .typeString("Manage your organization, properties, and direct performance.")
                     .start();
                 }}
                 options={{
-                  delay: 50,
+                  delay: 40,
                   cursor: "",
                 }}
               />
-            </div>
+            </p>
           </div>
         </div>
 
@@ -250,55 +247,49 @@ export default function Home() {
         )}
 
         {/* ================= QUICK ACCESS ================= */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
           {isTelecaller || isTelecallerAdmin ? (
             <>
               <QuickAccessTile
                 title="Leads"
-                subtitle={`${crmStats?.total || 0} Total Leads`}
+                subtitle={`${crmStats?.total || 0} Leads`}
                 icon={Users}
-                bg="bg-blue-100"
-                iconBg="bg-blue-500"
+                theme="blue"
                 onClick={() => navigate("/leads")}
               />
               <QuickAccessTile
                 title="Pending"
                 subtitle={`${crmStats?.pending || 0} Leads`}
                 icon={Clock}
-                bg="bg-amber-100"
-                iconBg="bg-amber-500"
+                theme="amber"
                 onClick={() => navigate("/leads/pending")}
               />
               <QuickAccessTile
                 title="Follow-ups"
                 subtitle={`${crmStats?.followups || 0} Scheduled`}
                 icon={Activity}
-                bg="bg-purple-100"
-                iconBg="bg-purple-500"
+                theme="purple"
                 onClick={() => navigate("/leads/followups")}
               />
               <QuickAccessTile
                 title="Performance"
                 subtitle="View metrics"
                 icon={Activity}
-                bg="bg-indigo-100"
-                iconBg="bg-indigo-500"
+                theme="indigo"
                 onClick={() => navigate("/performance")}
               />
               <QuickAccessTile
                 title="My Team"
                 subtitle="Associates"
                 icon={UserCheck}
-                bg="bg-emerald-100"
-                iconBg="bg-emerald-500"
+                theme="emerald"
                 onClick={() => navigate("/myteam")}
               />
               <QuickAccessTile
                 title="Reports"
                 subtitle="CRM Analytics"
                 icon={Briefcase}
-                bg="bg-pink-100"
-                iconBg="bg-pink-500"
+                theme="pink"
                 onClick={() => navigate("/reports")}
               />
             </>
@@ -308,48 +299,42 @@ export default function Home() {
                 title="Projects"
                 subtitle="Manage ventures"
                 icon={Briefcase}
-                bg="bg-blue-100"
-                iconBg="bg-blue-500"
+                theme="blue"
                 onClick={() => navigate("/projects")}
               />
               <QuickAccessTile
                 title="Team"
                 subtitle="Your associates"
                 icon={Users}
-                bg="bg-purple-100"
-                iconBg="bg-purple-500"
+                theme="purple"
                 onClick={() => navigate("/myteam")}
               />
               <QuickAccessTile
                 title="Designs"
                 subtitle="Media & creatives"
                 icon={UserCheck}
-                bg="bg-pink-100"
-                iconBg="bg-pink-500"
+                theme="pink"
                 onClick={() => navigate("/greetings")}
               />
               <QuickAccessTile
                 title="News"
                 subtitle="Latest updates"
                 icon={Users}
-                bg="bg-emerald-100"
-                iconBg="bg-emerald-500"
+                theme="emerald"
                 onClick={() => navigate("/news")}
               />
               <QuickAccessTile
                 title="Reports"
                 subtitle="View analytics"
                 icon={Briefcase}
-                bg="bg-amber-100"
-                iconBg="bg-amber-500"
+                theme="amber"
                 onClick={() => navigate("/reports")}
               />
               <QuickAccessTile
                 title="Services"
                 subtitle="Manage offerings"
                 icon={ShieldCheck}
-                bg="bg-indigo-100"
-                iconBg="bg-indigo-500"
+                theme="indigo"
                 onClick={() => navigate("/services-home")}
               />
             </>
@@ -687,45 +672,71 @@ function MinimalKpi({ title, value, icon: Icon, onClick }) {
     <div
       onClick={onClick}
       className={`
-        bg-white/80
-        border border-slate-200
-        rounded-xl
-        px-4 py-3
-        flex items-center gap-3
-        ${onClick ? "cursor-pointer hover:shadow-md transition-shadow" : ""}
+        bg-white
+        border border-slate-200/80
+        rounded-2xl
+        p-5
+        flex items-center gap-4
+        shadow-sm hover:shadow-xl hover:-translate-y-0.5
+        transition-all duration-300
+        ${onClick ? "cursor-pointer" : ""}
       `}
     >
-
       {/* Icon */}
-      <div className="h-9 w-9 rounded-lg bg-secondary-500/10 flex items-center justify-center">
-        <Icon size={18} className="text-secondary-500" />
+      <div className="h-10 w-10 rounded-xl bg-indigo-50/60 text-indigo-600 border border-indigo-100/50 flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+        <Icon size={18} />
       </div>
 
       {/* Text */}
       <div>
-        <div className="text-xs text-slate-500">{title}</div>
-        <div className="text-xl font-semibold text-slate-900">{value}</div>
+        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</div>
+        <div className="text-2xl font-black text-slate-900 mt-0.5 tracking-tight">{value}</div>
       </div>
     </div>
   );
 }
 
-function QuickAccessTile({ title, subtitle, icon: Icon, bg, iconBg, onClick }) {
+function QuickAccessTile({ title, subtitle, icon: Icon, theme = "indigo", onClick }) {
+  const themes = {
+    blue: {
+      icon: "text-blue-600 bg-blue-50/80 border border-blue-100",
+      glow: "hover:border-blue-200 hover:shadow-blue-50/50"
+    },
+    purple: {
+      icon: "text-purple-600 bg-purple-50/80 border border-purple-100",
+      glow: "hover:border-purple-200 hover:shadow-purple-50/50"
+    },
+    pink: {
+      icon: "text-pink-600 bg-pink-50/80 border border-pink-100",
+      glow: "hover:border-pink-200 hover:shadow-pink-50/50"
+    },
+    emerald: {
+      icon: "text-emerald-600 bg-emerald-50/80 border border-emerald-100",
+      glow: "hover:border-emerald-200 hover:shadow-emerald-50/50"
+    },
+    amber: {
+      icon: "text-amber-600 bg-amber-50/80 border border-amber-100",
+      glow: "hover:border-amber-200 hover:shadow-amber-50/50"
+    },
+    indigo: {
+      icon: "text-indigo-600 bg-indigo-50/80 border border-indigo-100",
+      glow: "hover:border-indigo-200 hover:shadow-indigo-50/50"
+    }
+  };
+  const activeTheme = themes[theme] || themes.indigo;
+
   return (
     <div
       onClick={onClick}
-      className={`rounded-xl p-4 cursor-pointer transition hover:shadow-md ${bg}`}
+      className={`bg-white border border-slate-200/80 rounded-2xl p-5 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between ${activeTheme.glow}`}
     >
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-slate-800">{title}</p>
-        <div
-          className={`h-9 w-9 rounded-full ${iconBg} flex items-center justify-center text-white`}
-        >
-          <Icon size={16} />
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-bold text-slate-800 tracking-tight">{title}</span>
+        <div className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${activeTheme.icon}`}>
+          <Icon size={18} />
         </div>
       </div>
-
-      <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
+      <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
     </div>
   );
 }

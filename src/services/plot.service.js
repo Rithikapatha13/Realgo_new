@@ -62,7 +62,13 @@ export const getPlotsMapData = async (projectId) => {
     return data;
 };
 
+export const getPublicPlotsMapData = async (projectId) => {
+    const { data } = await apiClient.get(`/public/plots-map-data/${projectId}`);
+    return data;
+};
+
 export const importPlotsFromExcel = async (filePath, projectName, projectId, phases) => {
+
     const { data } = await apiClient.post(`/plots-excel-import`, {
         file_path: filePath,
         projectName,

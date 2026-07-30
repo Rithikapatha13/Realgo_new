@@ -73,17 +73,21 @@ import GrupeSrinivasamPlotsMap from "../pages/Ventures/plotmap/GrupeSrinivasamPl
 import GrupeLRGreenShieldsMap from "../pages/Ventures/plotmap/GrupeLRGreenShields";
 import GBApurvaHomesMap from "../pages/Ventures/plotmap/GBApurvaHomes";
 import AnvayUniversityCountyMap from "../pages/Ventures/plotmap/AnvayUniversityCounty";
+import PublicPlotMapView from "../pages/Ventures/PublicPlotMapView";
 
 import Admins from "./../pages/Administration/Admins";
 
 export const publicRoutes = {
   auth: {
     basePath: "",
-    routes: [{ path: "signup", component: Signup },
-    { path: "login", component: Login }
+    routes: [
+      { path: "signup", component: Signup },
+      { path: "login", component: Login },
+      { path: "public/map/:projectId", component: PublicPlotMapView }
     ],
   },
 };
+
 
 export const routeConfig = {
   General: {

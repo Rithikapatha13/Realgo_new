@@ -14,7 +14,8 @@ import {
   Sparkles,
   CheckCheck
 } from "lucide-react";
-import { getNotifications, markNotificationsRead } from "../../services/common.service";
+import { getNotifications, markNotificationsRead } from "@/services/common.service";
+import Button from "@/components/Common/Button";
 
 export default function Notifications() {
   const navigate = useNavigate();
@@ -114,27 +115,27 @@ export default function Notifications() {
     switch (type) {
       case "LEAD_ASSIGNMENT":
         return {
-          icon: <UserPlus size={18} className="text-blue-600" />,
+          icon: <UserPlus size={16} className="text-blue-600" />,
           bgColor: "bg-blue-50 border border-blue-100",
         };
       case "LEAD_TRANSFER":
         return {
-          icon: <ArrowLeftRight size={18} className="text-amber-600" />,
+          icon: <ArrowLeftRight size={16} className="text-amber-600" />,
           bgColor: "bg-amber-50 border border-amber-100",
         };
       case "LEAD_OUTCOME_UPDATE":
         return {
-          icon: <CheckCircle size={18} className="text-emerald-600" />,
+          icon: <CheckCircle size={16} className="text-emerald-600" />,
           bgColor: "bg-emerald-50 border border-emerald-100",
         };
       case "PLOT_BOOKED":
         return {
-          icon: <CheckCircle size={18} className="text-emerald-600" />,
+          icon: <CheckCircle size={16} className="text-emerald-600" />,
           bgColor: "bg-emerald-50 border border-emerald-100",
         };
       default:
         return {
-          icon: <Bell size={18} className="text-slate-600" />,
+          icon: <Bell size={16} className="text-slate-600" />,
           bgColor: "bg-slate-50 border border-slate-100",
         };
     }
@@ -147,14 +148,14 @@ export default function Notifications() {
 
     return (
       <div
-        className={`group p-5 rounded-2xl border transition-all duration-300 flex gap-4 text-left relative ${
+        className={`group p-4 rounded-xl border transition-all duration-300 flex gap-4 text-left relative bg-white shadow-sm hover:shadow-md ${
           !n.isRead
-            ? "bg-white border-primary-100 shadow-sm shadow-primary-50/30 hover:border-primary-200 hover:shadow-md"
-            : "bg-white/60 border-slate-100 hover:bg-white hover:border-slate-200"
+            ? "border-primary-500/20 bg-primary-50/5 hover:border-primary-500/40"
+            : "border-slate-200/80 hover:border-slate-300"
         }`}
       >
         {/* Left Icon */}
-        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${bgColor} shadow-sm group-hover:scale-105 transition-transform`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${bgColor} shadow-sm group-hover:scale-105 transition-transform`}>
           {icon}
         </div>
 
@@ -163,11 +164,11 @@ export default function Notifications() {
           <div className="flex items-center gap-2">
             <p className="text-sm font-bold text-slate-800 leading-snug">{n.title}</p>
             {!n.isRead && (
-              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full flex-shrink-0" />
+              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full flex-shrink-0 animate-pulse" />
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">{n.body}</p>
-          <div className="flex items-center gap-3 text-[10px] text-slate-400 mt-3 font-semibold">
+          <p className="text-xs text-slate-500 mt-1 leading-relaxed font-medium">{n.body}</p>
+          <div className="flex items-center gap-3 text-[10px] text-slate-400 mt-2 font-semibold">
             <span className="flex items-center gap-1"><Calendar size={11} /> {dateStr}</span>
             <span>•</span>
             <span className="flex items-center gap-1"><Clock size={11} /> {timeStr}</span>
@@ -176,7 +177,7 @@ export default function Notifications() {
 
         {/* Read Status Ribbon */}
         {!n.isRead && (
-          <div className="absolute top-5 right-5 w-2 h-2 bg-primary-500 rounded-full" />
+          <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-rose-500 rounded-full" />
         )}
       </div>
     );
@@ -185,28 +186,28 @@ export default function Notifications() {
   return (
     <div className="p-4 sm:p-6 bg-slate-50 min-h-screen">
       {/* Container */}
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Header Section */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-8 justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-2xl transition-all active:scale-95 flex items-center justify-center"
+              className="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl transition-all active:scale-95 flex items-center justify-center shadow-sm"
               title="Go Back"
             >
               <ArrowLeft size={18} />
             </button>
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-0.5">
                 <span className="px-2 py-0.5 bg-primary-50 text-primary-600 text-[9px] font-bold uppercase tracking-widest rounded">Center</span>
                 <span className="text-slate-300">/</span>
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Inbox</span>
               </div>
-              <h1 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                 Notification Hub
                 {unreadCount > 0 && (
-                  <span className="bg-rose-100 text-rose-600 text-xs font-black px-2.5 py-0.5 rounded-full">
+                  <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
                     {unreadCount} Unread
                   </span>
                 )}
@@ -215,30 +216,32 @@ export default function Notifications() {
           </div>
 
           {/* Quick Actions */}
-          <div className="flex items-center gap-2 self-start md:self-auto">
+          <div className="flex items-center gap-2 sm:ml-auto">
             {unreadCount > 0 && (
-              <button
+              <Button
                 onClick={handleMarkAllAsRead}
                 disabled={refreshing}
-                className="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl text-xs font-bold transition-all shadow-md shadow-primary-100 active:scale-95 flex items-center gap-2"
+                variant="primary"
+                className="flex items-center gap-2"
               >
-                <CheckCheck size={14} />
+                <CheckCheck size={16} />
                 <span>Mark All as Read</span>
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={() => fetchNotifications(true)}
               disabled={refreshing}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-2xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2"
+              variant="outline"
+              className="flex items-center gap-2"
             >
-              {refreshing ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              {refreshing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
               <span>Refresh</span>
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Filter & Search Panel */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row items-center gap-4 justify-between">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row items-center gap-4 justify-between">
           
           {/* Tabs */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -253,7 +256,7 @@ export default function Notifications() {
                   setFilterTab(tab.id);
                   setDisplayLimit(20);
                 }}
-                className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                   filterTab === tab.id
                     ? "bg-slate-800 text-white shadow-sm"
                     : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300"
@@ -282,7 +285,7 @@ export default function Notifications() {
                 setFilterQuery(e.target.value);
                 setDisplayLimit(20);
               }}
-              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 text-xs font-medium transition-all"
+              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 text-xs font-medium transition-all"
             />
             {filterQuery && (
               <button
@@ -298,7 +301,7 @@ export default function Notifications() {
         {/* Notifications Listing */}
         <div className="space-y-6">
           {loading ? (
-            <div className="bg-white rounded-3xl p-20 border border-slate-200 shadow-sm flex flex-col items-center justify-center">
+            <div className="bg-white rounded-xl p-20 border border-slate-200 shadow-sm flex flex-col items-center justify-center">
               <Loader2 size={32} className="animate-spin text-primary-500" />
               <p className="text-xs text-slate-400 mt-4 font-bold uppercase tracking-wider">Syncing Notifications...</p>
             </div>
@@ -351,7 +354,7 @@ export default function Notifications() {
                 <div className="pt-2 text-center">
                   <button
                     onClick={() => setDisplayLimit(prev => prev + 20)}
-                    className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                    className="px-6 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 transition-all shadow-sm active:scale-95"
                   >
                     Load More Notifications
                   </button>
@@ -359,8 +362,8 @@ export default function Notifications() {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm py-24 px-6 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-3xl flex items-center justify-center mb-5 shadow-sm text-slate-400">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-24 px-6 text-center flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mb-5 shadow-sm text-slate-400">
                 <Bell size={24} />
               </div>
               <h3 className="text-base font-bold text-slate-800">Your inbox is empty</h3>

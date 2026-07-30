@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreVertical, Search, Calendar, Trash2, CheckCircle2, ArrowLeft, Eye, Lock } from "lucide-react";
+import { MoreVertical, Search, Calendar, Trash2, CheckCircle2, ArrowLeft, Eye, Lock, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGetMyTeam, useDeleteRequestToAdmin, useInactiveRequestToAdmin } from "@/hooks/useTeam";
 import { LoadingIndicator } from "@/components";
@@ -20,7 +20,8 @@ export default function MyTeam() {
   const { data: teamMembers = [], isLoading, isError, refetch } = useGetMyTeam({
     search,
     from: fromDate,
-    to: toDate
+    to: toDate,
+    size: 100
   });
 
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -159,69 +160,70 @@ export default function MyTeam() {
         {teamMembers.map((user) => (
           <div
             key={user.id}
-            className="bg-white rounded-2xl border border-slate-200 p-5 relative hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group"
+            className="bg-white rounded-xl border border-slate-300 p-5 relative hover:shadow-lg hover:border-slate-400 transition-all duration-300 group flex items-center gap-5"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 overflow-hidden border-2 border-slate-50 flex-shrink-0">
-                {user.image ? (
-                  <img src={resolveImageUrl(user.image)} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-xl font-bold text-slate-300">
-                    {user.firstName?.[0]}{user.lastName?.[0]}
-                  </span>
-                )}
-              </div>
-              <div className="absolute top-4 right-4">
-                <button
-                  onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
-                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                >
-                  <MoreVertical size={18} />
-                </button>
-                {openMenuId === user.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-10 right-0 bg-white border border-slate-100 rounded-xl shadow-xl w-48 z-20 py-1.5 animate-in fade-in zoom-in duration-200">
-                      <button onClick={() => handleView(user)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
-                        <Eye size={16} className="text-indigo-500" /> View Profile
-                      </button>
-                      <button onClick={() => handleDeleteClick(user)} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors">
-                        <Trash2 size={16} /> Delete Request
-                      </button>
-                      <button onClick={() => handleInactiveClick(user)} className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 transition-colors">
-                        <Lock size={16} /> Inactive Request
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="font-bold text-slate-900 group-hover:text-primary-500 transition-colors">
-                {user.firstName} {user.lastName}
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2 py-0.5 bg-primary-500/10 text-primary-500 rounded-full">
-                  {user.role?.roleName || "No Role"}
+            {/* Profile Photo */}
+            <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-slate-400 overflow-hidden border border-slate-200 flex-shrink-0 shadow-sm group-hover:scale-105 transition-all duration-300">
+              {user.image ? (
+                <img src={resolveImageUrl(user.image)} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl font-bold text-slate-300">
+                  {user.firstName?.[0]}{user.lastName?.[0]}
                 </span>
-                {user.status === "VERIFIED" && (
-                  <span className="flex items-center gap-1 text-[10px] text-green-600 font-bold tracking-wider uppercase">
-                    <CheckCircle2 size={10} /> Verified
-                  </span>
-                )}
-              </div>
+              )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <div className="text-xs text-slate-400">
-                <p className="font-medium text-slate-500">{user.phone}</p>
-                <p className="mt-0.5">{user.company?.company || "Real Go"}</p>
+            {/* Text Info */}
+            <div className="flex-1 min-w-0 pr-6">
+              <div className="flex items-center gap-1.5">
+                <h3 className="font-bold text-slate-900 group-hover:text-primary-500 transition-colors text-lg truncate leading-snug">
+                  {user.firstName} {user.lastName}
+                </h3>
+                {user.status === "VERIFIED" && (
+                  <CheckCircle2 size={16} className="text-emerald-500 fill-emerald-50 flex-shrink-0" title="Verified Member" />
+                )}
               </div>
+              
+              <p className="text-sm font-medium text-slate-500 mt-0.5">
+                {user.role?.roleName || "No Role"}
+              </p>
 
-              <div className="flex gap-2">
-                {/* Action placeholders */}
-              </div>
+              {user.teamHeadName && (
+                <p className="text-xs text-slate-400 font-medium mt-1">
+                  Reporting to: <span className="text-slate-600 font-bold">{user.teamHeadName}</span>
+                </p>
+              )}
+
+              <p className="text-xs font-semibold text-slate-400 flex items-center gap-1.5 mt-2">
+                <Phone size={12} className="text-slate-300" />
+                <span>{user.phone}</span>
+              </p>
+            </div>
+
+            {/* Actions Menu */}
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+              >
+                <MoreVertical size={16} />
+              </button>
+              {openMenuId === user.id && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                  <div className="absolute top-8 right-0 bg-white border border-slate-100 rounded-xl shadow-xl w-48 z-20 py-1.5 animate-in fade-in zoom-in duration-200">
+                    <button onClick={() => handleView(user)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                      <Eye size={16} className="text-indigo-500" /> View Profile
+                    </button>
+                    <button onClick={() => handleDeleteClick(user)} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors">
+                      <Trash2 size={16} /> Delete Request
+                    </button>
+                    <button onClick={() => handleInactiveClick(user)} className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 transition-colors">
+                      <Lock size={16} /> Inactive Request
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ))}
